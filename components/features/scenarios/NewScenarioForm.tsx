@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Resolver } from "react-hook-form";
 import { z } from "zod";
 
 // --- 外部で定義する型やスキーマ ---
@@ -55,7 +55,7 @@ type ScenarioFormValues = z.infer<typeof formSchema>;
 
 export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
   const form = useForm<ScenarioFormValues>({
-    resolver: zodResolver(formSchema) as any,
+    resolver: zodResolver(formSchema) as Resolver<ScenarioFormValues>,
     defaultValues: {
       title: "",
       playerMin: 1,
