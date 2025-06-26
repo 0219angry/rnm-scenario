@@ -1,14 +1,13 @@
 #!/bin/bash
 
-echo "VERCEL_GIT_COMMIT_REF: $VERCEL_GIT_COMMIT_REF"
-
-if [[ "$VERCEL_GIT_COMMIT_REF" == "develop" ]] ; then
-  # Proceed with the build
-  echo "✅ - Build can proceed"
+# ブランチが "develop" または "main" の場合
+if [[ "$VERCEL_GIT_COMMIT_REF" == "develop" || "$VERCEL_GIT_COMMIT_REF" == "main" ]] ; then
+  # ビルドを実行する
+  echo "✅ - Build can proceed for branch: $VERCEL_GIT_COMMIT_REF"
   exit 1;
 
 else
-  # Don't build
-  echo "🛑 - Build cancelled"
+  # それ以外のブランチはビルドをキャンセルする
+  echo "🛑 - Build cancelled for branch: $VERCEL_GIT_COMMIT_REF"
   exit 0;
 fi
