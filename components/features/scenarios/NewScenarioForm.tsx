@@ -55,7 +55,7 @@ type ScenarioFormValues = z.infer<typeof formSchema>;
 
 export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
   const form = useForm<ScenarioFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       title: "",
       playerMin: 1,
