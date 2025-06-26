@@ -12,6 +12,9 @@ const notoSansJp = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "シナリオ管理アプリ",
   description: "マーダーミステリーやTRPGのシナリオとセッションを管理するアプリです。",
+  icons: {
+    icon: '/favicon.ico', // ← ここ！
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +31,7 @@ export default function RootLayout({
             {children}
           </main>
           <footer className="bg-gray-200 p-4 text-center">
-            <p>© 2025 シナリオ管理</p>
+            <p>© 2025 RNM</p>
           </footer>
         </div>
       </body>
