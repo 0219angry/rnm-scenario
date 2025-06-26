@@ -5,7 +5,8 @@ import prisma from "./prisma";
 import { redirect } from "next/navigation";
 
 export async function getCurrentUser() {
-  const sessionToken = cookies().get("sessionToken")?.value;
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get("sessionToken")?.value;
 
   if (!sessionToken) {
     return null;
@@ -24,12 +25,13 @@ export async function getCurrentUser() {
 }
 
 export async function logout() {
-  const sessionToken = cookies().get("sessionToken")?.value;
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get("sessionToken")?.value;
   if (sessionToken) {
     await prisma.userSession.deleteMany({
       where: { sessionToken },
     });
-    cookies().delete("sessionToken");
+    cookieStore.delete("sessionToken");
   }
   redirect("/");
 }

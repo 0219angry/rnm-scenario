@@ -7,20 +7,33 @@ type Props = {
   };
 };
 
-export default async function UserProfilePage({ params }: Props) {
+export default async function UserProfilePage(props: Props) {
+  const username = props.params.username;
+
   const user = await prisma.user.findUnique({
-    where: { username: params.username },
+    where: { username },
   });
 
   if (!user) {
-    notFound();
+    return <div>ユーザーが見つかりませんでした…😢</div>;
   }
 
   return (
+<main className="max-w-xl mx-auto mt-12 px-4">
+  <h1 className="text-2xl font-bold mb-4">
+    {user.name ?? user.username}さんのプロフィール
+  </h1>
+
+  <div className="flex items-center gap-4">
+    <img
+      src={user.image ?? `https://avatar.vercel.sh/${user.id}`}
+      alt="プロフィール画像"
+      className="w-32 h-32 rounded-full object-cover"
+    />
     <div>
-      <h1>{user.name}</h1>
-      <p>@{user.username}</p>
-      {/* ここに詳細情報を追加していきますわ */}
+      <p className="text-gray-700 font-semibold text-lg">@{user.username}</p>
     </div>
+  </div>
+</main>
   );
 }
