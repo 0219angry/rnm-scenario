@@ -6,51 +6,35 @@ import { z } from "zod";
 
 // --- 外部で定義する型やスキーマ ---
 
-/**
- * ジャンルのEnum定義
- * PrismaのEnumと一致させる必要があります。
- */
 export enum Genre {
   MADAMIS = "マダミス",
   TRPG = "TRPG",
   OTHER = "その他",
 }
 
-/**
- * コンポーネントが受け取るルールブック情報の型
- */
 type Rulebook = {
   id: string;
   name: string;
 };
 
-/**
- * NewScenarioFormコンポーネントのPropsの型
- */
 interface NewScenarioFormProps {
   rulebooks: Rulebook[];
-  // ownerIdは通常、認証状態から取得するためpropsで渡す必要はありません。
 }
 
-/**
- * フォームのバリデーションスキーマ定義 (Zod)
- */
-const formSchema = z.object({
+export const formSchema = z.object({
   title: z.string().min(1, "タイトルは必須です"),
-  playerMin: z.coerce.number().int("整数で入力してください").positive("1以上の数値を入力してください"),
-  playerMax: z.coerce.number().int("整数で入力してください").positive("1以上の数値を入力してください"),
-  requiresGM: z.boolean().default(false),
+  playerMin: z.coerce.number().int().positive("1人以上で入力してください"),
+  playerMax: z.coerce.number().int().positive("1人以上で入力してください"),
+  requiresGM: z.boolean().default(false), // .default() を付けるのが重要
   genre: z.nativeEnum(Genre, {
     errorMap: () => ({ message: "ジャンルを選択してください" }),
   }),
-  averageTime: z.coerce.number().int("整数で入力してください").positive("1分以上で入力してください"),
-  // preprocessを使い、空文字が送信された場合にundefinedに変換する
+  averageTime: z.coerce.number().int().positive("1分以上で入力してください"),
   distribution: z.preprocess(
     (val) => (val === "" ? undefined : val),
     z.string().url("有効なURLを入力してください").optional()
   ),
-  isPublic: z.boolean().default(true),
-  // preprocessを使い、未選択（空文字）の場合にundefinedに変換する
+  isPublic: z.boolean().default(true), // .default() を付けるのが重要
   rulebookId: z.preprocess(
     (val) => (val === "" ? undefined : val),
     z.string().optional()
@@ -61,20 +45,17 @@ const formSchema = z.object({
   ),
 }).refine(data => data.playerMax >= data.playerMin, {
   message: "最大プレイヤー人数は最低プレイヤー人数以上である必要があります",
-  path: ["playerMax"], // エラーを表示するフィールド
+  path: ["playerMax"],
 });
 
-// ZodスキーマからTypeScriptの型を推論
 type ScenarioFormValues = z.infer<typeof formSchema>;
 
 
 // --- Reactコンポーネント定義 ---
 
 export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
-  // react-hook-formの初期化
   const form = useForm<ScenarioFormValues>({
     resolver: zodResolver(formSchema),
-    // defaultValuesはフォームの初期表示に使われる
     defaultValues: {
       title: "",
       playerMin: 1,
@@ -89,16 +70,8 @@ export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
     },
   });
 
-  // フォーム送信時の処理
   async function onSubmit(values: ScenarioFormValues) {
-    // valuesはZodによって型安全性が保証され、preprocessによって整形済み
     console.log("送信されるデータ:", values);
-    
-    // TODO: ここでAPIへの送信処理を実装します。
-    // ownerIdなどもこのタイミングで追加できます。
-    // const dataToSend = { ...values, ownerId: "現在のユーザーID" };
-    // await fetch('/api/scenarios', { method: 'POST', body: JSON.stringify(dataToSend) });
-    
     alert("シナリオが登録されました（仮）");
   }
 
@@ -106,17 +79,14 @@ export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
     <div className="w-full max-w-2xl p-8 space-y-8 bg-white rounded-xl shadow-md">
       <h2 className="text-2xl font-bold text-center text-gray-800">新しいシナリオを登録</h2>
       
-      {/* novalidate を指定し、ブラウザのデフォルトバリデーションを無効化 */}
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-6">
-        
-        {/* シナリオ名 */}
+        {/* ----- 以下、JSX部分は変更なし ----- */}
         <div>
           <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-700">シナリオ名</label>
           <input id="title" {...form.register("title")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
           {form.formState.errors.title && <p className="mt-1 text-xs text-red-500">{form.formState.errors.title.message}</p>}
         </div>
 
-        {/* プレイヤー人数 */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
             <label htmlFor="playerMin" className="block mb-2 text-sm font-medium text-gray-700">最低プレイヤー人数</label>
@@ -130,7 +100,6 @@ export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
           </div>
         </div>
         
-        {/* ジャンルとルールブック */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
             <label htmlFor="genre" className="block mb-2 text-sm font-medium text-gray-700">ジャンル</label>
@@ -165,21 +134,18 @@ export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
           </div>
         </div>
 
-        {/* 想定時間 */}
         <div>
           <label htmlFor="averageTime" className="block mb-2 text-sm font-medium text-gray-700">想定時間（分）</label>
           <input id="averageTime" type="number" inputMode="numeric" {...form.register("averageTime")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
           {form.formState.errors.averageTime && <p className="mt-1 text-xs text-red-500">{form.formState.errors.averageTime.message}</p>}
         </div>
 
-        {/* 配布先URL */}
         <div>
           <label htmlFor="distribution" className="block mb-2 text-sm font-medium text-gray-700">配布先URL（任意）</label>
           <input id="distribution" type="url" placeholder="https://example.com" {...form.register("distribution")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
           {form.formState.errors.distribution && <p className="mt-1 text-xs text-red-500">{form.formState.errors.distribution.message}</p>}
         </div>
         
-        {/* チェックボックス */}
         <div className="flex items-center space-x-4">
           <div className="flex items-center">
             <input id="requiresGM" type="checkbox" {...form.register("requiresGM")} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" />
@@ -191,7 +157,6 @@ export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
           </div>
         </div>
         
-        {/* コメント */}
         <div>
           <label htmlFor="comment" className="block mb-2 text-sm font-medium text-gray-700">コメント（任意）</label>
           <textarea
@@ -205,7 +170,6 @@ export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
           )}
         </div>
 
-        {/* 送信ボタン */}
         <button 
           type="submit"
           disabled={form.formState.isSubmitting} 
