@@ -12,6 +12,7 @@ const formSchema = z.object({
   averageTime: z.coerce.number().int().min(1, "想定時間は1分以上である必要があります"),
   distribution: z.string().url("有効なURLを入力してください").optional().or(z.literal('')),
   isPublic: z.boolean().default(true),
+  comment: z.string().max(1000, "コメントは1000文字以内で入力してください").optional(),
 }).refine(data => data.playerMax >= data.playerMin, {
   message: "最大プレイヤー人数は最低プレイヤー人数以上である必要があります",
   path: ["playerMax"],
@@ -28,6 +29,7 @@ export function NewScenarioForm() {
       averageTime: 60,
       distribution: "",
       isPublic: true,
+      comment: "",
     },
   });
 
@@ -82,8 +84,27 @@ export function NewScenarioForm() {
             <label htmlFor="isPublic" className="ml-2 text-sm font-medium text-gray-700">公開</label>
           </div>
         </div>
+        
+        <div>
+          <label htmlFor="comment" className="block mb-2 text-sm font-medium text-gray-700">コメント</label>
+          <textarea
+            id="comment"
+            rows={4}
+            {...form.register("comment")}
+            className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          {form.formState.errors.comment && (
+            <p className="text-red-500 text-xs mt-1">{form.formState.errors.comment.message}</p>
+          )}
+        </div>
 
-        <button type="submit" className="w-full py-2 font-bold text-white bg-blue-400 rounded-md hover:bg-blue-500 transition-colors">登録する</button>
+        <button 
+          type="submit"
+          disabled={form.formState.isSubmitting} 
+          className="w-full py-2 font-bold text-white bg-blue-400 rounded-md hover:bg-blue-500 transition-colors"
+        >
+          登録する
+        </button>
       </form>
     </div>
   );
