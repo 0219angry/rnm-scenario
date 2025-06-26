@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { logout } from "@/lib/auth";
 import { User } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export function UserMenu({ user }: { user: User }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,7 +27,7 @@ export function UserMenu({ user }: { user: User }) {
   return (
     <div className="relative" ref={dropdownRef}>
       <button onClick={() => setIsOpen(!isOpen)} className="flex items-center focus:outline-none">
-        <img
+        <Image
           src={user.image ?? `https://avatar.vercel.sh/${user.id}`}
           alt="User Icon"
           className="w-8 h-8 rounded-full"

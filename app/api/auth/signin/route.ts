@@ -6,6 +6,7 @@ import { cookies } from 'next/headers';
 export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json();
+    const cookieStore = await cookies();
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    cookies().set('sessionToken', session.sessionToken, {
+    cookieStore.set('sessionToken', session.sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 24 * 60 * 60,
