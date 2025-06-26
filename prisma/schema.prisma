@@ -98,6 +98,7 @@ model Scenario {
   genre         Genre
   averageTime   Int       // 所要時間（分）
   distribution  String?   // 配布先URL
+  content       String?   // シナリオ内容（Markdownなど）
   isPublic      Boolean   @default(true)
 
   rulebook      Rulebook? @relation(fields: [rulebookId], references: [id])
