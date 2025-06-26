@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
   const users = await prisma.user.findMany({
