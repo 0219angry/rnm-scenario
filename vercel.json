@@ -1,0 +1,3 @@
+{
+  "buildCommand": "if [ \"$VERCEL_GIT_BRANCH\" = \"release\" ]; then npm run build; else echo 'Skip build'; fi"
+}
