@@ -9,16 +9,16 @@ import { z } from "zod";
 // Prismaのモデルに合わせて、GenreのEnumを定義します。
 // プロジェクトの実際のEnum定義に合わせてください。
 export enum Genre {
-  MADAMIS = "MADAMIS",
+  MADAMIS = "マダミス",
   TRPG = "TRPG",
-  OTHER = "OTHER",
+  OTHER = "その他",
 }
 
 // コンポーネントが受け取るpropsの型を定義します。
 // Rulebookモデルのidとタイトル（または名前）を想定しています。
 type Rulebook = {
   id: string;
-  title: string;
+  name: string;
 };
 
 interface NewScenarioFormProps {
@@ -58,7 +58,7 @@ export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
       playerMax: 1,
       requiresGM: false,
       // genreのデフォルト値を追加
-      genre: Genre.MYSTERY,
+      genre: Genre.MADAMIS,
       averageTime: 60,
       distribution: "",
       isPublic: true,
@@ -128,7 +128,7 @@ export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
               <option value="">選択しない</option>
               {rulebooks.map((rulebook) => (
                 <option key={rulebook.id} value={rulebook.id}>
-                  {rulebook.title}
+                  {rulebook.name}
                 </option>
               ))}
             </select>

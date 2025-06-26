@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import prisma from "./prisma";
+import { prisma } from "./prisma";
 import { redirect } from "next/navigation";
 
 export async function getCurrentUser() {
