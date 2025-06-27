@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import ScenarioList from '@/components/features/scenarios/ScenarioList';
 import ScenarioFilter from '@/components/features/scenarios/ScenarioFilter';
 import { fetchScenarios } from '@/lib/data'; // 作成した関数をインポート
+import Link from 'next/link';
 
 type ScenariosPageProps = {
   params: Promise<{ [key: string]: string }>;
@@ -18,12 +19,12 @@ export default async function ScenariosPage({
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">シナリオ一覧</h1>
-        <a
+        <Link
           href="/scenarios/new"
           className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
         >
           ＋ 新規作成
-        </a>
+        </Link>
       </div>
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="w-full md:w-1/4">

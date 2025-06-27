@@ -1,15 +1,8 @@
 import { fetchScenarioById } from "@/lib/data";
 import { notFound } from "next/navigation";
-import { Genre } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
 import { GenreTag } from "@/components/ui/GenreTag";
-
-const genreMap = {
-  [Genre.MADAMIS]: 'マダミス',
-  [Genre.TRPG]: 'TRPG',
-  [Genre.OTHER]: 'その他',
-};
 
 export default async function ScenarioDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
