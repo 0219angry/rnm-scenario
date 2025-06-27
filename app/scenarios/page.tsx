@@ -11,7 +11,7 @@ type ScenariosPageProps = {
 
 export default async function ScenariosPage({ searchParams }: ScenariosPageProps) {
   // 分離したデータ取得関数を呼び出す
-  const scenarios = await fetchScenarios(searchParams);
+  const scenarios = fetchScenarios(searchParams);
 
   return (
     <div className="container mx-auto p-4">
