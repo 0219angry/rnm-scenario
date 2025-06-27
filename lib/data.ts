@@ -68,3 +68,14 @@ export async function fetchScenarios(searchParams: NextSearchParams) {
     return [];
   }
 }
+
+export async function fetchScenarioById(id: string) {
+  console.log("Fetching scenario with ID:", id);
+  return await prisma.scenario.findUnique({
+    where: { id },
+    include: {
+      rulebook: true,
+      owner: true,
+    },
+  });
+}
