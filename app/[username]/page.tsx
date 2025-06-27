@@ -1,28 +1,26 @@
 import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-
-export const dynamic = 'force-dynamic';
+import type { PageProps } from "@/types"; // ★ ステップ2で作成した共通の型をインポート
 
 export async function generateStaticParams() {
   const users = await prisma.user.findMany({
+    where: { username: { not: null } },
     select: { username: true },
   });
 
-  return users
-    .filter((user): user is { username: string } => !!user.username)
-    .map((user) => ({
-      username: user.username,
-    }));
-}
-  
-interface PageProps {
-  params: {
-    username: string;
-  };
+  return users.map((user) => ({
+    username: user.username!,
+  }));
 }
 
+
+// ★ インポートした共通のPagePropsを使います
 export default async function UserProfilePage({ params }: PageProps) {
+  // paramsがオプショナル(?)なので、存在しないケースを考慮
+  if (!params?.username) {
+    notFound();
+  }
   const { username } = params;
 
   const user = await prisma.user.findUnique({
