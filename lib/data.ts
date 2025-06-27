@@ -4,11 +4,7 @@ import { Genre, Prisma } from '@prisma/client';
 /**
  * URLの検索パラメータの型定義
  */
-export type ScenarioSearchParams = {
-  genre?: string;
-  player_num?: string;
-  gm?: 'required' | 'optional' | '';
-};
+type NextSearchParams = { [key: string]: string | string[] | undefined };
 
 /**
  * 文字列がPrismaのGenre enumに存在するかをチェックする型ガード
@@ -24,8 +20,11 @@ function isValidGenre(genre: string): genre is Genre {
  * @param searchParams URLから受け取った検索パラメータ
  * @returns 条件に一致するシナリオの配列
  */
-export async function fetchScenarios(searchParams: ScenarioSearchParams) {
-  const { genre, player_num, gm } = searchParams;
+export async function fetchScenarios(searchParams: NextSearchParams) {
+  // ★ 配列の可能性を考慮して、値を取り出す
+  const genre = Array.isArray(searchParams.genre) ? searchParams.genre[0] : searchParams.genre;
+  const player_num = Array.isArray(searchParams.player_num) ? searchParams.player_num[0] : searchParams.player_num;
+  const gm = Array.isArray(searchParams.gm) ? searchParams.gm[0] : searchParams.gm;
 
   const where: Prisma.ScenarioWhereInput = {};
 

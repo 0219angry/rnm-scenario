@@ -1,10 +1,12 @@
 import { Suspense } from 'react';
 import ScenarioList from '@/components/features/scenarios/ScenarioList';
 import ScenarioFilter from '@/components/features/scenarios/ScenarioFilter';
-import { fetchScenarios, ScenarioSearchParams } from '@/lib/data'; // 作成した関数をインポート
+import { fetchScenarios } from '@/lib/data'; // 作成した関数をインポート
 
 type ScenariosPageProps = {
-  searchParams: ScenarioSearchParams;
+  // params は動的ルート（例: /scenarios/[id]）用。今回は使わないが含めておくのが一般的
+  params: { [key: string]: string };
+  searchParams: { [key:string]: string | string[] | undefined };
 };
 
 export default async function ScenariosPage({ searchParams }: ScenariosPageProps) {
