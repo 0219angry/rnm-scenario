@@ -4,7 +4,7 @@ import { Genre, Prisma } from '@prisma/client';
 /**
  * URLの検索パラメータの型定義
  */
-type NextSearchParams = { [key: string]: string | string[] | undefined };
+type NextSearchParams = { [key:string]: string | string[] | undefined };
 
 /**
  * 文字列がPrismaのGenre enumに存在するかをチェックする型ガード
