@@ -16,7 +16,15 @@ export default async function ScenariosPage({
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">シナリオ一覧</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">シナリオ一覧</h1>
+        <a
+          href="/scenarios/new"
+          className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
+        >
+          ＋ 新規作成
+        </a>
+      </div>
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="w-full md:w-1/4">
           {/*
