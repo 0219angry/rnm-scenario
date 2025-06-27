@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import type { PageProps } from "@/types"; // ★ ステップ2で作成した共通の型をインポート
 
 export async function generateStaticParams() {
   const users = await prisma.user.findMany({
@@ -10,18 +9,24 @@ export async function generateStaticParams() {
   });
 
   return users.map((user) => ({
-    username: user.username!,
+    params: {
+      username: user.username!,
+    },
   }));
 }
 
 
-// ★ インポートした共通のPagePropsを使います
-export default async function UserProfilePage({ params }: PageProps) {
-  // paramsがオプショナル(?)なので、存在しないケースを考慮
-  if (!params?.username) {
+export default async function UserProfilePage({
+    params,
+  }: {
+    params: Promise<{ username: string }>;
+  }) {
+
+  const { username } = await params;
+    // paramsがオプショナル(?)なので、存在しないケースを考慮
+  if (!username) {
     notFound();
   }
-  const { username } = params;
 
   const user = await prisma.user.findUnique({
     where: { username },

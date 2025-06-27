@@ -4,14 +4,15 @@ import ScenarioFilter from '@/components/features/scenarios/ScenarioFilter';
 import { fetchScenarios } from '@/lib/data'; // 作成した関数をインポート
 
 type ScenariosPageProps = {
-  // params は動的ルート（例: /scenarios/[id]）用。今回は使わないが含めておくのが一般的
-  params: { [key: string]: string };
-  searchParams: { [key:string]: string | string[] | undefined };
+  params: Promise<{ [key: string]: string }>;
+  searchParams: Promise<{ [key:string]: string | string[] | undefined }>;
 };
 
-export default async function ScenariosPage({ searchParams }: ScenariosPageProps) {
+export default async function ScenariosPage({
+   searchParams
+}: ScenariosPageProps) {
   // 分離したデータ取得関数を呼び出す
-  const scenarios = await fetchScenarios(searchParams);
+  const scenarios = await fetchScenarios(await searchParams);
 
   return (
     <div className="container mx-auto p-4">

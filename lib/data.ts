@@ -12,7 +12,7 @@ type NextSearchParams = { [key:string]: string | string[] | undefined };
  * @returns Genre型であればtrue、そうでなければfalse
  */
 function isValidGenre(genre: string): genre is Genre {
-  return Object.values(Genre).includes(genre);
+  return Object.values(Genre).includes(genre as Genre);
 }
 
 /**
