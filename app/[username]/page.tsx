@@ -17,13 +17,13 @@ export async function generateStaticParams() {
 }
   
 interface PageProps {
-  params: Promise<{
+  params: {
     username: string;
-  }>;
+  };
 }
 
 export default async function UserProfilePage({ params }: PageProps) {
-  const { username } = await params;
+  const { username } = params;
 
   const user = await prisma.user.findUnique({
     where: { username },
