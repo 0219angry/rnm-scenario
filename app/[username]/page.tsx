@@ -2,28 +2,31 @@ import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-export const dynamic = 'force-dynamic';
-
 export async function generateStaticParams() {
   const users = await prisma.user.findMany({
+    where: { username: { not: null } },
     select: { username: true },
   });
 
-  return users
-    .filter((user): user is { username: string } => !!user.username)
-    .map((user) => ({
-      username: user.username,
-    }));
-}
-  
-interface PageProps {
-  params: Promise<{
-    username: string;
-  }>;
+  return users.map((user) => ({
+    params: {
+      username: user.username!,
+    },
+  }));
 }
 
-export default async function UserProfilePage({ params }: PageProps) {
+
+export default async function UserProfilePage({
+    params,
+  }: {
+    params: Promise<{ username: string }>;
+  }) {
+
   const { username } = await params;
+    // paramsがオプショナル(?)なので、存在しないケースを考慮
+  if (!username) {
+    notFound();
+  }
 
   const user = await prisma.user.findUnique({
     where: { username },
