@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { Genre } from '@prisma/client';
+import { Genre, Prisma } from '@prisma/client';
 import { Suspense } from 'react';
 import ScenarioList from '@/components/features/scenarios/ScenarioList';
 import ScenarioFilter from '@/components/features/scenarios/ScenarioFilter';
@@ -17,7 +17,7 @@ export default async function ScenariosPage({
 }) {
   const { genre, player_num, gm } = searchParams;
 
-  const where: any = {};
+  const where: Prisma.ScenarioWhereInput = {};
 
   if (genre) {
     where.genre = genre;
