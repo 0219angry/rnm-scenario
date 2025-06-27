@@ -15,7 +15,7 @@ export type ScenarioSearchParams = {
  * @param genre チェックする文字列
  * @returns Genre型であればtrue、そうでなければfalse
  */
-function isValidGenre(genre: any): genre is Genre {
+function isValidGenre(genre: string): genre is Genre {
   return Object.values(Genre).includes(genre);
 }
 
