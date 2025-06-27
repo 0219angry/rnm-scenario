@@ -13,7 +13,7 @@ type SearchParams = {
 export default async function ScenariosPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const { genre, player_num, gm } = searchParams;
 
