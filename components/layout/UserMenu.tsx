@@ -28,6 +28,8 @@ export function UserMenu({ user }: { user: User }) {
     <div className="relative" ref={dropdownRef}>
       <button onClick={() => setIsOpen(!isOpen)} className="flex items-center focus:outline-none">
         <Image
+          width={32}
+          height={32}
           src={user.image ?? `https://avatar.vercel.sh/${user.id}`}
           alt="User Icon"
           className="w-8 h-8 rounded-full"

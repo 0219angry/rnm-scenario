@@ -8,18 +8,34 @@ export async function Header() {
   return (
     <header className="bg-white shadow-md">
       <nav className="container mx-auto px-6 py-3 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold text-gray-800">
-          RNM Scenario
-        </Link>
-        <div className="flex items-center">
+        {/* 左側：ロゴ＋ジャンル別シナリオ */}
+        <div className="flex items-center space-x-6">
+          <Link href="/" className="text-xl font-bold text-gray-800">
+            RNM Scenario
+          </Link>
+
+          <div className="flex items-center space-x-4 text-sm text-gray-700">
+            <Link href="/scenarios/madamis" className="hover:text-blue-500">マダミスシナリオ</Link>
+            <Link href="/scenarios/trpg" className="hover:text-blue-500">TRPGシナリオ</Link>
+          </div>
+        </div>
+
+        {/* 右側：セッション＋ユーザーメニュー */}
+        <div className="flex items-center space-x-4 text-sm">
+          <Link href="/sessions" className="text-gray-800 hover:text-blue-500">
+            セッション一覧
+          </Link>
           {user ? (
             <UserMenu user={user} />
           ) : (
             <>
-              <Link href="/signin" className="text-gray-800 hover:text-blue-500 mx-2">
+              <Link href="/signin" className="text-gray-800 hover:text-blue-500">
                 ログイン
               </Link>
-              <Link href="/signup" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 mx-2">
+              <Link
+                href="/signup"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              >
                 新規登録
               </Link>
             </>
