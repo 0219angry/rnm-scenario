@@ -15,8 +15,8 @@ export async function Header() {
           </Link>
 
           <div className="flex items-center space-x-4 text-sm text-gray-700">
-            <Link href="/scenarios/madamis" className="hover:text-blue-500">マダミスシナリオ</Link>
-            <Link href="/scenarios/trpg" className="hover:text-blue-500">TRPGシナリオ</Link>
+            <Link href="/scenarios?genre=MADAMIS" className="hover:text-blue-500">マダミス</Link>
+            <Link href="/scenarios?genre=TRPG" className="hover:text-blue-500">TRPG</Link>
           </div>
         </div>
 
