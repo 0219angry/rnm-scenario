@@ -41,7 +41,7 @@ export default function ScenarioFilter() {
           <select
             id="genre"
             name="genre"
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            className="bg-white dark:bg-gray-700 mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
             onChange={handleChange}
             // 変更点：useSearchParamsから直接値を取得して設定
             defaultValue={searchParams.get('genre') || ''}
@@ -60,7 +60,7 @@ export default function ScenarioFilter() {
             type="number"
             id="player_num"
             name="player_num"
-            className="mt-1 block w-full pl-3 pr-2 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            className="bg-white dark:bg-gray-700 mt-1 block w-full pl-3 pr-2 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
             onChange={handleChange}
             // 変更点：useSearchParamsから直接値を取得して設定
             defaultValue={searchParams.get('player_num') || ''}
@@ -75,7 +75,7 @@ export default function ScenarioFilter() {
           <select
             id="gm"
             name="gm"
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            className="bg-white dark:bg-gray-700 mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
             onChange={handleChange}
             // 変更点：useSearchParamsから直接値を取得して設定
             defaultValue={searchParams.get('gm') || ''}
