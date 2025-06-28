@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 // isValid を date-fns から追加でインポートします
-import { parse, isValid } from "date-fns";
+import { isValid } from "date-fns";
 
 export async function POST(req: NextRequest) {
   try {

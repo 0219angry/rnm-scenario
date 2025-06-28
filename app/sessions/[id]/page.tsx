@@ -7,8 +7,8 @@ import { ja } from "date-fns/locale/ja";
 import { GenreTag } from "@/components/ui/GenreTag";
 import Image from "next/image";
 
-export default async function SessionDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   // ⭐️ includeに scenario: { include: { rulebook: true } } を追加してルールブック名も取得
   const session = await prisma.session.findUnique({
     where: { id },
