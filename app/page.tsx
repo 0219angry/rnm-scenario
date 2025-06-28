@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { fetchLatestScenarios, fetchUpcomingSessions } from "@/lib/data";
 import { GenreTag } from "@/components/ui/GenreTag";
+import { LocalDateTime } from "@/components/ui/LocalDateTime";
 
 export default async function Home() {
   const newScenarios = await fetchLatestScenarios();
@@ -48,7 +49,14 @@ export default async function Home() {
             {upcomingSessions.map((session) => (
               <li key={session.id} className="border-b py-2">
                 <p className="font-bold">{session.scenario.title}</p>
-                <p>日時: {new Date(session.scheduledAt).toLocaleString("ja-JP")}</p>
+                <p className="text-sm text-gray-600">
+                  日時:{" "}
+                  {/* ✅ new Date()やtoLocaleStringを直接使わず、新しいコンポーネントを呼び出す */}
+                  <LocalDateTime
+                    utcDate={session.scheduledAt}
+                    formatStr="M月d日(E) HH:mm"
+                  />
+                </p>
               </li>
             ))}
           </ul>
