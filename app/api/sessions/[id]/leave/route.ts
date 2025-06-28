@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -12,7 +12,7 @@ export async function DELETE(
       return new NextResponse("認証されていません", { status: 401 });
     }
 
-    const sessionId = params.id;
+    const sessionId = (await params).id;
     const userId = user.id;
 
     // 参加を取り消し

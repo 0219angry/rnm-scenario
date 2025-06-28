@@ -5,7 +5,7 @@ import { ParticipantRole } from "@prisma/client";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { sessionId: string; userId: string } }
+  { params }: { params: Promise<{ sessionId: string; userId: string }> }
 ) {
   try {
     const currentUser = await getCurrentUser();
@@ -13,7 +13,7 @@ export async function PATCH(
       return new NextResponse("認証されていません", { status: 401 });
     }
 
-    const { sessionId, userId } = params;
+    const { sessionId, userId } = await params;
     const { role } = (await req.json()) as { role: ParticipantRole };
 
     // このセッションのオーナーか確認
