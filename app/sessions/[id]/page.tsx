@@ -3,13 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale/ja";
 
-type SessionPageProps = {
-  params: { id: string };
-};
 
-export default async function SessionDetailPage({ params }: SessionPageProps) {
+export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await prisma.session.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       scenario: true,
       owner: true,
