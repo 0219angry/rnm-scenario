@@ -114,3 +114,29 @@ export async function fetchUpcomingSessions(limit = 2) {
     },
   });
 }
+
+export async function fetchCommentsBySessionId(sessionId: string) {
+  try {
+    const comments = await prisma.comment.findMany({
+      where: {
+        sessionId: sessionId,
+      },
+      include: {
+        user: { // 投稿者の情報も一緒に取得
+          select: {
+            id: true,
+            name: true,
+            image: true, // アバター画像など
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc', // 古い順に並べる
+      },
+    });
+    return comments;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('コメントの取得に失敗しました。');
+  }
+}

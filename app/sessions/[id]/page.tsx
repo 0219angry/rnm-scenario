@@ -8,6 +8,8 @@ import Image from "next/image";
 import { SessionJoinButton } from "@/components/features/sessions/SessionJoinButton";
 import { ParticipantRow } from "@/components/features/sessions/ParticipantRow";
 import { AddParticipantForm } from "@/components/features/sessions/AddParticipantForm";
+import { CommentForm } from "@/components/features/comments/CommentForm";
+import { fetchCommentsBySessionId } from "@/lib/data";
 
 export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -37,7 +39,9 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
   const currentUser = await getCurrentUser();
   const isOwner = currentUser?.id === session.ownerId;
   const isParticipant = session.participants.some(p => p.userId === currentUser?.id);
+  const comments = await fetchCommentsBySessionId(session.id); // コメント一覧を取得
   const { scenario } = session; // 可読性のためにシナリオオブジェクトを分割代入
+  const userSession = await getCurrentUser();
 
   return (
     <div className="container mx-auto p-4">
@@ -148,6 +152,49 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
             {session.owner.name ?? session.owner.username}
           </Link>
         </div>
+              {/* --- ▼▼▼ コメント機能エリア ▼▼▼ --- */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold">コメント</h2>
+          
+          {/* コメント一覧 */}
+          <div className="space-y-4">
+            {comments.length > 0 ? (
+              comments.map((comment) => (
+                <div key={comment.id} className="flex gap-4">
+                  <div className="relative h-8 w-8 overflow-hidden rounded-full">
+                    <Image
+                      src={comment.user.image || `https://avatar.vercel.sh/${comment.user.id}`} // デフォルトアバター
+                      alt={comment.user.name || 'avatar'}
+                      fill // fillプロパティで親要素にフィットさせる
+                      sizes="32px" // fillを使う場合、sizesプロパティで画像のサイズを指定すると最適化に役立ちます
+                      className="object-cover" // 画像が親要素に合わせて適切に表示されるようにする
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold">{comment.user.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(comment.createdAt).toLocaleString('ja-JP')}
+                      </p>
+                    </div>
+                    <p className="mt-1 whitespace-pre-wrap">{comment.text}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">まだコメントはありません。</p>
+            )}
+          </div>
+
+          {/* コメント入力フォーム (ログインしている場合のみ表示) */}
+          {userSession ? (
+            <CommentForm sessionId={session.id} />
+          ) : (
+            <p className="text-center mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+              コメントするには<Link href="/login" className="text-blue-500 hover:underline">ログイン</Link>が必要です。
+            </p>
+          )}
+        </section>
       </div>
     </div>
   );
