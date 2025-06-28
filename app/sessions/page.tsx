@@ -30,14 +30,14 @@ export default async function SessionListPage() {
       ) : (
         <ul className="space-y-4">
           {sessions.map((session) => (
-            <li key={session.id} className="p-4 bg-white rounded-lg shadow-md">
+            <li key={session.id} className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
               <Link href={`/sessions/${session.id}`}>
-                <div className="text-lg font-semibold text-blue-600 hover:underline">
+                <div className="text-lg font-semibold text-blue-300 hover:underline">
                   {session.title ?? "セッション名未設定"}
                 </div>
               </Link>
-              <div className="text-sm text-gray-600 mt-1">
-                📅 <p className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-100 mt-1">
+                📅 <p className="text-sm text-gray-600 dark:text-gray-100">
                       日時:{" "}
                       {/* ✅ new Date()やtoLocaleStringを直接使わず、新しいコンポーネントを呼び出す */}
                       <LocalDateTime
@@ -46,7 +46,7 @@ export default async function SessionListPage() {
                       />
                     </p>
               </div>
-              <div className="text-sm text-gray-500 mt-1">
+              <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 🎲 シナリオ: {session.scenario?.title ?? "シナリオ未設定"} / 🎤 主催者: {session.owner?.name ?? "不明"}
               </div>
             </li>

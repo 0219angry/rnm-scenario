@@ -58,7 +58,7 @@ export function AddParticipantForm({ sessionId }: Props) {
   };
 
   return (
-    <div className="space-y-4 rounded-lg border bg-white p-6">
+    <div className="space-y-4 rounded-lg border bg-white dark:bg-gray-800 p-6">
       <h3 className="font-bold text-lg">参加者を追加</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <input
@@ -71,7 +71,7 @@ export function AddParticipantForm({ sessionId }: Props) {
         <select
           value={selectedRole}
           onChange={(e) => setSelectedRole(e.target.value as ParticipantRole)}
-          className="w-full rounded-md border p-2 bg-white"
+          className="w-full rounded-md border p-2 bg-white dark:bg-gray-700"
         >
           {ROLES.map(role => <option key={role} value={role}>{role}</option>)}
         </select>
@@ -80,7 +80,7 @@ export function AddParticipantForm({ sessionId }: Props) {
       {searchResults.length > 0 && (
         <ul className="space-y-2 border-t pt-4">
           {searchResults.map((user) => (
-            <li key={user.id} className="flex items-center justify-between p-2 rounded-md hover:bg-gray-100">
+            <li key={user.id} className="flex items-center justify-between p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
               <div className="flex items-center gap-3">
                 <Image
                   width={40} height={40}
@@ -90,7 +90,7 @@ export function AddParticipantForm({ sessionId }: Props) {
                 />
                 <div>
                   <p className="font-semibold">{user.name}</p>
-                  <p className="text-sm text-gray-500">@{user.username}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-300">@{user.username}</p>
                 </div>
               </div>
               <button

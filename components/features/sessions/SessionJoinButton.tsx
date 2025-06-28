@@ -71,7 +71,7 @@ export function SessionJoinButton({ sessionId, isParticipant }: Props) {
           value={selectedRole}
           onChange={(e) => setSelectedRole(e.target.value as ParticipantRole)}
           disabled={isPending}
-          className="w-full h-full appearance-none rounded-lg border-2 border-gray-300 bg-white py-3 pl-4 pr-10 text-lg font-semibold text-gray-800 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100"
+          className="w-full h-full appearance-none rounded-lg border-2 border-gray-300 bg-white dark:bg-gray-700 py-3 pl-4 pr-10 text-lg font-semibold text-gray-800 dark:text-gray-300 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100"
         >
           {ROLES.map((role) => (
             <option key={role} value={role}>
@@ -86,7 +86,7 @@ export function SessionJoinButton({ sessionId, isParticipant }: Props) {
       <button
         onClick={handleClick}
         disabled={isPending}
-        className="flex-grow flex items-center justify-center gap-2 py-3 px-4 font-bold text-white rounded-lg transition bg-green-600 hover:bg-green-700 disabled:bg-gray-400"
+        className="flex-grow flex items-center justify-center gap-2 py-3 px-4 font-bold text-white rounded-lg transition bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-700 disabled:bg-gray-400"
       >
         <UserPlusIcon className="h-5 w-5" />
         {/* ✅ ボタンのテキストを選択した役割に応じて変更 */}
