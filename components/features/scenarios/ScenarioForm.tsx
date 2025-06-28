@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Genre } from "@prisma/client";
+import Link from "next/link";
 
 // --- 型定義とスキーマ ---
 
@@ -134,6 +135,14 @@ export function ScenarioForm({
                 </option>
               ))}
             </select>
+            <p className="mt-2 text-xs text-gray-500">
+              目的のルールブックがない場合は、
+              <Link href="/rulebooks/new" target="_blank" className="text-blue-600 hover:underline">
+                こちらから新規登録
+              </Link>
+              してください。
+              <span className="text-red-500"> (新しいタブで開きます)</span>
+            </p>
             {form.formState.errors.rulebookId && <p className="mt-1 text-xs text-red-500">{form.formState.errors.rulebookId.message}</p>}
           </div>
         </div>
