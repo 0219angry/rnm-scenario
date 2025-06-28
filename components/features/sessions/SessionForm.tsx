@@ -6,6 +6,7 @@ import { useForm, Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Genre } from "@prisma/client";
 import ScenarioSelector from "@/components/ui/ScenarioSelector";
+import { format } from "date-fns";
 
 // --- 型定義 ---
 type Scenario = {
@@ -133,8 +134,8 @@ export function SessionForm({
           <input
             id="scheduledAt"
             type="datetime-local"
-            {...form.register("scheduledAt")}
-            className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={format(form.watch("scheduledAt"), "yyyy-MM-dd'T'HH:mm")}
+            onChange={(e) => form.setValue("scheduledAt", new Date(e.target.value))}
           />
           {form.formState.errors.scheduledAt && (
             <p className="mt-1 text-xs text-red-500">{form.formState.errors.scheduledAt.message}</p>
