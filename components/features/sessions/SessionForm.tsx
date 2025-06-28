@@ -117,7 +117,7 @@ export function SessionForm({
           <label htmlFor="scheduledAt" className="block mb-2 text-sm font-medium text-gray-700">開催日</label>
           <input
             id="scheduledAt"
-            type="date"
+            type="datetime-local"
             {...form.register("scheduledAt")}
             className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
