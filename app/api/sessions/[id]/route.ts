@@ -42,3 +42,4 @@ export async function DELETE(
     return new NextResponse("サーバーエラーが発生しました", { status: 500 });
   }
 }
+
