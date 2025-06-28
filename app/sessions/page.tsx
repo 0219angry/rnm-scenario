@@ -34,7 +34,7 @@ export default async function SessionListPage() {
             <li key={session.id} className="p-4 bg-white rounded-lg shadow-md">
               <Link href={`/sessions/${session.id}`}>
                 <div className="text-lg font-semibold text-blue-600 hover:underline">
-                  {session.scenario?.title ?? "シナリオ未設定"}
+                  {session.title ?? "セッション名未設定"}
                 </div>
               </Link>
               <div className="text-sm text-gray-600 mt-1">
