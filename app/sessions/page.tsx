@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { format } from "date-fns";
-import { ja } from "date-fns/locale/ja";
+import { LocalDateTime } from "@/components/ui/LocalDateTime";
 
 export default async function SessionListPage() {
   const sessions = await prisma.session.findMany({
@@ -38,7 +37,14 @@ export default async function SessionListPage() {
                 </div>
               </Link>
               <div className="text-sm text-gray-600 mt-1">
-                📅 {format(new Date(session.scheduledAt), "yyyy年MM月dd日 HH:mm", { locale: ja })}
+                📅 <p className="text-sm text-gray-600">
+                      日時:{" "}
+                      {/* ✅ new Date()やtoLocaleStringを直接使わず、新しいコンポーネントを呼び出す */}
+                      <LocalDateTime
+                        utcDate={session.scheduledAt}
+                        formatStr="M月d日(E) HH:mm"
+                      />
+                    </p>
               </div>
               <div className="text-sm text-gray-500 mt-1">
                 🎲 シナリオ: {session.scenario?.title ?? "シナリオ未設定"} / 🎤 主催者: {session.owner?.name ?? "不明"}
