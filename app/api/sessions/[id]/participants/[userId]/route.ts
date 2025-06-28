@@ -49,8 +49,8 @@ export async function PATCH(
 
 // ✅【新規追加】参加者をキックするためのDELETEメソッド
 export async function DELETE(
-  req: Request,
-  context: { params: { sessionId: string; userId: string } }
+  _req: Request,
+  context: { params: Promise<{ sessionId: string; userId: string }> }
 ) {
   try {
     const currentUser = await getCurrentUser();
@@ -58,7 +58,7 @@ export async function DELETE(
       return new NextResponse("認証されていません", { status: 401 });
     }
 
-    const { sessionId, userId: userToKickId } = context.params;
+    const { sessionId, userId: userToKickId } = await context.params;
 
     // このセッションのオーナーか確認
     const session = await prisma.session.findUnique({
