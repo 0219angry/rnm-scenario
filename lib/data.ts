@@ -99,11 +99,13 @@ export async function fetchLatestScenarios(limit = 4) {
 }
 
 export async function fetchUpcomingSessions(limit = 2) {
+  const today = new Date();
+  today.setDate(today.getDate() - 1); // 今日以降のセッションを取得
   return await prisma.session.findMany({
     orderBy: { scheduledAt: "asc" },
     where: {
       scheduledAt: {
-        gte: new Date(),
+        gte: today,
       },
     },
     take: limit,

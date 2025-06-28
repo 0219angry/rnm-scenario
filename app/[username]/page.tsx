@@ -58,9 +58,9 @@ export default async function UserProfilePage({
   const genreCounts = user.participations.reduce(
     (acc, participation) => {
       const genre = participation.session.scenario.genre;
-      if (genre === "MADAMIS") {
+      if (genre === "MADAMIS" && participation.session.isFinished) {
         acc.madamis++;
-      } else if (genre === "TRPG") {
+      } else if (genre === "TRPG" && participation.session.isFinished) {
         acc.trpg++;
       }
       return acc;
