@@ -99,11 +99,13 @@ export async function fetchLatestScenarios(limit = 4) {
 }
 
 export async function fetchUpcomingSessions(limit = 2) {
+  const today = new Date();
+  today.setDate(today.getDate() - 1); // 今日以降のセッションを取得
   return await prisma.session.findMany({
     orderBy: { scheduledAt: "asc" },
     where: {
       scheduledAt: {
-        gte: new Date(),
+        gte: today,
       },
     },
     take: limit,
@@ -111,4 +113,30 @@ export async function fetchUpcomingSessions(limit = 2) {
       scenario: true, // シナリオのタイトル表示用
     },
   });
+}
+
+export async function fetchCommentsBySessionId(sessionId: string) {
+  try {
+    const comments = await prisma.comment.findMany({
+      where: {
+        sessionId: sessionId,
+      },
+      include: {
+        user: { // 投稿者の情報も一緒に取得
+          select: {
+            id: true,
+            name: true,
+            image: true, // アバター画像など
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc', // 古い順に並べる
+      },
+    });
+    return comments;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('コメントの取得に失敗しました。');
+  }
 }

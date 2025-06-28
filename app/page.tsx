@@ -2,6 +2,7 @@ import Link from "next/link";
 import { fetchLatestScenarios, fetchUpcomingSessions } from "@/lib/data";
 import { GenreTag } from "@/components/ui/GenreTag";
 import { LocalDateTime } from "@/components/ui/LocalDateTime";
+import { GmTag } from "@/components/ui/GmTag";
 
 export default async function Home() {
   const newScenarios = await fetchLatestScenarios();
@@ -25,9 +26,11 @@ export default async function Home() {
             {newScenarios.map((scenario) => (
               <div key={scenario.id} className="border p-4 rounded-lg">
                 <h3 className="text-lg font-bold">{scenario.title}</h3>
-                <GenreTag genre={scenario.genre} linkable={false} />
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <GenreTag genre={scenario.genre} /> {/* 👈 linkableを削除 */}
+                  <GmTag requiresGM={scenario.requiresGM} />
+                </div>
                 <p>人数: {scenario.playerMin === scenario.playerMax ? scenario.playerMin : `${scenario.playerMin}〜${scenario.playerMax}`}人</p>
-                <p>GM: {scenario.requiresGM ? "必要" : "不要"}</p>
               </div>
             ))}
           </div>
@@ -48,7 +51,7 @@ export default async function Home() {
           <ul>
             {upcomingSessions.map((session) => (
               <li key={session.id} className="border-b py-2">
-                <p className="font-bold">{session.scenario.title}</p>
+                <p className="font-bold">{session.title} - {session.scenario.title}</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   日時:{" "}
                   {/* ✅ new Date()やtoLocaleStringを直接使わず、新しいコンポーネントを呼び出す */}
