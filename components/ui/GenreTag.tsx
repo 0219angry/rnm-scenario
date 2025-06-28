@@ -9,8 +9,8 @@ const genreMap: Record<Genre, string> = {
 };
 
 const genreColorMap: Record<Genre, string> = {
-  MADAMIS: "bg-pink-500",
-  TRPG: "bg-purple-500",
+  MADAMIS: "bg-purple-600",
+  TRPG: "bg-green-600",
   OTHER: "bg-gray-500",
 };
 
