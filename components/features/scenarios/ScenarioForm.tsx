@@ -1,12 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, Resolver, SubmitHandler } from "react-hook-form";
+import { useForm, Resolver} from "react-hook-form";
 import { z } from "zod";
 import Link from "next/link";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
-import { Genre } from "@prisma/client"; // PrismaのGenre Enumをインポート
-import { de } from "date-fns/locale";
+import { Genre } from "@prisma/client"; 
 
 // --- 型定義とスキーマ ---
 
