@@ -127,6 +127,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                             sessionId={session.id}
                             participant={participant}
                             isOwner={isOwner}
+                            currentUserId={currentUser?.id}
                         />
                     ))}
                 </ul>

@@ -153,6 +153,8 @@ model SessionParticipant {
 
   role        ParticipantRole   // GM / キャラ名なども書ける♪
   assignedAt  DateTime  @default(now())
+  
+  youtubeLink String?  // YouTube動画のURLを保存するフィールド（任意）
 
   @@id([sessionId, userId]) // セッション×ユーザで一意に
 }
