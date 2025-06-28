@@ -38,7 +38,7 @@ export default function NewScenarioClient({ rulebooks }: Props) {
     <div className="container mx-auto py-10">
       <ScenarioForm
         rulebooks={rulebooks}
-        onSubmit={handleCreate}
+        onFormSubmit={handleCreate}
       />
     </div>
   );

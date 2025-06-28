@@ -55,10 +55,10 @@ export default function EditScenarioClient({ id, scenario, rulebooks }: Props) {
         averageTime: scenario.averageTime,
         distribution: scenario.distribution ?? "",
         rulebookId: scenario.rulebookId ?? "",
-        comment: scenario.content ?? "",
+        content: scenario.content ?? "",
         isPublic: scenario.isPublic,
       }}
-      onSubmit={handleUpdate}
+      onFormSubmit={handleUpdate}
     />
   );
 }
