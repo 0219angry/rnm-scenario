@@ -71,7 +71,7 @@ export default async function UserProfilePage({
   return (
     <main className="container mx-auto mt-12 max-w-4xl px-4">
       {/* --- プロフィールヘッダー --- */}
-      <div className="flex flex-col items-center gap-6 rounded-xl bg-white p-8 shadow-md md:flex-row">
+      <div className="flex flex-col items-center gap-6 rounded-xl bg-white dark:bg-gray-800 p-8 shadow-md md:flex-row">
         <Image
           src={user.image ?? `https://avatar.vercel.sh/${user.id}`}
           alt="プロフィール画像"
@@ -80,10 +80,10 @@ export default async function UserProfilePage({
           className="h-32 w-32 flex-shrink-0 rounded-full object-cover ring-4 ring-sky-200"
         />
         <div className="text-center md:text-left">
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
             {user.name ?? user.username}
           </h1>
-          <p className="mt-1 text-lg font-semibold text-gray-500">
+          <p className="mt-1 text-lg font-semibold text-gray-500 dark:text-gray-400">
             @{user.username}
           </p>
         </div>
@@ -91,15 +91,15 @@ export default async function UserProfilePage({
 
       {/* ✅ ステップ3: 累計数表示UI */}
       <div className="mt-8">
-        <h2 className="text-xl font-bold text-gray-700">プレイ記録</h2>
+        <h2 className="text-xl font-bold text-gray-700 dark:text-gray-300">プレイ記録</h2>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="rounded-lg bg-white p-6 shadow">
+          <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow">
             <h3 className="text-lg font-semibold text-purple-800">マダミス</h3>
             <p className="mt-2 text-4xl font-bold text-purple-600">
               {genreCounts.madamis} <span className="text-xl font-medium">回</span>
             </p>
           </div>
-          <div className="rounded-lg bg-white p-6 shadow">
+          <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow">
             <h3 className="text-lg font-semibold text-green-800">TRPG</h3>
             <p className="mt-2 text-4xl font-bold text-green-600">
               {genreCounts.trpg} <span className="text-xl font-medium">回</span>
@@ -110,26 +110,26 @@ export default async function UserProfilePage({
 
       {/* ✅ ステップ3: 参加履歴一覧UI */}
       <div className="mt-10">
-        <h2 className="text-xl font-bold text-gray-700">参加したセッション</h2>
+        <h2 className="text-xl font-bold text-gray-700 dark:text-gray-300">参加したセッション</h2>
         {user.participations.length > 0 ? (
           <ul className="mt-4 space-y-4">
             {user.participations.map((p) => (
-              <li key={p.session.id} className="rounded-lg bg-white p-4 shadow transition hover:shadow-lg">
+              <li key={p.session.id} className="rounded-lg bg-white dark:bg-gray-800 p-4 shadow transition hover:shadow-lg">
                 <div className="flex flex-col justify-between gap-2 sm:flex-row">
                   <div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {format(p.session.scheduledAt, "yyyy年MM月dd日", { locale: ja })}
                     </p>
                     <GenreTag genre={p.session.scenario.genre} />
                     {/* ✅【変更点】リンク先をセッション詳細ページに修正 */}
-                    <Link href={`/sessions/${p.session.id}`} className="text-lg font-bold text-blue-600 hover:underline">
+                    <Link href={`/sessions/${p.session.id}`} className="text-lg font-bold text-blue-600 dark:text-blue-400 hover:underline">
                       {/* ✅ セッションタイトルがあればそれを、なければシナリオタイトルを表示 */}
                       {p.session.title || p.session.scenario.title}
                     </Link>
 
                     {/* ✅ セッションタイトルがある場合、補足としてシナリオタイトルを表示 */}
                     {p.session.title && (
-                       <p className="text-sm text-gray-700">シナリオ: {p.session.scenario.title}</p>
+                       <p className="text-sm text-gray-700 dark:text-gray-300">シナリオ: {p.session.scenario.title}</p>
                     )}
                   </div>
                   <div className="flex-shrink-0">

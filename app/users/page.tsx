@@ -17,7 +17,7 @@ export default async function UsersPage() {
 
   return (
     <main className="container mx-auto mt-12 max-w-5xl px-4">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">
+      <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-8">
         ユーザー一覧
       </h1>
 
@@ -29,7 +29,7 @@ export default async function UsersPage() {
             <Link 
               href={`/${user.username}`} 
               key={user.id} 
-              className="block rounded-lg bg-white p-4 text-center shadow transition hover:shadow-lg hover:-translate-y-1"
+              className="block rounded-lg bg-white dark:bg-gray-800 p-4 text-center shadow transition hover:shadow-lg hover:-translate-y-1"
             >
               <Image
                 src={user.image ?? `https://avatar.vercel.sh/${user.id}`}
@@ -39,10 +39,10 @@ export default async function UsersPage() {
                 className="h-24 w-24 mx-auto rounded-full object-cover ring-4 ring-white"
               />
               <div className="mt-3">
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
                   {user.name ?? user.username}
                 </h2>
-                <p className="mt-1 text-sm font-medium text-gray-500">
+                <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                   @{user.username}
                 </p>
               </div>

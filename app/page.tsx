@@ -49,7 +49,7 @@ export default async function Home() {
             {upcomingSessions.map((session) => (
               <li key={session.id} className="border-b py-2">
                 <p className="font-bold">{session.scenario.title}</p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   日時:{" "}
                   {/* ✅ new Date()やtoLocaleStringを直接使わず、新しいコンポーネントを呼び出す */}
                   <LocalDateTime
