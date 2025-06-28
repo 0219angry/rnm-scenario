@@ -41,7 +41,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="container mx-auto p-4">
-      <div className="bg-white shadow-lg rounded-lg p-8 relative">
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 relative">
         {/* 編集ボタン */}
         {isOwner && (
           <Link
@@ -74,7 +74,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
           {session.notes && (
              <div className="pt-4 border-t mt-4">
                <h2 className="font-semibold text-xl mb-2">📝 メモ</h2>
-               <p className="text-gray-700 whitespace-pre-wrap text-base">{session.notes}</p>
+               <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap text-base">{session.notes}</p>
              </div>
           )}
         </div>
@@ -82,12 +82,12 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
         {/* ✅ シナリオ情報のセクション（情報を追加） */}
         <div className="mb-6">
           <h2 className="font-semibold text-xl mb-4">📘 シナリオ情報</h2>
-          <div className="space-y-4 text-lg bg-slate-50 p-6 rounded-lg">
+          <div className="space-y-4 text-lg bg-slate-50 dark:bg-slate-700 p-6 rounded-lg">
              <p><span className="font-semibold">タイトル:</span> {scenario.title}</p>
              <p className="flex items-center gap-2">
                <span className="font-semibold">ジャンル:</span> <GenreTag genre={scenario.genre} />
                {/* ルールブック名も表示 */}
-               {scenario.rulebook && <span className="text-gray-500 text-base">/ {scenario.rulebook.name}</span>}
+               {scenario.rulebook && <span className="text-gray-500 dark:text-gray-300 text-base">/ {scenario.rulebook.name}</span>}
              </p>
              <p><span className="font-semibold">プレイヤー数:</span> {scenario.playerMin === scenario.playerMax ? scenario.playerMin : `${scenario.playerMin}〜${scenario.playerMax}`}人</p>
              {/* ✨ ここから追加情報 */}
@@ -104,8 +104,8 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
         {scenario.content && (
             <div className="mb-6">
                 <h2 className="font-semibold text-xl mb-4">📄 シナリオの内容</h2>
-                <div className="bg-slate-50 p-6 rounded-lg">
-                    <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">{scenario.content}</p>
+                <div className="bg-slate-50 dark:bg-slate-700 p-6 rounded-lg">
+                    <p className="text-gray-800 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">{scenario.content}</p>
                 </div>
             </div>
         )}
@@ -127,12 +127,12 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                     ))}
                 </ul>
             ) : (
-                <p className="text-gray-500">まだ参加者はいません。</p>
+                <p className="text-gray-400">まだ参加者はいません。</p>
             )}
         </div>
 
         {/* 登録者情報 */}
-        <div className="text-sm text-gray-500 mt-8 pt-4 border-t flex items-center gap-2">
+        <div className="text-sm text-gray-500 dark:text-gray-400 mt-8 pt-4 border-t flex items-center gap-2">
           <span className="font-semibold">作成者:</span>
           <Image
             width={32}
@@ -143,7 +143,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
           />
           <Link
             href={`/${session.owner.username ?? session.owner.id}`}
-            className="text-blue-500 hover:underline"
+            className="text-blue-200 hover:underline"
           >
             {session.owner.name ?? session.owner.username}
           </Link>

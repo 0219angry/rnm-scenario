@@ -31,11 +31,11 @@ export default function ScenarioFilter() {
   };
 
   return (
-    <div className="p-4 border rounded-lg bg-white shadow-sm">
-      <h2 className="text-lg font-semibold mb-4 text-gray-800">絞り込み</h2>
+    <div className="p-4 border rounded-lg bg-white dark:bg-gray-800 shadow-sm">
+      <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">絞り込み</h2>
       <div className="space-y-4">
         <div>
-          <label htmlFor="genre" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="genre" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             ジャンル
           </label>
           <select
@@ -53,7 +53,7 @@ export default function ScenarioFilter() {
           </select>
         </div>
         <div>
-          <label htmlFor="player_num" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="player_num" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             プレイヤー数
           </label>
           <input
@@ -69,7 +69,7 @@ export default function ScenarioFilter() {
           />
         </div>
         <div>
-          <label htmlFor="gm" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="gm" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             GM
           </label>
           <select
