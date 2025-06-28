@@ -7,6 +7,7 @@ import { ja } from "date-fns/locale/ja";
 import { GenreTag } from "@/components/ui/GenreTag";
 import Image from "next/image";
 import { SessionJoinButton } from "@/components/features/sessions/SessionJoinButton";
+import { ParticipantRow } from "@/components/features/sessions/ParticipantRow";
 
 export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -113,24 +114,14 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
             <h2 className="font-semibold text-xl mb-4">👥 参加者 ({session.participants.length}人)</h2>
             {session.participants.length > 0 ? (
                 <ul className="space-y-3">
-                    {session.participants.map(({ user, role }) => (
-                        <li key={user.id} className="flex items-center gap-3 rounded-lg bg-slate-50 p-3">
-                            <Image
-                                width={40}
-                                height={40}
-                                src={user.image ?? `https://avatar.vercel.sh/${user.id}`}
-                                alt={user.name ?? "User avatar"}
-                                className="h-10 w-10 rounded-full object-cover"
-                            />
-                            <div className="flex-grow">
-                                <span className="font-medium">{user.name ?? user.username}</span>
-                                {role && (
-                                    <span className="ml-2 inline-block rounded bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-800">
-                                        {role}
-                                    </span>
-                                )}
-                            </div>
-                        </li>
+                    {session.participants.map((participant) => (
+                        // ✅ 新しいコンポーネントを呼び出す
+                        <ParticipantRow 
+                            key={participant.user.id}
+                            sessionId={session.id}
+                            participant={participant}
+                            isOwner={isOwner}
+                        />
                     ))}
                 </ul>
             ) : (
