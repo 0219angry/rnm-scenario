@@ -5,15 +5,15 @@ import { cookies } from 'next/headers';
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const { username, password } = await req.json();
     const cookieStore = await cookies();
 
-    if (!email || !password) {
+    if (!username || !password) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { username },
     });
 
     if (!user || !user.password) {

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const formSchema = z.object({
-  email: z.string().email(),
+  username: z.string().min(3),
   password: z.string().min(8),
 });
 
@@ -13,7 +13,7 @@ export function SignInForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -42,8 +42,8 @@ export function SignInForm() {
       <h2 className="text-2xl font-bold text-center text-gray-800">ログイン</h2>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div>
-          <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">メールアドレス</label>
-          <input id="email" type="email" {...form.register("email")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          <label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-700">ユーザー名</label>
+          <input id="username" type="text" {...form.register("username")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
         </div>
         <div>
           <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">パスワード</label>
