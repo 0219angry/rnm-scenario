@@ -8,6 +8,7 @@ import { GenreTag } from "@/components/ui/GenreTag";
 import Image from "next/image";
 import { SessionJoinButton } from "@/components/features/sessions/SessionJoinButton";
 import { ParticipantRow } from "@/components/features/sessions/ParticipantRow";
+import { AddParticipantForm } from "@/components/features/sessions/AddParticipantForm";
 
 export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -112,6 +113,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
         {/* ✅【追加】参加者一覧セクション */}
         <div className="mb-6">
             <h2 className="font-semibold text-xl mb-4">👥 参加者 ({session.participants.length}人)</h2>
+            {isOwner && <AddParticipantForm sessionId={session.id} />}
             {session.participants.length > 0 ? (
                 <ul className="space-y-3">
                     {session.participants.map((participant) => (
