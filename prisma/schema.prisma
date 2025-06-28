@@ -66,6 +66,28 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model Rulebook {
+  id          String    @id @default(cuid())
+  name        String
+  system      String
+  publisher   String?
+  url         String?
+  description String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // 関連するシナリオたち
+  scenarios   Scenario[]
+}
+
+// ジャンルenum
+enum Genre {
+  MADAMIS
+  TRPG
+  OTHER
+}
+
 // シナリオ管理機能
 model Scenario {
   id            String    @id @default(cuid())
@@ -73,9 +95,14 @@ model Scenario {
   playerMin     Int
   playerMax     Int
   requiresGM    Boolean
+  genre         Genre
   averageTime   Int       // 所要時間（分）
   distribution  String?   // 配布先URL
+  content       String?   // シナリオ内容（Markdownなど）
   isPublic      Boolean   @default(true)
+
+  rulebook      Rulebook? @relation(fields: [rulebookId], references: [id])
+  rulebookId    String?   
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
