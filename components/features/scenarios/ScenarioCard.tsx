@@ -24,7 +24,7 @@ export default function ScenarioCard({ scenario }: { scenario: ScenarioWithRelat
           {scenario.rulebook && <span> / {scenario.rulebook.name}</span>}
         </div>
         <div className="text-sm text-gray-800 space-y-1 mb-4 flex-grow">
-          <p>プレイヤー数: {scenario.playerMin}〜{scenario.playerMax}人</p>
+          <p>プレイヤー数: {scenario.playerMin===scenario.playerMax ? scenario.playerMin : `${scenario.playerMin}〜${scenario.playerMax}`}人</p>
           <p>GM: {scenario.requiresGM ? '必須' : '不要'}</p>
           <p>所要時間: {scenario.averageTime}分</p>
         </div>

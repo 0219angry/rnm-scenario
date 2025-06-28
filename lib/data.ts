@@ -79,3 +79,25 @@ export async function fetchScenarioById(id: string) {
     },
   });
 }
+
+export async function fetchLatestScenarios(limit = 4) {
+  return await prisma.scenario.findMany({
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+}
+
+export async function fetchUpcomingSessions(limit = 2) {
+  return await prisma.session.findMany({
+    orderBy: { scheduledAt: "asc" },
+    where: {
+      scheduledAt: {
+        gte: new Date(),
+      },
+    },
+    take: limit,
+    include: {
+      scenario: true, // シナリオのタイトル表示用
+    },
+  });
+}
