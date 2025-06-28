@@ -5,11 +5,13 @@ import { useForm, Resolver, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import Link from "next/link";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
+import { Genre } from "@prisma/client"; // PrismaのGenre Enumをインポート
+import { de } from "date-fns/locale";
 
 // --- 型定義とスキーマ ---
 
 // ジャンルのEnum (PrismaのEnumとは別に、表示用の値を持つ)
-export enum Genre {
+export enum GenreName {
   MADAMIS = "マダミス",
   TRPG = "TRPG",
   OTHER = "その他",
@@ -26,6 +28,8 @@ interface NewScenarioFormProps {
   rulebooks: Rulebook[];
   // フォーム送信時の処理を外部から注入できるようにする
   onFormSubmit: (values: ScenarioFormValues) => Promise<void>;
+  defaultValues?: Partial<ScenarioFormValues>; // 編集時の初期値
+  isEdit?: boolean; // 編集モードかどうか
 }
 
 // Zodによるフォームのバリデーションスキーマ
@@ -62,7 +66,12 @@ export type ScenarioFormValues = z.infer<typeof formSchema>;
 
 // --- Reactコンポーネント定義 ---
 
-export function ScenarioForm({ rulebooks = [], onFormSubmit }: NewScenarioFormProps) {
+export function ScenarioForm({ 
+  rulebooks = [],
+  onFormSubmit,
+  defaultValues = {}, // 親コンポーネントからの初期値
+  isEdit = false, // デフォルトは新規登録モード
+}: NewScenarioFormProps) {
   const form = useForm<ScenarioFormValues>({
     resolver: zodResolver(formSchema) as Resolver<ScenarioFormValues>,
     // フォームの初期値
@@ -77,6 +86,7 @@ export function ScenarioForm({ rulebooks = [], onFormSubmit }: NewScenarioFormPr
       isPublic: true,
       rulebookId: "",
       content: "",
+      ...defaultValues, // 親コンポーネントからの初期値をマージ
     },
   });
 
@@ -86,7 +96,9 @@ export function ScenarioForm({ rulebooks = [], onFormSubmit }: NewScenarioFormPr
 
   return (
     <div className="w-full max-w-2xl p-8 space-y-8 bg-white rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold text-center text-gray-800">新しいシナリオを登録</h2>
+      <h2 className="text-2xl font-bold text-center text-gray-800">
+        {isEdit ? "シナリオを編集" : "新しいシナリオを登録"}
+      </h2>
       
       <form onSubmit={form.handleSubmit(onFormSubmit)} noValidate className="space-y-6">
         {/* シナリオ名 */}
@@ -224,7 +236,9 @@ export function ScenarioForm({ rulebooks = [], onFormSubmit }: NewScenarioFormPr
           disabled={form.formState.isSubmitting} 
           className="w-full py-3 font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
         >
-          {form.formState.isSubmitting ? '登録中...' : '登録する'}
+          {form.formState.isSubmitting 
+            ? (isEdit ? '更新中...' : '登録中...') 
+            : (isEdit ? '更新する' : '保存する')}
         </button>
       </form>
     </div>
