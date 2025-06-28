@@ -80,6 +80,17 @@ export async function fetchScenarioById(id: string) {
   });
 }
 
+export async function fetchSessionById(id: string) {
+  console.log("Fetching session with ID:", id);
+  return await prisma.session.findUnique({
+    where: { id },
+    include: {
+      scenario: true, // シナリオのタイトル表示用
+      owner: true, // セッションのオーナー情報
+    },
+  });
+}
+
 export async function fetchLatestScenarios(limit = 4) {
   return await prisma.scenario.findMany({
     orderBy: { createdAt: "desc" },

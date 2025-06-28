@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
 import { GenreTag } from "@/components/ui/GenreTag";
+import Image from "next/image";
 
 export default async function ScenarioDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -53,10 +54,12 @@ export default async function ScenarioDetailPage({ params }: { params: Promise<{
         <div className="text-sm text-gray-500 mt-8 pt-4 border-t flex items-center gap-2">
           <span className="font-semibold">作成者:</span>
           {/* ユーザアイコンと名前 */}
-          <img
+          <Image
+            width={32}
+            height={32}
             src={scenario.owner.image ?? `https://avatar.vercel.sh/${scenario.owner.id}`}
-            alt="ユーザアイコン"
-            className="w-6 h-6 rounded-full object-cover"
+            alt="User Icon"
+            className="w-8 h-8 rounded-full"
           />
           <Link
             href={`/${scenario.owner.username ?? scenario.owner.id}`}

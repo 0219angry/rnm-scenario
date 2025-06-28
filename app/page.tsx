@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { fetchLatestScenarios, fetchUpcomingSessions } from "@/lib/data";
+import { GenreTag } from "@/components/ui/GenreTag";
 
 export default async function Home() {
   const newScenarios = await fetchLatestScenarios();
@@ -23,7 +24,8 @@ export default async function Home() {
             {newScenarios.map((scenario) => (
               <div key={scenario.id} className="border p-4 rounded-lg">
                 <h3 className="text-lg font-bold">{scenario.title}</h3>
-                <p>人数: {scenario.playerMin}〜{scenario.playerMax}人</p>
+                <GenreTag genre={scenario.genre} linkable={false} />
+                <p>人数: {scenario.playerMin === scenario.playerMax ? scenario.playerMin : `${scenario.playerMin}〜${scenario.playerMax}`}人</p>
                 <p>GM: {scenario.requiresGM ? "必要" : "不要"}</p>
               </div>
             ))}
