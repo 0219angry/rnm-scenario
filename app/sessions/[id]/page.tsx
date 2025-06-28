@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale/ja";
 import { GenreTag } from "@/components/ui/GenreTag";
 import Image from "next/image";
+import { SessionJoinButton } from "@/components/features/sessions/SessionJoinButton";
 
 export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -19,6 +20,12 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
         },
       },
       owner: true,
+      participants: {
+        orderBy: { assignedAt: 'asc' }, // 参加が早い順に並べる
+        include: {
+          user: true, // 参加者の詳細情報も取得
+        },
+      },
     },
   });
 
@@ -28,6 +35,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
 
   const currentUser = await getCurrentUser();
   const isOwner = currentUser?.id === session.ownerId;
+  const isParticipant = session.participants.some(p => p.userId === currentUser?.id);
   const { scenario } = session; // 可読性のためにシナリオオブジェクトを分割代入
 
   return (
@@ -44,7 +52,11 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
         )}
 
         <h1 className="text-3xl font-bold mb-6">{session.title}</h1>
-
+        {currentUser && (
+          <div className="my-6">
+            <SessionJoinButton sessionId={session.id} isParticipant={isParticipant} />
+          </div>
+        )}
         {/* セッション情報 */}
         <div className="space-y-4 text-lg border-b pb-6 mb-6">
           <p>
@@ -95,6 +107,36 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                 </div>
             </div>
         )}
+        
+        {/* ✅【追加】参加者一覧セクション */}
+        <div className="mb-6">
+            <h2 className="font-semibold text-xl mb-4">👥 参加者 ({session.participants.length}人)</h2>
+            {session.participants.length > 0 ? (
+                <ul className="space-y-3">
+                    {session.participants.map(({ user, role }) => (
+                        <li key={user.id} className="flex items-center gap-3 rounded-lg bg-slate-50 p-3">
+                            <Image
+                                width={40}
+                                height={40}
+                                src={user.image ?? `https://avatar.vercel.sh/${user.id}`}
+                                alt={user.name ?? "User avatar"}
+                                className="h-10 w-10 rounded-full object-cover"
+                            />
+                            <div className="flex-grow">
+                                <span className="font-medium">{user.name ?? user.username}</span>
+                                {role && (
+                                    <span className="ml-2 inline-block rounded bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-800">
+                                        {role}
+                                    </span>
+                                )}
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p className="text-gray-500">まだ参加者はいません。</p>
+            )}
+        </div>
 
         {/* 登録者情報 */}
         <div className="text-sm text-gray-500 mt-8 pt-4 border-t flex items-center gap-2">
