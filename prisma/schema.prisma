@@ -134,13 +134,14 @@ model Session {
 }
 
 model SessionParticipant {
-  session     Session   @relation(fields: [sessionId], references: [id])
+  session     Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   sessionId   String
 
-  user        User      @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String
 
   role        String?   // GM / キャラ名なども書ける♪
+  assignedAt  DateTime  @default(now())
 
   @@id([sessionId, userId]) // セッション×ユーザで一意に
 }
