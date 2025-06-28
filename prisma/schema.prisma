@@ -26,6 +26,7 @@ model User {
 
   accounts      Account[]
   userSessions  UserSession[]
+  comments      Comment[]
 }
 
 model Account {
@@ -131,6 +132,7 @@ model Session {
   createdAt     DateTime   @default(now())
 
   participants  SessionParticipant[]
+  comments  Comment[]
 }
 
 enum ParticipantRole {
@@ -151,6 +153,24 @@ model SessionParticipant {
 
   role        ParticipantRole   // GM / キャラ名なども書ける♪
   assignedAt  DateTime  @default(now())
+  
+  youtubeLink String?  // YouTube動画のURLを保存するフィールド（任意）
 
   @@id([sessionId, userId]) // セッション×ユーザで一意に
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String   @db.Text // コメント本文
+  createdAt DateTime @default(now()) // 投稿日時
+
+  // --- リレーション定義 ---
+  sessionId String   // どのセッションへのコメントか
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  userId    String   // 誰が投稿したか
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([userId])
 }
