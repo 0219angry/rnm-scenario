@@ -32,7 +32,7 @@ export default async function SessionListPage() {
           {sessions.map((session) => (
             <li key={session.id} className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
               <Link href={`/sessions/${session.id}`}>
-                <div className="text-lg font-semibold text-blue-300 hover:underline">
+                <div className="text-lg font-semibold text-blue-500 dark:text-blue-300 hover:underline">
                   {session.title ?? "セッション名未設定"}
                 </div>
               </Link>

@@ -2,7 +2,49 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
-// ✅【新規追加】セッションを削除するためのDELETEメソッド
+export async function PUT(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return new NextResponse("認証されていません", { status: 401 });
+    }
+
+    const sessionId = (await context.params).id;
+    const body = await req.json();
+
+    // セッションのオーナーであることを確認
+    const session = await prisma.session.findUnique({
+      where: { id: sessionId },
+      select: { ownerId: true },
+    });
+
+    if (!session) {
+      return new NextResponse("セッションが見つかりません", { status: 404 });
+    }
+
+    // 権限チェック：セッションのオーナーのみが更新できる
+    if (session.ownerId !== currentUser.id) {
+      return new NextResponse("権限がありません", { status: 403 });
+    }
+
+    // セッションを更新
+    const updatedSession = await prisma.session.update({
+      where: { id: sessionId },
+      data: body,
+    });
+
+    return NextResponse.json(updatedSession);
+  } catch (error) {
+    console.error("セッションの更新中にエラー", error);
+    return new NextResponse("サーバーエラーが発生しました", { status: 500 });
+  }
+}
+
+
+// 【新規追加】セッションを削除するためのDELETEメソッド
 export async function DELETE(
   req: Request,
   context: { params: Promise<{ id: string }> }

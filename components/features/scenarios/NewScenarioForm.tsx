@@ -3,10 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Resolver } from "react-hook-form";
 import { z } from "zod";
-
+import { Genre } from "@prisma/client";
 // --- 外部で定義する型やスキーマ ---
 
-export enum Genre {
+export enum GenreName {
   MADAMIS = "マダミス",
   TRPG = "TRPG",
   OTHER = "その他",
@@ -110,7 +110,7 @@ export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
             >
               {Object.values(Genre).map((genreValue) => (
                 <option key={genreValue} value={genreValue}>
-                  {genreValue}
+                  {GenreName[genreValue]}
                 </option>
               ))}
             </select>
