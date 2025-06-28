@@ -2,8 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
-import { format } from "date-fns";
-import { ja } from "date-fns/locale/ja";
+import { LocalDateTime } from "@/components/ui/LocalDateTime";
 import { GenreTag } from "@/components/ui/GenreTag";
 import Image from "next/image";
 import { SessionJoinButton } from "@/components/features/sessions/SessionJoinButton";
@@ -63,9 +62,10 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
         <div className="space-y-4 text-lg border-b pb-6 mb-6">
           <p>
             <span className="font-semibold">📅 開催日:</span>{" "}
-            {format(new Date(session.scheduledAt), "yyyy年MM月dd日 HH:mm", {
-              locale: ja,
-            })}
+            <LocalDateTime 
+              utcDate={session.scheduledAt} 
+              formatStr="yyyy年MM月dd日 HH:mm" 
+            />
           </p>
           <p>
             <span className="font-semibold">✅ 状態:</span>{" "}
