@@ -1,38 +1,52 @@
-// components/ui/GenreTag.tsx
-import Link from "next/link";
 import { Genre } from "@prisma/client";
+import Link from "next/link";
+// ✅ アイコンをインポートします
+import { PuzzlePieceIcon, CubeIcon, TagIcon } from '@heroicons/react/24/solid';
 
-const genreMap: Record<Genre, string> = {
-  MADAMIS: "マダミス",
-  TRPG: "TRPG",
-  OTHER: "その他",
+// ✅ 各ジャンルに対応するスタイル、テキスト、アイコンを定義
+const genreStyles: Record<Genre, { text: string; className: string; icon: React.ElementType }> = {
+  MADAMIS: {
+    text: 'マダミス',
+    className: 'bg-purple-100 text-purple-800 border-purple-300',
+    icon: PuzzlePieceIcon, // パズルのピースアイコン
+  },
+  TRPG: {
+    text: 'TRPG',
+    className: 'bg-green-100 text-green-800 border-green-300',
+    icon: CubeIcon, // サイコロをイメージした立方体アイコン
+  },
+  OTHER: {
+    text: 'その他',
+    className: 'bg-gray-100 text-gray-800 border-gray-300',
+    icon: TagIcon, //汎用的なタグアイコン
+  },
 };
 
-const genreColorMap: Record<Genre, string> = {
-  MADAMIS: "bg-purple-600",
-  TRPG: "bg-green-600",
-  OTHER: "bg-gray-500",
-};
-
-type GenreTagProps = {
+type Props = {
   genre: Genre;
-  linkable?: boolean; // 🔸 オプションでリンク可にできるよ
+  linkable?: boolean; // リンクにするかどうかのオプション
 };
 
-export function GenreTag({ genre, linkable = true }: GenreTagProps) {
-  const tag = (
+export function GenreTag({ genre, linkable = false }: Props) {
+  const style = genreStyles[genre] || genreStyles.OTHER;
+  const Icon = style.icon;
+
+  const TagContent = (
     <span
-      className={`inline-block px-2 py-1 text-sm font-medium text-white rounded-full ${genreColorMap[genre]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${style.className}`}
     >
-      {genreMap[genre]}
+      <Icon className="h-4 w-4" />
+      {style.text}
     </span>
   );
 
-  return linkable ? (
-    <Link href={`/scenarios?genre=${genre}`} prefetch={false}>
-      {tag}
-    </Link>
-  ) : (
-    tag
-  );
+  if (linkable) {
+    return (
+      <Link href={`/scenarios?genre=${genre}`} className="transition hover:opacity-80">
+        {TagContent}
+      </Link>
+    );
+  }
+
+  return TagContent;
 }
