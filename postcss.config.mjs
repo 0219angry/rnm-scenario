@@ -1,5 +1,6 @@
-const config = {
-  plugins: ["@tailwindcss/postcss"],
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {}, // v4からの新しいプラグイン
+    'autoprefixer': {},        // 各ブラウザ用のベンダープレフィックスを自動で付与
+  },
 };
-
-export default config;

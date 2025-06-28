@@ -10,9 +10,9 @@ type ScenarioWithRelations = Scenario & {
 
 export default function ScenarioCard({ scenario }: { scenario: ScenarioWithRelations }) {
   return (
-    <Link href={`/scenarios/${scenario.id}`} className="block h-full rounded-lg border bg-white transition hover:shadow-lg">
+    <Link href={`/scenarios/${scenario.id}`} className="block h-full rounded-lg border bg-white dark:bg-gray-800 transition hover:shadow-lg">
       <div className="flex h-full flex-col p-4">
-        <h3 className="text-lg font-bold mb-2 text-gray-800">
+        <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-100 truncate">
           {scenario.title}
         </h3>
 
@@ -22,17 +22,17 @@ export default function ScenarioCard({ scenario }: { scenario: ScenarioWithRelat
           <GmTag requiresGM={scenario.requiresGM} />
         </div>
         
-        <div className="text-sm text-gray-600 mb-2">
+        <div className="text-sm text-gray-600 mb-2 dark:text-gray-300">
             {scenario.rulebook && <span>ルールブック: {scenario.rulebook.name}</span>}
         </div>
 
-        <div className="text-sm text-gray-800 space-y-1 mb-4 flex-grow">
+        <div className="text-sm text-gray-800 dark:text-gray-300 space-y-1 mb-4 flex-grow">
           <p>プレイヤー数: {scenario.playerMin === scenario.playerMax ? scenario.playerMin : `${scenario.playerMin}〜${scenario.playerMax}`}人</p>
           {/* ⚠️ 古いGM要否の表示は削除 */}
           <p>所要時間: {scenario.averageTime}分程度</p>
         </div>
         
-        <div className="text-xs text-gray-500 mt-auto pt-2 border-t">
+        <div className="text-xs text-gray-500 mt-auto pt-2 border-t dark:text-gray-400">
           作成者: {scenario.owner.name ?? scenario.owner.username}
         </div>
       </div>

@@ -40,26 +40,26 @@ export function RulebookForm({ onSubmit, isSubmitting, defaultValues = {} }: Pro
       {/* 必須項目 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             ルールブック名 <span className="text-red-500">*</span>
           </label>
           <input 
             id="name" 
             type="text" 
             {...register("name")} 
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+            className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
           />
           {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
         </div>
         <div>
-          <label htmlFor="system" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="system" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             システム名 <span className="text-red-500">*</span>
           </label>
           <input 
             id="system" 
             type="text" 
             {...register("system")} 
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+            className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
           />
           {errors.system && <p className="mt-1 text-xs text-red-500">{errors.system.message}</p>}
         </div>
@@ -67,20 +67,20 @@ export function RulebookForm({ onSubmit, isSubmitting, defaultValues = {} }: Pro
 
       {/* ✅【追加】任意項目 */}
       <div>
-        <label htmlFor="publisher" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="publisher" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           出版社（任意）
         </label>
         <input 
           id="publisher" 
           type="text" 
           {...register("publisher")} 
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+          className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
         />
         {errors.publisher && <p className="mt-1 text-xs text-red-500">{errors.publisher.message}</p>}
       </div>
 
       <div>
-        <label htmlFor="url" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           公式サイトURL（任意）
         </label>
         <input 
@@ -88,20 +88,20 @@ export function RulebookForm({ onSubmit, isSubmitting, defaultValues = {} }: Pro
           type="url" 
           {...register("url")}
           placeholder="https://example.com"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+          className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
         />
         {errors.url && <p className="mt-1 text-xs text-red-500">{errors.url.message}</p>}
       </div>
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           説明（任意）
         </label>
         <textarea 
           id="description" 
           {...register("description")}
           rows={4}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           placeholder="ルールブックの概要や特徴などを入力します"
         />
         {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description.message}</p>}

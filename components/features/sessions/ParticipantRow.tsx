@@ -70,7 +70,7 @@ export function ParticipantRow({ sessionId, participant, isOwner }: Props) {
   const { user } = participant;
 
   return (
-    <li className="flex items-center gap-3 rounded-lg bg-slate-50 p-3">
+    <li className="flex items-center gap-3 rounded-lg bg-slate-50 dark:bg-slate-700 p-3">
       <Image
         width={40} height={40}
         src={user.image ?? `https://avatar.vercel.sh/${user.id}`}

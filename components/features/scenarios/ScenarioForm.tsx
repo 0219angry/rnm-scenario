@@ -94,37 +94,37 @@ export function ScenarioForm({
   const watchRequiresGM = form.watch("requiresGM");
 
   return (
-    <div className="w-full max-w-2xl p-8 space-y-8 bg-white rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold text-center text-gray-800">
+    <div className="w-full max-w-2xl p-8 space-y-8 bg-white rounded-xl shadow-md dark:bg-gray-800">
+      <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
         {isEdit ? "シナリオを編集" : "新しいシナリオを登録"}
       </h2>
       
       <form onSubmit={form.handleSubmit(onFormSubmit)} noValidate className="space-y-6">
         {/* シナリオ名 */}
         <div>
-          <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-700">シナリオ名 <span className="text-red-500">*</span></label>
-          <input id="title" {...form.register("title")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">シナリオ名 <span className="text-red-500">*</span></label>
+          <input id="title" {...form.register("title")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600" />
           {form.formState.errors.title && <p className="mt-1 text-xs text-red-500">{form.formState.errors.title.message}</p>}
         </div>
 
         {/* プレイヤー人数 */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <label htmlFor="playerMin" className="block mb-2 text-sm font-medium text-gray-700">最低プレイヤー人数 <span className="text-red-500">*</span></label>
-            <input id="playerMin" type="number" inputMode="numeric" {...form.register("playerMin")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <label htmlFor="playerMin" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">最低プレイヤー人数 <span className="text-red-500">*</span></label>
+            <input id="playerMin" type="number" inputMode="numeric" {...form.register("playerMin")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600" />
             {form.formState.errors.playerMin && <p className="mt-1 text-xs text-red-500">{form.formState.errors.playerMin.message}</p>}
           </div>
           <div>
-            <label htmlFor="playerMax" className="block mb-2 text-sm font-medium text-gray-700">最大プレイヤー人数 <span className="text-red-500">*</span></label>
-            <input id="playerMax" type="number" inputMode="numeric" {...form.register("playerMax")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <label htmlFor="playerMax" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">最大プレイヤー人数 <span className="text-red-500">*</span></label>
+            <input id="playerMax" type="number" inputMode="numeric" {...form.register("playerMax")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600" />
             {form.formState.errors.playerMax && <p className="mt-1 text-xs text-red-500">{form.formState.errors.playerMax.message}</p>}
           </div>
         </div>
 
         {/* ジャンルとGM要否のタグ選択UI */}
-        <div className="space-y-4 rounded-lg border bg-slate-50 p-4">
+        <div className="space-y-4 rounded-lg border bg-slate-50 p-4 dark:bg-gray-700 dark:border-gray-600">
           <div>
-            <label className="block mb-3 text-sm font-medium text-gray-700">ジャンル <span className="text-red-500">*</span></label>
+            <label className="block mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">ジャンル <span className="text-red-500">*</span></label>
             <div className="flex flex-wrap gap-2">
               {Object.values(Genre).map((genreValue) => (
                 <button
@@ -134,7 +134,7 @@ export function ScenarioForm({
                   className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
                     watchGenre === genreValue
                       ? 'bg-blue-600 text-white shadow'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500'
                   }`}
                 >
                   {watchGenre === genreValue && <CheckCircleIcon className="h-5 w-5" />}
@@ -145,7 +145,7 @@ export function ScenarioForm({
             {form.formState.errors.genre && <p className="mt-2 text-xs text-red-500">{form.formState.errors.genre.message}</p>}
           </div>
           <div>
-            <label className="block mb-3 text-sm font-medium text-gray-700">GM要否 <span className="text-red-500">*</span></label>
+            <label className="block mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">GM要否 <span className="text-red-500">*</span></label>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -153,7 +153,7 @@ export function ScenarioForm({
                 className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
                   watchRequiresGM === true
                     ? 'bg-orange-500 text-white shadow'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500'
                 }`}
               >
                 {watchRequiresGM === true && <CheckCircleIcon className="h-5 w-5" />}
@@ -165,7 +165,7 @@ export function ScenarioForm({
                 className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
                   watchRequiresGM === false
                     ? 'bg-green-500 text-white shadow'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500'
                 }`}
               >
                 {watchRequiresGM === false && <CheckCircleIcon className="h-5 w-5" />}
@@ -177,20 +177,20 @@ export function ScenarioForm({
 
         {/* 使用ルールブック */}
         <div>
-          <label htmlFor="rulebookId" className="block mb-2 text-sm font-medium text-gray-700">使用ルールブック（任意）</label>
+          <label htmlFor="rulebookId" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">使用ルールブック（任意）</label>
           <select
             id="rulebookId"
             {...form.register("rulebookId")}
-            className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
           >
             <option value="">選択しない</option>
             {rulebooks.map((rulebook) => (
               <option key={rulebook.id} value={rulebook.id}>{rulebook.name}</option>
             ))}
           </select>
-          <p className="mt-2 text-xs text-gray-500">
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
             目的のルールブックがない場合は、
-            <Link href="/rulebooks/new" target="_blank" className="text-blue-600 hover:underline">
+            <Link href="/rulebooks/new" target="_blank" className="text-blue-600 hover:underline dark:text-blue-400">
               こちらから新規登録
             </Link>
             してください。
@@ -199,32 +199,32 @@ export function ScenarioForm({
 
         {/* 想定時間 */}
         <div>
-          <label htmlFor="averageTime" className="block mb-2 text-sm font-medium text-gray-700">想定時間（分） <span className="text-red-500">*</span></label>
-          <input id="averageTime" type="number" inputMode="numeric" {...form.register("averageTime")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          <label htmlFor="averageTime" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">想定時間（分） <span className="text-red-500">*</span></label>
+          <input id="averageTime" type="number" inputMode="numeric" {...form.register("averageTime")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600" />
           {form.formState.errors.averageTime && <p className="mt-1 text-xs text-red-500">{form.formState.errors.averageTime.message}</p>}
         </div>
 
         {/* 配布先URL */}
         <div>
-          <label htmlFor="distribution" className="block mb-2 text-sm font-medium text-gray-700">配布先URL（任意）</label>
-          <input id="distribution" type="url" placeholder="https://example.com" {...form.register("distribution")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          <label htmlFor="distribution" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">配布先URL（任意）</label>
+          <input id="distribution" type="url" placeholder="https://example.com" {...form.register("distribution")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600" />
           {form.formState.errors.distribution && <p className="mt-1 text-xs text-red-500">{form.formState.errors.distribution.message}</p>}
         </div>
 
         {/* 公開設定 */}
         <div className="flex items-center">
-          <input id="isPublic" type="checkbox" {...form.register("isPublic")} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" />
-          <label htmlFor="isPublic" className="ml-2 text-sm font-medium text-gray-700">このシナリオを公開する</label>
+          <input id="isPublic" type="checkbox" {...form.register("isPublic")} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600" />
+          <label htmlFor="isPublic" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">このシナリオを公開する</label>
         </div>
         
         {/* 内容・あらすじ */}
         <div>
-          <label htmlFor="content" className="block mb-2 text-sm font-medium text-gray-700">内容・あらすじ（任意）</label>
+          <label htmlFor="content" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">内容・あらすじ（任意）</label>
           <textarea
             id="content"
             rows={6}
             {...form.register("content")}
-            className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
           />
           {form.formState.errors.content && <p className="mt-1 text-xs text-red-500">{form.formState.errors.content.message}</p>}
         </div>

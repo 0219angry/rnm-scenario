@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
+import { ThemeProvider } from "@/components/features/theme/ThemeProvider";
 
 const notoSansJp = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
@@ -23,17 +24,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
       <body className={`${notoSansJp.variable} font-sans antialiased`}>
-        <div className="flex flex-col min-h-screen">
-          <Header />
-          <main className="flex-grow container mx-auto p-4">
-            {children}
-          </main>
-          <footer className="bg-gray-200 p-4 text-center">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-grow container mx-auto p-4">
+              {children}
+            </main>
+            <footer className="bg-gray-200 dark:bg-gray-800 p-4 text-center">
             <p>© 2025 RNM</p>
           </footer>
-        </div>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
