@@ -1,15 +1,10 @@
-import { Scenario, Rulebook, User, Genre } from '@prisma/client';
+import { GenreTag } from '@/components/ui/GenreTag';
+import { Scenario, Rulebook, User } from '@prisma/client';
 import Link from 'next/link';
 
 type ScenarioWithRelations = Scenario & {
   rulebook: Rulebook | null;
   owner: User;
-};
-
-const genreMap = {
-  [Genre.MADAMIS]: 'マダミス',
-  [Genre.TRPG]: 'TRPG',
-  [Genre.OTHER]: 'その他',
 };
 
 export default function ScenarioCard({ scenario }: { scenario: ScenarioWithRelations }) {
@@ -20,7 +15,7 @@ export default function ScenarioCard({ scenario }: { scenario: ScenarioWithRelat
           {scenario.title}
         </h3>
         <div className="text-sm text-gray-600 mb-2">
-          <span>{genreMap[scenario.genre]}</span>
+          <GenreTag genre={scenario.genre} linkable={true} />
           {scenario.rulebook && <span> / {scenario.rulebook.name}</span>}
         </div>
         <div className="text-sm text-gray-800 space-y-1 mb-4 flex-grow">

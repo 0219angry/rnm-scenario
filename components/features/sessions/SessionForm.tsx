@@ -17,6 +17,7 @@ type Scenario = {
 };
 
 export const sessionFormSchema = z.object({
+  title: z.string().min(1, "タイトルを入力してください"),
   scenarioId: z.preprocess(
     (val) => (val === "" ? undefined : val),
     z.string().optional()
@@ -49,6 +50,7 @@ export function SessionForm({
   const form = useForm<SessionFormValues>({
     resolver: zodResolver(sessionFormSchema) as Resolver<SessionFormValues>,
     defaultValues: {
+      title: "",
       scheduledAt: new Date(),
       isFinished: false,
       scenarioId: "",
@@ -67,6 +69,19 @@ export function SessionForm({
       </h2>
 
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-6">
+        {/* 📝 タイトル */}
+        <div>
+          <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-700">タイトル</label>
+          <input
+            id="title"
+            type="text"
+            {...form.register("title")}
+            className="w-full px-3 py-2 rounded-md bg-gray-100"
+          />
+          {form.formState.errors.title && (
+            <p className="mt-1 text-xs text-red-500">{form.formState.errors.title.message}</p>
+          )}
+        </div>
         {/* 🎛 フィルターUI */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>

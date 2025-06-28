@@ -116,6 +116,7 @@ model Scenario {
 
 model Session {
   id            String     @id @default(cuid())
+  title         String?    // セッション名（任意）
   scenario      Scenario   @relation(fields: [scenarioId], references: [id])
   scenarioId    String
 
