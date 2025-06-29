@@ -33,6 +33,8 @@ const scenarioUpdateSchema = z.object({
   genre: z.nativeEnum(Genre).optional(),
   averageTime: z.coerce.number().int().min(0).optional(),
   distribution: z.string().url("有効なURLを入力してください").optional().or(z.literal('')),
+  priceMax: z.coerce.number().int().nonnegative("価格上限は0円以上で入力してください").optional(),
+  priceMin: z.coerce.number().int().nonnegative("価格下限は0円以上で入力してください").optional(),
   content: z.string().max(5000, "内容は5000文字以内です").optional(),
   isPublic: z.boolean().optional(),
   rulebookId: z.string().optional().nullable(),
@@ -45,6 +47,15 @@ const scenarioUpdateSchema = z.object({
 }, {
     message: "最小プレイヤー数は最大プレイヤー数以下である必要があります",
     path: ["playerMin"], // エラーを関連付けるフィールド
+}).refine(data => {
+  // priceMaxとpriceMinの関係を定義
+  if (data.priceMax !== undefined && data.priceMin !== undefined) {
+    return data.priceMax >= data.priceMin;
+  }
+  return true; // どちらかが未指定ならOK
+},{
+  message:"最大価格は最低価格以上である必要があります",
+  path: ["priceMax"]
 });
 
 

@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       return new NextResponse(JSON.stringify({ message: "入力内容に誤りがあります。", errors: validatedFields.error.flatten().fieldErrors }), { status: 400 });
     }
 
-    const { title, playerMin, playerMax, requiresGM, genre, averageTime, distribution, isPublic, rulebookId, comment } = validatedFields.data;
+    const { title, playerMin, playerMax, requiresGM, genre, averageTime, distribution, priceMax, priceMin, isPublic, rulebookId, comment } = validatedFields.data;
 
     const newScenario = await prisma.scenario.create({
       data: {
@@ -63,6 +63,8 @@ export async function POST(request: Request) {
         genre,
         averageTime,
         distribution: distribution || null,
+        priceMax,
+        priceMin,
         isPublic,
         rulebookId: rulebookId || null,
         content: comment || null,
