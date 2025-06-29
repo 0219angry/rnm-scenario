@@ -176,7 +176,10 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                       <div className="flex items-center gap-2">
                         <p className="font-bold">{comment.user.name}</p>
                         <p className="text-xs text-gray-500">
-                          {new Date(comment.createdAt).toLocaleString('ja-JP')}
+                          <LocalDateTime 
+                            utcDate={comment.createdAt} 
+                            formatStr="yyyy年MM月dd日 HH:mm:ss" 
+                          />
                         </p>
                       </div>
                       <p className="mt-1 whitespace-pre-wrap">{comment.text}</p>
