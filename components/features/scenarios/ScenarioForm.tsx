@@ -108,7 +108,10 @@ export function ScenarioForm({
 
   useEffect(() => {
     const fetchBoothPrice = async () => {
-      if (!distributionUrl || !distributionUrl.startsWith("https://booth.pm/")) return;
+      if(!distributionUrl) return;
+      const url = new URL(distributionUrl);
+      const isBooth = url.hostname === "booth.pm" || url.hostname.endsWith(".booth.pm");
+      if (!isBooth) return;
       try {
         const res = await fetch(`/api/booth-price?url=${encodeURIComponent(distributionUrl)}`);
         const data = await res.json();
