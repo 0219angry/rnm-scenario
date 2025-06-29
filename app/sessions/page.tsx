@@ -54,8 +54,8 @@ export default async function SessionListPage({
                         {session.title ?? "セッション名未設定"}
                       </div>
                     <div className="text-sm text-gray-600 dark:text-gray-100 mt-1">
-                      📅 <p className="text-sm text-gray-600 dark:text-gray-100">
-                            日時:{" "}
+                       <p className="text-sm text-gray-600 dark:text-gray-100">
+                            📅 日時:{" "}
                             {/* ✅ new Date()やtoLocaleStringを直接使わず、新しいコンポーネントを呼び出す */}
                             <LocalDateTime
                               utcDate={session.scheduledAt}
