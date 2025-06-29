@@ -33,9 +33,6 @@ const ROLES: ParticipantRole[] = ["PL", "PC", "GM", "KP", "SPECTATOR"];
 
 export function ParticipantRow({ sessionId, participant, isOwner, currentUserId }: Props) {
 
-  console.log(`参加者: ${participant.user.name}, 参加者ID: ${participant.user.id}`);
-  console.log(`渡されたログイン中のユーザーID (currentUserId):`, currentUserId);
-
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isEditing, setIsEditing] = useState(false);

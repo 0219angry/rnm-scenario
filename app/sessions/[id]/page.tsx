@@ -57,7 +57,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
         )}
 
         <h1 className="text-3xl font-bold mb-6">{session.title}</h1>
-        {currentUser && (
+        {currentUser && !session.isFinished && (
           <div className="my-6">
             <SessionJoinButton sessionId={session.id} isParticipant={isParticipant} />
           </div>
@@ -117,7 +117,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
         {/* ✅【追加】参加者一覧セクション */}
         <div className="mb-6">
             <h2 className="font-semibold text-xl mb-4">👥 参加者 ({session.participants.length}人)</h2>
-            {isOwner && <AddParticipantForm sessionId={session.id} />}
+            {isOwner && !session.isFinished && <AddParticipantForm sessionId={session.id} />}
             {session.participants.length > 0 ? (
                 <ul className="space-y-3">
                     {session.participants.map((participant) => (
@@ -126,7 +126,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
                             key={participant.user.id}
                             sessionId={session.id}
                             participant={participant}
-                            isOwner={isOwner}
+                            isOwner={isOwner && !session.isFinished}
                             currentUserId={currentUser?.id}
                         />
                     ))}
@@ -148,54 +148,59 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
           />
           <Link
             href={`/${session.owner.username ?? session.owner.id}`}
-            className="text-blue-200 hover:underline"
+            className="text-blue-500 dark:text-blue-200 hover:underline"
           >
             {session.owner.name ?? session.owner.username}
           </Link>
         </div>
               {/* --- ▼▼▼ コメント機能エリア ▼▼▼ --- */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold">コメント</h2>
-          
-          {/* コメント一覧 */}
-          <div className="space-y-4">
-            {comments.length > 0 ? (
-              comments.map((comment) => (
-                <div key={comment.id} className="flex gap-4">
-                  <div className="relative h-8 w-8 overflow-hidden rounded-full">
-                    <Image
-                      src={comment.user.image || `https://avatar.vercel.sh/${comment.user.id}`} // デフォルトアバター
-                      alt={comment.user.name || 'avatar'}
-                      fill // fillプロパティで親要素にフィットさせる
-                      sizes="32px" // fillを使う場合、sizesプロパティで画像のサイズを指定すると最適化に役立ちます
-                      className="object-cover" // 画像が親要素に合わせて適切に表示されるようにする
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="font-bold">{comment.user.name}</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(comment.createdAt).toLocaleString('ja-JP')}
-                      </p>
+        <div className="mt-8 border-t pt-6">
+          <section className="space-y-6">
+            <h2 className="text-2xl font-bold">コメント</h2>
+            
+            {/* コメント一覧 */}
+            <div className="space-y-4">
+              {comments.length > 0 ? (
+                comments.map((comment) => (
+                  <div key={comment.id} className="flex gap-4">
+                    <div className="relative h-8 w-8 overflow-hidden rounded-full">
+                      <Image
+                        src={comment.user.image || `https://avatar.vercel.sh/${comment.user.id}`} // デフォルトアバター
+                        alt={comment.user.name || 'avatar'}
+                        fill // fillプロパティで親要素にフィットさせる
+                        sizes="32px" // fillを使う場合、sizesプロパティで画像のサイズを指定すると最適化に役立ちます
+                        className="object-cover" // 画像が親要素に合わせて適切に表示されるようにする
+                      />
                     </div>
-                    <p className="mt-1 whitespace-pre-wrap">{comment.text}</p>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold">{comment.user.name}</p>
+                        <p className="text-xs text-gray-500">
+                          <LocalDateTime 
+                            utcDate={comment.createdAt} 
+                            formatStr="yyyy年MM月dd日 HH:mm:ss" 
+                          />
+                        </p>
+                      </div>
+                      <p className="mt-1 whitespace-pre-wrap">{comment.text}</p>
+                    </div>
                   </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500">まだコメントはありません。</p>
-            )}
-          </div>
+                ))
+              ) : (
+                <p className="text-gray-500">まだコメントはありません。</p>
+              )}
+            </div>
 
-          {/* コメント入力フォーム (ログインしている場合のみ表示) */}
-          {userSession ? (
-            <CommentForm sessionId={session.id} />
-          ) : (
-            <p className="text-center mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-              コメントするには<Link href="/login" className="text-blue-500 hover:underline">ログイン</Link>が必要です。
-            </p>
-          )}
-        </section>
+            {/* コメント入力フォーム (ログインしている場合のみ表示) */}
+            {userSession ? (
+              <CommentForm sessionId={session.id} />
+            ) : (
+              <p className="text-center mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                コメントするには<Link href="/login" className="text-blue-500 hover:underline">ログイン</Link>が必要です。
+              </p>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );
