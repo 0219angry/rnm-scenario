@@ -3,7 +3,8 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { profileFormSchema, type ProfileFormValues } from "@/components/features/users/ProfileEditForm"; // Zodスキーマをインポート（次に作成）
+import { type ProfileFormValues } from "@/components/features/users/ProfileEditForm"; // Zodスキーマをインポート（次に作成）
+import { Prisma } from "@prisma/client";
 
 // 戻り値の型を定義
 interface UpdateProfileResult {
@@ -43,10 +44,15 @@ export async function updateProfile(
       message: "プロフィールが更新されました！",
       user: { username: updatedUser.username }
     };
-  } catch (e: any) {
-    // ユーザー名重複エラーなどを考慮
-    if (e.code === 'P2002' && e.meta?.target?.includes('username')) {
-      return { success: false, message: "このユーザー名は既に使用されています。" };
+  } catch (e: unknown) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      const { code, meta } = e;
+      if (code === "P2002" && Array.isArray(meta?.target) && meta.target.includes("username")) {
+        return {
+          success: false,
+          message: "このユーザー名は既に使用されています。",
+        };
+      }
     }
     return { success: false, message: "サーバーエラーが発生しました。" };
   }
