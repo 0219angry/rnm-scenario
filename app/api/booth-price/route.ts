@@ -4,14 +4,18 @@ import * as cheerio from 'cheerio';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const url = searchParams.get('url');
+  const strUrl = searchParams.get('url');
 
-  if (!url || !url.startsWith("https://booth.pm/")) {
-    return NextResponse.json({ error: '無効なURLです' }, { status: 400 });
-  }
+
+  if(!strUrl) return;
+      const url = new URL(strUrl);
+      const isBooth = url.hostname === "booth.pm" || url.hostname.endsWith(".booth.pm");
+      if (!isBooth) {
+        return NextResponse.json({ error: '無効なURLです' }, { status: 400 });
+      }
 
   try {
-    const response = await axios.get(url, {
+    const response = await axios.get(strUrl, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
 
