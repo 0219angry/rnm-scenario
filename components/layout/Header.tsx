@@ -25,7 +25,7 @@ export async function Header() {
         {/* 右側：セッション＋ユーザーメニュー */}
         <div className="flex items-center space-x-4 text-sm">
           <ThemeSwitcher />
-          <Link href="/sessions" className="text-gray-800 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
+          <Link href="/sessions?status=upcoming" className="text-gray-800 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
             セッション一覧
           </Link>
           {user ? (
