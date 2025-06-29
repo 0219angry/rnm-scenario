@@ -135,7 +135,18 @@ export function SessionForm({
             id="scheduledAt"
             type="datetime-local"
             value={format(form.watch("scheduledAt"), "yyyy-MM-dd'T'HH:mm")}
-            onChange={(e) => form.setValue("scheduledAt", new Date(e.target.value))}
+            min="2000-01-01T00:00"
+            max="3000-12-31T23:59"
+            onChange={(e) => {
+              const input = e.target.value;
+              const parsedDate = new Date(input);
+              if (isNaN(parsedDate.getTime())) {
+                // 無効な日付のときはフォームに反映させない！
+                console.warn("無効な日付だよ〜🥺", input);
+                return;
+              }
+              form.setValue("scheduledAt", parsedDate);
+            }}
           />
           {form.formState.errors.scheduledAt && (
             <p className="mt-1 text-xs text-red-500">{form.formState.errors.scheduledAt.message}</p>
