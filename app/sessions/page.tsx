@@ -48,25 +48,25 @@ export default async function SessionListPage({
           ) : (
             <ul className="space-y-4">
               {sessions.map((session) => (
-                <li key={session.id} className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-                  <Link href={`/sessions/${session.id}`}>
-                    <div className="text-lg font-semibold text-blue-500 dark:text-blue-300 hover:underline">
-                      {session.title ?? "セッション名未設定"}
+                <li key={session.id} className="rounded-lg bg-white dark:bg-gray-800 shadow transition hover:shadow-lg">
+                  <Link href={`/sessions/${session.id}`} className="block p-4">
+                      <div className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                        {session.title ?? "セッション名未設定"}
+                      </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-100 mt-1">
+                      📅 <p className="text-sm text-gray-600 dark:text-gray-100">
+                            日時:{" "}
+                            {/* ✅ new Date()やtoLocaleStringを直接使わず、新しいコンポーネントを呼び出す */}
+                            <LocalDateTime
+                              utcDate={session.scheduledAt}
+                              formatStr="M月d日(E) HH:mm"
+                            />
+                          </p>
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      🎲 シナリオ: {session.scenario?.title ?? "シナリオ未設定"} / 🎤 主催者: {session.owner?.name ?? "不明"}
                     </div>
                   </Link>
-                  <div className="text-sm text-gray-600 dark:text-gray-100 mt-1">
-                    📅 <p className="text-sm text-gray-600 dark:text-gray-100">
-                          日時:{" "}
-                          {/* ✅ new Date()やtoLocaleStringを直接使わず、新しいコンポーネントを呼び出す */}
-                          <LocalDateTime
-                            utcDate={session.scheduledAt}
-                            formatStr="M月d日(E) HH:mm"
-                          />
-                        </p>
-                  </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    🎲 シナリオ: {session.scenario?.title ?? "シナリオ未設定"} / 🎤 主催者: {session.owner?.name ?? "不明"}
-                  </div>
                 </li>
               ))}
             </ul>
