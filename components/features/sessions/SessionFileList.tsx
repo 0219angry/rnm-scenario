@@ -56,7 +56,11 @@ type Props = {
 };
 
 export function SessionFileList({ files, loading }: Props) {
-  // 内部のuseEffectとデータ取得ロジックはすべて削除
+  // ドラッグが開始されたときに、ドラッグするファイルの情報をセットする
+  const handleDragStart = (e: React.DragEvent<HTMLLIElement>, file: FileInfo) => {
+    // データをJSON形式でDataTransferオブジェクトに保存
+    e.dataTransfer.setData('application/json', JSON.stringify(file));
+  };
 
   return (
     <div className="w-full">
@@ -76,6 +80,8 @@ export function SessionFileList({ files, loading }: Props) {
             {files.map((file) => (
               <li
                 key={file.name}
+                draggable={true}
+                onDragStart={(e) => handleDragStart(e, file)}
                 className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors duration-150"
               >
                 <div className="flex items-center min-w-0">

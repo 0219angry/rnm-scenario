@@ -45,7 +45,7 @@ async function getPlayersForSession(sessionId: string): Promise<Player[]> {
  * @returns トリガー情報の配列
  */
 function getTriggersForSession(): Trigger[] {
-  const NUMBER_OF_TRIGGERS = 10; // ここで列数を定義
+  const NUMBER_OF_TRIGGERS = 5; // ここで列数を定義
   const triggers: Trigger[] = [];
   for (let i = 1; i <= NUMBER_OF_TRIGGERS; i++) {
     triggers.push({
