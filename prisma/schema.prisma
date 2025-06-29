@@ -18,6 +18,7 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  bio           String?
 
   // シナリオ・セッションの所有
   scenarios     Scenario[]
