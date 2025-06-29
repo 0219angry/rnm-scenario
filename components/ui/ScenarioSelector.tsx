@@ -66,7 +66,7 @@ export function ScenarioSelector({
 
       {/* 🎴 一覧から選択 */}
       <div className="grid gap-2 sm:grid-cols-2">
-        {filteredScenarios.map((scenario) => {
+        {filteredScenarios.slice(0, 8).map((scenario) => {
           const isSelected = scenario.id === value;
           return (
             <button
