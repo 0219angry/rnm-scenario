@@ -2,14 +2,16 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { LocalDateTime } from "@/components/ui/LocalDateTime";
 import { SessionFilterForm } from "@/components/features/sessions/SessionFilterForm";
+import { Prisma } from "@prisma/client";
 
 export default async function SessionListPage({
     searchParams 
   }: {
-    searchParams: Promise<{ [key: string]: string | undefined }> }) {
+    searchParams: Promise<{ [key: string]: string | undefined }>
+  }) {
   const { title, owner, status } = await searchParams;
 
-  const where: any = {};
+  const where: Prisma.SessionWhereInput = {};
   if (title) {
     where.scenario = { title: { contains: title } };
   }
