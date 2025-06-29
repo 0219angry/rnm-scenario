@@ -14,6 +14,8 @@ export const formSchema = z.object({
     (val) => (val === "" ? undefined : val),
     z.string().url("有効なURLを入力してください").optional()
   ),
+  priceMax: z.coerce.number().int().nonnegative("価格上限は0円以上で入力してください").optional(),
+  priceMin: z.coerce.number().int().nonnegative("価格下限は0円以上で入力してください").optional(),
   isPublic: z.boolean().default(true),
   rulebookId: z.preprocess(
     (val) => (val === "" ? undefined : val),
@@ -26,6 +28,15 @@ export const formSchema = z.object({
 }).refine(data => data.playerMax >= data.playerMin, {
   message: "最大プレイヤー人数は最低プレイヤー人数以上である必要があります",
   path: ["playerMax"],
+}).refine(data => {
+  // priceMaxとpriceMinの関係を定義
+  if (data.priceMax !== undefined && data.priceMin !== undefined) {
+    return data.priceMax >= data.priceMin;
+  }
+  return true; // どちらかが未指定ならOK
+},{
+  message:"最大価格は最低価格以上である必要があります",
+  path: ["priceMax"]
 });
 
 export type ScenarioFormValues = z.infer<typeof formSchema>;

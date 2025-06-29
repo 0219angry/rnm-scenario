@@ -103,6 +103,9 @@ model Scenario {
   content       String?   // シナリオ内容（Markdownなど）
   isPublic      Boolean   @default(true)
 
+  priceMax      Int?      // 価格上限（円）
+  priceMin      Int?      // 価格下限（円）
+
   rulebook      Rulebook? @relation(fields: [rulebookId], references: [id])
   rulebookId    String?   
 

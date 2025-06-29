@@ -6,6 +6,7 @@ import { z } from "zod";
 import Link from "next/link";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { Genre } from "@prisma/client"; 
+import { useEffect } from "react";
 
 // --- 型定義とスキーマ ---
 
@@ -45,6 +46,9 @@ export const formSchema = z.object({
     (val) => (val === "" ? undefined : val),
     z.string().url("有効なURLを入力してください").optional()
   ),
+  priceMax: z.coerce.number().int().nonnegative("価格上限は0円以上で入力してください").optional(),
+  priceMin: z.coerce.number().int().nonnegative("価格下限は0円以上で入力してください").optional(),
+  // priceMinとpriceMaxの関係を定義
   isPublic: z.boolean().default(true),
   rulebookId: z.preprocess(
     (val) => (val === "" ? undefined : val),
@@ -57,6 +61,12 @@ export const formSchema = z.object({
 }).refine(data => data.playerMax >= data.playerMin, {
   message: "最大プレイヤー人数は最低プレイヤー人数以上である必要があります",
   path: ["playerMax"],
+}).refine(data => {
+  // priceMaxとpriceMinの関係を定義
+  if (data.priceMax !== undefined && data.priceMin !== undefined) {
+    return data.priceMax >= data.priceMin;
+  }
+  return true; // どちらかが未指定ならOK
 });
 
 // Zodスキーマからフォームの型を推論
@@ -82,6 +92,8 @@ export function ScenarioForm({
       genre: Genre.MADAMIS,
       averageTime: 120,
       distribution: "",
+      priceMax: 0, // 初期値は未指定
+      priceMin: 0,
       isPublic: true,
       rulebookId: "",
       content: "",
@@ -92,6 +104,27 @@ export function ScenarioForm({
   // watchで現在のフォームの値を取得し、UIに反映させる
   const watchGenre = form.watch("genre");
   const watchRequiresGM = form.watch("requiresGM");
+  const distributionUrl = form.watch("distribution");
+
+  useEffect(() => {
+    const fetchBoothPrice = async () => {
+      if (!distributionUrl || !distributionUrl.startsWith("https://booth.pm/")) return;
+      try {
+        const res = await fetch(`/api/booth-price?url=${encodeURIComponent(distributionUrl)}`);
+        const data = await res.json();
+        if (typeof data.min === "number") {
+          form.setValue("priceMin", data.min, { shouldValidate: true });
+        }
+        if (typeof data.max === "number") {
+          form.setValue("priceMax", data.max, { shouldValidate: true });
+        }
+      } catch (err) {
+        console.warn("価格の取得に失敗しちゃったよ…", err);
+      }
+    };
+
+    fetchBoothPrice();
+  }, [distributionUrl, form.setValue]);
 
   return (
     <div className="w-full max-w-2xl p-8 space-y-8 bg-white rounded-xl shadow-md dark:bg-gray-800">
@@ -209,6 +242,20 @@ export function ScenarioForm({
           <label htmlFor="distribution" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">配布先URL（任意）</label>
           <input id="distribution" type="url" placeholder="https://example.com" {...form.register("distribution")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600" />
           {form.formState.errors.distribution && <p className="mt-1 text-xs text-red-500">{form.formState.errors.distribution.message}</p>}
+        </div>
+
+        {/* 価格 */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div>
+            <label htmlFor="priceMin" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">最低価格 <span className="text-red-500">*</span></label>
+            <input id="priceMin" type="number" inputMode="numeric" {...form.register("priceMin")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600" />
+            {form.formState.errors.priceMin && <p className="mt-1 text-xs text-red-500">{form.formState.errors.priceMin.message}</p>}
+          </div>
+          <div>
+            <label htmlFor="priceMax" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">最高価格 <span className="text-red-500">*</span></label>
+            <input id="priceerMax" type="number" inputMode="numeric" {...form.register("priceMax")} className="w-full px-3 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600" />
+            {form.formState.errors.priceMax && <p className="mt-1 text-xs text-red-500">{form.formState.errors.priceMax.message}</p>}
+          </div>
         </div>
 
         {/* 公開設定 */}

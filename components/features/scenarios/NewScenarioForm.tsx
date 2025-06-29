@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Genre } from "@prisma/client";
+import { useEffect } from "react";
 // --- 外部で定義する型やスキーマ ---
 
 export enum GenreName {
@@ -69,6 +70,7 @@ export function NewScenarioForm({ rulebooks = [] }: NewScenarioFormProps) {
       comment: "",
     },
   });
+
 
   async function onSubmit(values: ScenarioFormValues) {
     console.log("送信されるデータ:", values);
