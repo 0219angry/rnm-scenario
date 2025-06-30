@@ -91,16 +91,52 @@ export function NotificationMenu() {
   }, []); // 空の依存配列は、このEffectがマウント時に一度だけ実行されることを意味する。
 
   /**
+   * メニューが開かれたときに、すべての未読通知を既読としてマークする
+   */
+  const handleOpenMenuAndMarkAllAsRead = async () => {
+    // 1. 未読の通知だけをフィルタリング
+    const unreadNotificationIds = notifications
+      .filter(n => !n.isRead)
+      .map(n => n.id);
+
+    // 2. 未読がなければ何もしない
+    if (unreadNotificationIds.length === 0) {
+      return;
+    }
+
+    // 3. オプティミスティックUIアップデート: UIを即時更新
+    setNotifications(prev =>
+      prev.map(n => ({ ...n, isRead: true }))
+    );
+
+    // 4. バックエンドに一括更新リクエストを送信
+    try {
+      await fetch('/api/notifications/mark-all-as-read', {
+        method: 'POST',
+      });
+    } catch (error) {
+      console.error("Failed to mark all notifications as read:", error);
+      // ここでUIを元に戻す処理を追加することも可能
+    }
+  };
+
+  /**
    * 未読通知が存在するかどうかを判定する計算済み変数。
    * この結果をもとに、未読インジケータの表示・非表示を制御する。
    */
   const hasUnread = notifications.some(n => !n.isRead);
 
+  // ▼▼▼ 表示用の通知リストを準備（最新5件を切り出す） ▼▼▼
+  const displayedNotifications = notifications.slice(0, 5);
+
+
   return (
-    // ▼▼▼ ステップ2: JSXのコンポーネント名を修正 ▼▼▼
     <Menu as="div" className="relative inline-block text-left">
       <div>
-        <MenuButton className="relative inline-flex justify-center rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2">
+        <MenuButton
+          onClick={handleOpenMenuAndMarkAllAsRead}
+          className="relative inline-flex justify-center rounded-full p-2 text-gray-500 hover:bg-gray-100 ..."
+        >
           <FaBell className="h-6 w-6" aria-hidden="true" />
           {hasUnread && (
             <span className="absolute -top-0 -right-0 flex h-3 w-3">
@@ -125,12 +161,12 @@ export function NotificationMenu() {
             <p className="text-sm font-semibold text-gray-900">通知</p>
           </div>
           <div className="max-h-96 overflow-y-auto">
-            {notifications.length === 0 ? (
+            {displayedNotifications.length === 0 ? (
               <div className="px-4 py-4">
                 <p className="text-sm text-gray-500">新しい通知はありません</p>
               </div>
             ) : (
-              notifications.map((notification) => (
+              displayedNotifications.map((notification) => (
                 <MenuItem key={notification.id}>
                   {({ active }) => (
                     <Link
@@ -158,6 +194,16 @@ export function NotificationMenu() {
                 </MenuItem>
               ))
             )}
+          </div>
+          <div className="px-1 py-1">
+            <MenuItem>
+              <Link
+                href="/notifications"
+                className="block w-full text-center rounded-md px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50"
+              >
+                すべての通知を見る
+              </Link>
+            </MenuItem>
           </div>
         </MenuItems>
       </Transition>
