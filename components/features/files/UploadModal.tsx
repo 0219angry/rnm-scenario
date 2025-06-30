@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, DragEvent } from 'react';
 import { FaUpload } from 'react-icons/fa';
 import { FiFile, FiX } from 'react-icons/fi';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { FileInfo } from '../sessions/SessionFileList';
 
 type Props = {
@@ -20,7 +19,6 @@ export function UploadFileModal({ sessionId, onUploadSuccess }: Props) {
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null); // input要素への参照
-  const supabase = createClientComponentClient();
 
   const openModal = () => setIsOpen(true);
   const closeModal = () => {

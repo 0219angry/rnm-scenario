@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 /**
  * 現在のユーザーの未読通知をすべて既読にする
  */
-export async function POST(_req: Request) {
+export async function POST() {
   try {
     const currentUser = await getCurrentUser();
     if (!currentUser?.id) {

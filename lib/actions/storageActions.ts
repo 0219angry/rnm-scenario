@@ -8,7 +8,7 @@ export async function getSignedUrl(sessionId: string, fileName: string, fileType
   if (!user) {
     throw new Error('Unauthorized');
   }
-
+  console.log(fileType);
   const { data, error } = await supabase.storage
     .from('session-files')
     .createSignedUploadUrl(`${sessionId}/${fileName}`, {

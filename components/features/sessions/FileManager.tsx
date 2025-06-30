@@ -56,6 +56,7 @@ const handleActivateTrigger = async (
   assignments: Assignment[] // 子コンポーネントから配布リストを直接受け取る
 ) => {
   // 1. 処理開始をユーザーに通知（ローディング状態のトーストを表示）
+  setLoading(true);
   const toastId = toast.loading(
     `トリガー「${triggerId}. ${triggerName}」: ${assignments.length}件の通知を送信中です...`
   );
@@ -127,6 +128,8 @@ const handleActivateTrigger = async (
     });
     // 子コンポーネントにエラーを伝播させ、ボタンのローディング状態などを解除させる
     throw error;
+  } finally {
+    setLoading(false);
   }
 };
 

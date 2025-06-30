@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import { Player, Trigger } from '@/types/types';
+import { Player } from '@/types/types';
 import { FileInfo } from '@/components/features/sessions/SessionFileList';
 import { FileManager } from '@/components/features/sessions/FileManager';
 import { FileObject } from '@supabase/storage-js';
@@ -38,22 +38,6 @@ async function getPlayersForSession(sessionId: string): Promise<Player[]> {
   }));
 
   return players;
-}
-
-/**
- * 配布トリガーの一覧を生成する
- * @returns トリガー情報の配列
- */
-function getTriggersForSession(): Trigger[] {
-  const NUMBER_OF_TRIGGERS = 5; // ここで列数を定義
-  const triggers: Trigger[] = [];
-  for (let i = 1; i <= NUMBER_OF_TRIGGERS; i++) {
-    triggers.push({
-      id: `trigger-${i}`,
-      name: String(i),
-    });
-  }
-  return triggers;
 }
 
 /**

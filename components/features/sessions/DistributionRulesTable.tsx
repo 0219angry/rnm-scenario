@@ -4,13 +4,11 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Player, Trigger } from '@/types/types'; 
 import { FileInfo } from './SessionFileList';
-import { CustomSelect } from '@/components/ui/CustomSelect'; // 作成したコンポーネントをインポート
 
 // アイコンライブラリ
 import { FiPlay, FiCheck, FiFile, FiImage, FiFileText, FiVideo, FiMusic } from 'react-icons/fi';
 import { FaFilePdf, FaFileWord, FaFileExcel } from 'react-icons/fa';
 import { VscChromeClose } from 'react-icons/vsc';
-import { fetchSessionById } from '@/lib/data';
 
 // --- ヘルパー関数: ファイルタイプに応じたアイコンを返す ---
 const getFileIcon = (mimetype: string) => {
