@@ -28,6 +28,7 @@ model User {
   accounts      Account[]
   userSessions  UserSession[]
   comments      Comment[]
+  notifications Notification[]
 }
 
 model Account {
@@ -177,4 +178,15 @@ model Comment {
 
   @@index([sessionId])
   @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  toUserId  String
+  content   String
+  link      String? 
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [toUserId], references: [id])
 }
