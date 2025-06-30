@@ -10,6 +10,7 @@ import { CustomSelect } from '@/components/ui/CustomSelect'; // 作成したコ�
 import { FiPlay, FiCheck, FiFile, FiImage, FiFileText, FiVideo, FiMusic } from 'react-icons/fi';
 import { FaFilePdf, FaFileWord, FaFileExcel } from 'react-icons/fa';
 import { VscChromeClose } from 'react-icons/vsc';
+import { fetchSessionById } from '@/lib/data';
 
 // --- ヘルパー関数: ファイルタイプに応じたアイコンを返す ---
 const getFileIcon = (mimetype: string) => {
@@ -23,21 +24,32 @@ const getFileIcon = (mimetype: string) => {
   return <FiFile className="text-gray-500" />;
 };
 
+export type Assignment = {
+  sessionId: string;
+  playerId: string;
+  playerName: string;
+  fileName: string;
+};
 
 type Props = {
+  sessionId: string;
   players: Player[];
   triggers: Trigger[];
   files: FileInfo[];
   /**
-   * トリガーヘッダーがクリックされ、確認後に呼び出される関数
+   * トリガーが発動される際に呼び出される非同期関数
    * @param triggerId 発動するトリガーのID
    * @param triggerName 発動するトリガーの名前
-   * @returns void
+   * @param assignments 作成された配布リスト
    */
-  onActivateTrigger: (triggerId: string, triggerName: string) => Promise<void>;
+  onActivateTrigger: (
+    triggerId: string,
+    triggerName: string,
+    assignments: Assignment[]
+  ) => Promise<void>;
 };
 
-export function DistributionRulesTable({ players, triggers, files,onActivateTrigger }: Props) {
+export function DistributionRulesTable({ sessionId, players, triggers, files,onActivateTrigger }: Props) {
   const [distributionState, setDistributionState] = useState<
     Record<string, Record<string, string | null>>
   >({});
@@ -98,40 +110,55 @@ export function DistributionRulesTable({ players, triggers, files,onActivateTrig
       handleFileAssign(playerId, triggerId, fileInfo.name);
     }
   };
-  const handleTriggerHeaderClick = async(triggerId: string, triggerName: string) => {
+  
+  const handleTriggerHeaderClick = async (triggerId: string, triggerName: string) => {
     if (activatedTriggers.has(triggerId) || activatingTriggerId) {
       return;
     }
-    // 割り当てられているファイル数をカウント
-    const assignedFilesCount = players.filter(
-      (player) => distributionState[player.id]?.[triggerId]
-    ).length;
 
-    // 確認メッセージを作成
+    // ★★★ このコンポーネント内で配布リストを作成する ★★★
+    const assignments: Assignment[] = players
+      .map(player => {
+        const fileName = distributionState[player.id]?.[triggerId];
+        if (fileName) {
+          return {
+            sessionId: sessionId,
+            playerId: player.id,
+            playerName: player.name, // デバッグ等で便利なように名前も追加
+            fileName: fileName,
+          };
+        }
+        return null;
+      })
+      // 型安全性を保つために型ガードを使用
+      .filter((item): item is Assignment => item !== null);
+
+    // 割り当てがない場合はユーザーに通知して処理を中断
+    if (assignments.length === 0) {
+      alert('このトリガーにはファイルが割り当てられていません。');
+      return;
+    }
+
+    // 確認メッセージに配布人数を表示
     const confirmationMessage = `トリガー「${triggerName}」を発動します。
     
-現在、${assignedFilesCount}人 のプレイヤーにファイルが割り当てられています。
+${assignments.length}人 のプレイヤーにファイルが配布されます。
 この操作は元に戻せません。よろしいですか？`;
 
-    // ブラウザの確認ダイアログを表示
     const isConfirmed = window.confirm(confirmationMessage);
 
-    // ユーザーが「OK」をクリックした場合のみ、propsで受け取った関数を実行
     if (isConfirmed) {
-      setActivatingTriggerId(triggerId); // 処理中の状態に設定
+      setActivatingTriggerId(triggerId);
       try {
-        // 親コンポーネントの非同期処理を呼び出し、完了を待つ
-        await onActivateTrigger(triggerId, triggerName);
+        // ★★★ 親コンポーネントに「配布リスト」を渡す ★★★
+        await onActivateTrigger(triggerId, triggerName, assignments);
 
-        // 成功した場合、発動済みリストにIDを追加
         setActivatedTriggers((prev) => new Set(prev).add(triggerId));
 
       } catch (error) {
-        // 親コンポーネントでエラーがスローされた場合
         console.error(`トリガー「${triggerName}」の発動に失敗しました。`, error);
         alert(`エラー: トリガー「${triggerName}」の発動に失敗しました。`);
       } finally {
-        // 成功・失敗にかかわらず、処理中状態を解除
         setActivatingTriggerId(null);
       }
     }

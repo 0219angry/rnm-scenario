@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { FileInfo, SessionFileList } from './SessionFileList';
 import { UploadFileModal } from '../files/UploadModal';
-import { DistributionRulesTable } from './DistributionRulesTable';
+import { DistributionRulesTable, Assignment } from './DistributionRulesTable';
 import { Player, Trigger} from '@/types/types';
 import { FiPlus, FiMinus } from 'react-icons/fi';
+import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 
 const INITIAL_TRIGGERS = 5;
 const MAX_TRIGGERS = 10;
@@ -45,15 +47,88 @@ export function FileManager({
     setTriggerCount(newCount);
   };
 
-  // テーブルコンポーネントから呼び出されるトリガー発動処理の本体
-  const handleActivateTrigger = async(triggerId: string, triggerName: string) => {
-    // ここで、データベースの更新やAPIへのリクエストなど、
-    // 実際のファイル配布処理を実行します。
-    console.log(`APIを呼び出し、トリガー[${triggerName}] (ID: ${triggerId}) を実行します...`);
+/**
+ * トリガー発動関数（個別通知APIを利用するように改良）
+ */
+const handleActivateTrigger = async (
+  triggerId: string,
+  triggerName: string,
+  assignments: Assignment[] // 子コンポーネントから配布リストを直接受け取る
+) => {
+  // 1. 処理開始をユーザーに通知（ローディング状態のトーストを表示）
+  const toastId = toast.loading(
+    `トリガー「${triggerId}. ${triggerName}」: ${assignments.length}件の通知を送信中です...`
+  );
 
-    // 処理成功のフィードバックをユーザーに表示
-    alert(`トリガー「${triggerName}」を発動しました。`);
-  };
+  try {
+    // 2. 配布リストの各項目に対して、個別通知APIの呼び出しプロミスを作成
+    const notificationPromises = assignments.map(assignment => {
+      
+      // 各ユーザーへの通知メッセージとリンクURLを生成
+      const message = `ファイル「${assignment.fileName}」があなたに共有されました。`;
+      // ファイル詳細ページなど、実際のアプリケーションのパス構造に合わせる
+      const { data } = supabase
+        .storage
+        .from('session-files') // ★★★ あなたのバケット名に変更 ★★★
+        .getPublicUrl(`${assignment.sessionId}/${assignment.fileName}`); // ファイル名（またはファイルパス）を指定
+
+      const linkUrl = data.publicUrl;
+
+      // 個別通知作成APIを呼び出す
+      return fetch('/api/notifications', { // ★こちらのエンドポイントを使用
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          toUserId: assignment.playerId,
+          message: message,
+          linkUrl: linkUrl,
+        }),
+      });
+    });
+
+    // 3. 全てのAPIリクエストが完了するのを待つ (一部が失敗しても処理を続行)
+    const results = await Promise.allSettled(notificationPromises);
+
+    // 4. APIリクエストの結果を集計
+    const successCount = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
+    const failureCount = assignments.length - successCount;
+
+    // 5. 結果に応じたフィードバックをトーストで表示
+    if (failureCount === 0) {
+      // 全て成功した場合
+      toast.success(
+        `トリガー「${triggerName}」: ${successCount}件すべての通知を送信しました。`,
+        { id: toastId } // ローディングトーストを成功トーストに置き換え
+      );
+    } else {
+      // 一部または全部が失敗した場合
+      toast.error(
+        `トリガー「${triggerName}」: ${successCount}件成功, ${failureCount}件失敗しました。`,
+        { id: toastId, duration: 8000 } // エラーは少し長めに表示
+      );
+      
+      // 失敗したリクエストの詳細を開発者向けにコンソールに出力
+      results.forEach((result, index) => {
+        if (result.status === 'rejected' || (result.status === 'fulfilled' && !result.value.ok)) {
+          console.error(
+            `[通知失敗] ユーザーID: ${assignments[index].playerId}`,
+            result
+          );
+        }
+      });
+    }
+  } catch (error) {
+    // ネットワークエラーなど、予期せぬエラーが発生した場合
+    console.error(`トリガー「${triggerName}」の処理中に予期せぬエラーが発生しました。`, error);
+    toast.error('通知処理中に予期せぬエラーが発生しました。詳細はコンソールを確認してください。', {
+      id: toastId,
+    });
+    // 子コンポーネントにエラーを伝播させ、ボタンのローディング状態などを解除させる
+    throw error;
+  }
+};
 
   return (
     <div className="flex flex-col md:flex-row md:gap-8">
@@ -105,6 +180,7 @@ export function FileManager({
         </div>
         
         <DistributionRulesTable
+          sessionId={sessionId}
           players={initialPlayers}
           triggers={triggers} // 動的に生成したトリガーを渡す
           files={files}

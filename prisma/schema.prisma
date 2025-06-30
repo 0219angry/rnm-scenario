@@ -28,7 +28,10 @@ model User {
   accounts      Account[]
   userSessions  UserSession[]
   comments      Comment[]
-  notifications Notification[]
+  // このユーザーが受け取った通知
+  notificationsTo   Notification[] @relation("NotificationsToUser")
+  // このユーザーが送信した通知
+  notificationsFrom Notification[] @relation("NotificationsFromUser")
 }
 
 model Account {
@@ -181,12 +184,17 @@ model Comment {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  toUserId  String
-  content   String
-  link      String? 
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  toUserId   String   // 通知先のユーザーID
+  fromUserId String   // 通知元のユーザーID
+  message    String   // 通知メッセージ本文
+  linkUrl    String?  // (任意) 通知クリック時の遷移先URL
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
 
-  user      User     @relation(fields: [toUserId], references: [id])
+  // リレーション定義
+  toUser   User @relation("NotificationsToUser", fields: [toUserId], references: [id], onDelete: Cascade)
+  fromUser User @relation("NotificationsFromUser", fields: [fromUserId], references: [id], onDelete: Cascade)
+
+  @@index([toUserId])
 }
