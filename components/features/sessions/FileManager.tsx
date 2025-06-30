@@ -46,7 +46,7 @@ export function FileManager({
   };
 
   // テーブルコンポーネントから呼び出されるトリガー発動処理の本体
-  const handleActivateTrigger = (triggerId: string, triggerName: string) => {
+  const handleActivateTrigger = async(triggerId: string, triggerName: string) => {
     // ここで、データベースの更新やAPIへのリクエストなど、
     // 実際のファイル配布処理を実行します。
     console.log(`APIを呼び出し、トリガー[${triggerName}] (ID: ${triggerId}) を実行します...`);

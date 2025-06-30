@@ -7,7 +7,7 @@ import { FileInfo } from './SessionFileList';
 import { CustomSelect } from '@/components/ui/CustomSelect'; // 作成したコンポーネントをインポート
 
 // アイコンライブラリ
-import { FiFile, FiImage, FiFileText, FiVideo, FiMusic } from 'react-icons/fi';
+import { FiPlay, FiCheck, FiFile, FiImage, FiFileText, FiVideo, FiMusic } from 'react-icons/fi';
 import { FaFilePdf, FaFileWord, FaFileExcel } from 'react-icons/fa';
 import { VscChromeClose } from 'react-icons/vsc';
 
@@ -34,7 +34,7 @@ type Props = {
    * @param triggerName 発動するトリガーの名前
    * @returns void
    */
-  onActivateTrigger: (triggerId: string, triggerName: string) => void;
+  onActivateTrigger: (triggerId: string, triggerName: string) => Promise<void>;
 };
 
 export function DistributionRulesTable({ players, triggers, files,onActivateTrigger }: Props) {
@@ -47,6 +47,13 @@ export function DistributionRulesTable({ players, triggers, files,onActivateTrig
     playerId: string;
     triggerId: string;
   } | null>(null);
+
+  // 発動済みのトリガーIDを管理する
+  const [activatedTriggers, setActivatedTriggers] = useState<Set<string>>(new Set());
+  // 現在処理中のトリガーIDを管理する（連続クリック防止）
+  const [activatingTriggerId, setActivatingTriggerId] = useState<string | null>(null);
+
+
 
   // ファイルの割り当て・解除を行うハンドラ
   const handleFileAssign = (
@@ -91,7 +98,10 @@ export function DistributionRulesTable({ players, triggers, files,onActivateTrig
       handleFileAssign(playerId, triggerId, fileInfo.name);
     }
   };
-  const handleTriggerHeaderClick = (triggerId: string, triggerName: string) => {
+  const handleTriggerHeaderClick = async(triggerId: string, triggerName: string) => {
+    if (activatedTriggers.has(triggerId) || activatingTriggerId) {
+      return;
+    }
     // 割り当てられているファイル数をカウント
     const assignedFilesCount = players.filter(
       (player) => distributionState[player.id]?.[triggerId]
@@ -108,10 +118,22 @@ export function DistributionRulesTable({ players, triggers, files,onActivateTrig
 
     // ユーザーが「OK」をクリックした場合のみ、propsで受け取った関数を実行
     if (isConfirmed) {
-      console.log(`トリガー「${triggerName}」(ID: ${triggerId}) を発動します。`);
-      onActivateTrigger(triggerId, triggerName);
-    } else {
-      console.log(`トリガー「${triggerName}」の発動はキャンセルされました。`);
+      setActivatingTriggerId(triggerId); // 処理中の状態に設定
+      try {
+        // 親コンポーネントの非同期処理を呼び出し、完了を待つ
+        await onActivateTrigger(triggerId, triggerName);
+
+        // 成功した場合、発動済みリストにIDを追加
+        setActivatedTriggers((prev) => new Set(prev).add(triggerId));
+
+      } catch (error) {
+        // 親コンポーネントでエラーがスローされた場合
+        console.error(`トリガー「${triggerName}」の発動に失敗しました。`, error);
+        alert(`エラー: トリガー「${triggerName}」の発動に失敗しました。`);
+      } finally {
+        // 成功・失敗にかかわらず、処理中状態を解除
+        setActivatingTriggerId(null);
+      }
     }
   };
 
@@ -124,17 +146,57 @@ export function DistributionRulesTable({ players, triggers, files,onActivateTrig
             <th scope="col" className="px-4 py-3 font-semibold w-3/12">
               プレイヤー
             </th>
-            {triggers.map((trigger) => (
-              <th 
-                key={trigger.id} 
-                scope="col" 
-                className="px-4 py-3 font-semibold text-center max-w-[150px]"
-                onClick={() => handleTriggerHeaderClick(trigger.id, trigger.name)}
-                title={`トリガー「${trigger.name}」を発動する`}
-              >
-                {trigger.name}
-              </th>
-            ))}
+            {/* 【変更点⑤】thの中身を全面的に刷新 */}
+            {triggers.map((trigger) => {
+              const isActivated = activatedTriggers.has(trigger.id);
+              const isActivating = activatingTriggerId === trigger.id;
+
+              return (
+                <th
+                  key={trigger.id}
+                  scope="col"
+                  className="px-4 py-3 font-semibold text-center"
+                >
+                  {/* トリガー名 */}
+                  <span className="block truncate mb-2">{trigger.name}</span>
+                  
+                  {/* 発動状態に応じて表示を切り替え */}
+                  <div className="h-8 flex items-center justify-center">
+                    {isActivated ? (
+                      // 発動済みの表示
+                      <div className="flex items-center justify-center gap-1.5 text-green-600 font-normal text-sm">
+                        <FiCheck size={16} />
+                        <span>完了</span>
+                      </div>
+                    ) : (
+                      // 未発動の場合、ボタンを表示
+                      <button
+                        type="button"
+                        onClick={() => handleTriggerHeaderClick(trigger.id, trigger.name)}
+                        disabled={isActivating || !!activatingTriggerId} // 自身または他が処理中なら無効
+                        className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                        title={ isActivating ? '処理中です...' : `トリガー「${trigger.name}」を発動する` }
+                      >
+                        {isActivating ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>処理中...</span>
+                          </>
+                        ) : (
+                          <>
+                            <FiPlay />
+                            <span>送信</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
