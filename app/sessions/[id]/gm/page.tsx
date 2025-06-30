@@ -108,9 +108,8 @@ export default async function SessionFilePage({
   }
 
   // サーバーサイドで必要なデータをすべて並行して取得
-  const [players, triggers, files] = await Promise.all([
+  const [players, files] = await Promise.all([
     getPlayersForSession(id),
-    Promise.resolve(getTriggersForSession()), // 同期関数もPromise.allに含める
     getFilesForSession(id),
   ]);
 
@@ -129,7 +128,6 @@ export default async function SessionFilePage({
       <FileManager
         sessionId={id}
         initialPlayers={players}
-        initialTriggers={triggers}
         initialFiles={files}
       />
     </main>

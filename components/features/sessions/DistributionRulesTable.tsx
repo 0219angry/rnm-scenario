@@ -110,15 +110,15 @@ export function DistributionRulesTable({ players, triggers, files }: Props) {
 
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-x-auto">
-      <table className="w-full min-w-[600px] table-fixed text-sm text-left">
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+      <table className="w-full min-w-full table-fixed text-sm text-left">
         <thead className="bg-gray-50 text-xs text-gray-700 uppercase">
           <tr>
             <th scope="col" className="px-4 py-3 font-semibold w-3/12">
               プレイヤー
             </th>
             {triggers.map((trigger) => (
-              <th key={trigger.id} scope="col" className="px-4 py-3 font-semibold text-center">
+              <th key={trigger.id} scope="col" className="px-4 py-3 font-semibold text-center max-w-[150px]">
                 {trigger.name}
               </th>
             ))}
@@ -131,13 +131,13 @@ export function DistributionRulesTable({ players, triggers, files }: Props) {
                 <div className="flex items-center gap-3">
                   <div className="relative w-9 h-9 flex-shrink-0">
                     <Image
-                      src={player.avatar_url || '/default-avatar.png'}
+                      src={player.avatar_url ?? `https://avatar.vercel.sh/${player.id}`}
                       alt={player.name}
                       fill
                       className="rounded-full object-cover"
                     />
                   </div>
-                  <span className="text-sm">{player.name}</span>
+                  <span className="text-xs">{player.name}</span>
                 </div>
               </td>
               {triggers.map((trigger) => {
