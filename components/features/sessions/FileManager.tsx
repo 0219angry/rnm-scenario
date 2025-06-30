@@ -45,6 +45,16 @@ export function FileManager({
     setTriggerCount(newCount);
   };
 
+  // テーブルコンポーネントから呼び出されるトリガー発動処理の本体
+  const handleActivateTrigger = (triggerId: string, triggerName: string) => {
+    // ここで、データベースの更新やAPIへのリクエストなど、
+    // 実際のファイル配布処理を実行します。
+    console.log(`APIを呼び出し、トリガー[${triggerName}] (ID: ${triggerId}) を実行します...`);
+
+    // 処理成功のフィードバックをユーザーに表示
+    alert(`トリガー「${triggerName}」を発動しました。`);
+  };
+
   return (
     <div className="flex flex-col md:flex-row md:gap-8">
       {/* --- 左カラム (3割) --- */}
@@ -98,6 +108,7 @@ export function FileManager({
           players={initialPlayers}
           triggers={triggers} // 動的に生成したトリガーを渡す
           files={files}
+          onActivateTrigger={handleActivateTrigger}
         />
       </div>
     </div>

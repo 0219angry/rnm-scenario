@@ -28,9 +28,16 @@ type Props = {
   players: Player[];
   triggers: Trigger[];
   files: FileInfo[];
+  /**
+   * トリガーヘッダーがクリックされ、確認後に呼び出される関数
+   * @param triggerId 発動するトリガーのID
+   * @param triggerName 発動するトリガーの名前
+   * @returns void
+   */
+  onActivateTrigger: (triggerId: string, triggerName: string) => void;
 };
 
-export function DistributionRulesTable({ players, triggers, files }: Props) {
+export function DistributionRulesTable({ players, triggers, files,onActivateTrigger }: Props) {
   const [distributionState, setDistributionState] = useState<
     Record<string, Record<string, string | null>>
   >({});
@@ -84,29 +91,29 @@ export function DistributionRulesTable({ players, triggers, files }: Props) {
       handleFileAssign(playerId, triggerId, fileInfo.name);
     }
   };
+  const handleTriggerHeaderClick = (triggerId: string, triggerName: string) => {
+    // 割り当てられているファイル数をカウント
+    const assignedFilesCount = players.filter(
+      (player) => distributionState[player.id]?.[triggerId]
+    ).length;
 
-  // CustomSelectコンポーネントに渡すための選択肢(options)を生成
-  const selectOptions = [
-    {
-      value: 'none', // 「未選択」を表す特別な値
-      label: (
-        <div className="flex items-center gap-2 text-gray-500">
-          <VscChromeClose />
-          <span>未選択</span>
-        </div>
-      ),
-    },
-    // アップロードされたファイル一覧をループして選択肢を生成
-    ...files.map((file) => ({
-      value: file.name,
-      label: (
-        <div className="flex items-center gap-2">
-          {getFileIcon(file.mimetype)}
-          <span className="text-xs">{file.name}</span>
-        </div>
-      ),
-    })),
-  ];
+    // 確認メッセージを作成
+    const confirmationMessage = `トリガー「${triggerName}」を発動します。
+    
+現在、${assignedFilesCount}人 のプレイヤーにファイルが割り当てられています。
+この操作は元に戻せません。よろしいですか？`;
+
+    // ブラウザの確認ダイアログを表示
+    const isConfirmed = window.confirm(confirmationMessage);
+
+    // ユーザーが「OK」をクリックした場合のみ、propsで受け取った関数を実行
+    if (isConfirmed) {
+      console.log(`トリガー「${triggerName}」(ID: ${triggerId}) を発動します。`);
+      onActivateTrigger(triggerId, triggerName);
+    } else {
+      console.log(`トリガー「${triggerName}」の発動はキャンセルされました。`);
+    }
+  };
 
 
   return (
@@ -118,7 +125,13 @@ export function DistributionRulesTable({ players, triggers, files }: Props) {
               プレイヤー
             </th>
             {triggers.map((trigger) => (
-              <th key={trigger.id} scope="col" className="px-4 py-3 font-semibold text-center max-w-[150px]">
+              <th 
+                key={trigger.id} 
+                scope="col" 
+                className="px-4 py-3 font-semibold text-center max-w-[150px]"
+                onClick={() => handleTriggerHeaderClick(trigger.id, trigger.name)}
+                title={`トリガー「${trigger.name}」を発動する`}
+              >
                 {trigger.name}
               </th>
             ))}
