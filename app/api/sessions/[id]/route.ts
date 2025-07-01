@@ -2,6 +2,61 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    // URLの動的セグメントからsessionIdを取得
+    const { id } = await params;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: 'sessionId is required' },
+        { status: 400 }
+      );
+    }
+
+    // Prismaを使ってデータベースを検索
+    const session = await prisma.session.findUnique({
+      where: { id: id },
+      // 以前と同様に必要な関連データを含める
+      include: {
+        scenario: {
+          include: {
+            rulebook: true,
+          },
+        },
+        owner: true,
+        participants: {
+          orderBy: { assignedAt: 'asc' },
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    // セッションが見つからなかった場合
+    if (!session) {
+      return NextResponse.json(
+        { message: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
+    // 成功した場合、セッションデータを返す
+    return NextResponse.json(session, { status: 200 });
+
+  } catch (error) {
+    console.error('API Error:', error);
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(
   req: Request,
   context: { params: Promise<{ id: string }> }

@@ -2,15 +2,20 @@
 
 import { useState, useEffect, useActionState, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
-import { updateYoutubeLink, type FormState } from '@/lib/actions/participantActions';
-import { FaEdit } from 'react-icons/fa';
+import { updateYoutubeLink, type FormState } from '@/lib/actions/participantActions'; // Server Actionをインポート
 
+// --- アイコンのインポート ---
+import { FaYoutube } from 'react-icons/fa';
+import { PencilIcon } from '@heroicons/react/24/solid'; // ★ 不足していたパスを修正
+
+// --- 型定義 ---
 type Props = {
   sessionId: string;
   currentLink: string | null;
+  asMenuItem?: boolean; // メニュー項目として表示するかどうかのフラグ
 };
 
-// フォームの送信ボタン（ローディング状態をハンドリング）
+// --- 送信ボタンコンポーネント ---
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
@@ -24,30 +29,35 @@ function SubmitButton() {
   );
 }
 
-export function EditYoutubeLinkModal({ sessionId, currentLink }: Props) {
+// --- メインコンポーネント本体 ---
+export function EditYoutubeLinkModal({ sessionId, currentLink, asMenuItem = false }: Props) {
+  // --- フック定義 ---
   const [isOpen, setIsOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
+  // Server Actionの状態管理
   const initialState: FormState = { message: '', success: false };
   const [state, formAction] = useActionState(updateYoutubeLink, initialState);
 
-  // isOpenの状態に応じてモーダルダイアログを開閉する
+  // ---副作用フック (useEffect) ---
+
+  // isOpen stateに応じて<dialog>要素の開閉を制御
   useEffect(() => {
     if (isOpen) {
-      dialogRef.current?.showModal(); // ダイアログを表示
+      dialogRef.current?.showModal();
     } else {
-      dialogRef.current?.close(); // ダイアログを閉じる
+      dialogRef.current?.close();
     }
   }, [isOpen]);
 
-  // Server Actionの処理が成功したら、モーダルを閉じる
+  // Server Actionが成功したらモーダルを閉じる
   useEffect(() => {
     if (state.success) {
       setIsOpen(false);
     }
   }, [state]);
 
-  // dialogがEscキーで閉じられた時にisOpenステートも更新する
+  // ESCキーでダイアログが閉じられた時に、isOpen stateも同期させる
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
@@ -56,18 +66,32 @@ export function EditYoutubeLinkModal({ sessionId, currentLink }: Props) {
     return () => dialog.removeEventListener('close', handleClose);
   }, []);
 
+
+  // --- レンダリング ---
   return (
     <>
-      {/* 編集ボタン（モーダルを開くトリガー） */}
-      <button
-        onClick={() => setIsOpen(true)}
-        title="自分の視点動画リンクを編集"
-        className="text-gray-400 transition-colors hover:text-blue-500"
-      >
-        <FaEdit size={20} />
-      </button>
+      {/* モーダルを開くトリガーボタン */}
+      {asMenuItem ? (
+        // メニュー項目として表示する場合
+        <button
+          onClick={() => setIsOpen(true)}
+          className="group flex w-full items-center rounded-md px-2 py-2 text-sm text-gray-900 hover:bg-gray-100"
+        >
+          <FaYoutube className="mr-2 h-5 w-5 text-red-500" />
+          YouTubeリンクを編集
+        </button>
+      ) : (
+        // 通常のアイコンボタンとして表示する場合
+        <button
+          onClick={() => setIsOpen(true)}
+          className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+          title="YouTubeリンクを編集"
+        >
+          <PencilIcon className="h-4 w-4 text-gray-500" />
+        </button>
+      )}
 
-      {/* モーダル本体 */}
+      {/* モーダルダイアログ本体 */}
       <dialog
         ref={dialogRef}
         className="m-auto w-11/12 max-w-md rounded-lg bg-white p-0 shadow-xl backdrop:bg-black/50 dark:bg-gray-800"
@@ -89,11 +113,15 @@ export function EditYoutubeLinkModal({ sessionId, currentLink }: Props) {
                 className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700"
               />
             </div>
+            
+            {/* サーバーからのメッセージ表示 */}
             {state.message && (
               <p className={`text-sm ${state.success ? 'text-green-500' : 'text-red-500'}`}>
                 {state.message}
               </p>
             )}
+
+            {/* 操作ボタン */}
             <div className="mt-6 flex justify-end gap-3">
               <button
                 type="button"

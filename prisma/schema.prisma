@@ -28,6 +28,10 @@ model User {
   accounts      Account[]
   userSessions  UserSession[]
   comments      Comment[]
+  // このユーザーが受け取った通知
+  notificationsTo   Notification[] @relation("NotificationsToUser")
+  // このユーザーが送信した通知
+  notificationsFrom Notification[] @relation("NotificationsFromUser")
 }
 
 model Account {
@@ -154,6 +158,7 @@ model SessionParticipant {
 
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String
+  character   String?
 
   role        ParticipantRole   // GM / キャラ名なども書ける♪
   assignedAt  DateTime  @default(now())
@@ -177,4 +182,20 @@ model Comment {
 
   @@index([sessionId])
   @@index([userId])
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  toUserId   String   // 通知先のユーザーID
+  fromUserId String   // 通知元のユーザーID
+  message    String   // 通知メッセージ本文
+  linkUrl    String?  // (任意) 通知クリック時の遷移先URL
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  // リレーション定義
+  toUser   User @relation("NotificationsToUser", fields: [toUserId], references: [id], onDelete: Cascade)
+  fromUser User @relation("NotificationsFromUser", fields: [fromUserId], references: [id], onDelete: Cascade)
+
+  @@index([toUserId])
 }

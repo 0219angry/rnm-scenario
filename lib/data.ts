@@ -122,13 +122,7 @@ export async function fetchCommentsBySessionId(sessionId: string) {
         sessionId: sessionId,
       },
       include: {
-        user: { // 投稿者の情報も一緒に取得
-          select: {
-            id: true,
-            name: true,
-            image: true, // アバター画像など
-          },
-        },
+        user: true
       },
       orderBy: {
         createdAt: 'asc', // 古い順に並べる

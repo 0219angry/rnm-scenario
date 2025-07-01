@@ -3,6 +3,7 @@ import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { ThemeProvider } from "@/components/features/theme/ThemeProvider";
+import { Toaster } from 'sonner';
 
 const notoSansJp = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
@@ -42,6 +43,7 @@ export default function RootLayout({
           </footer>
           </div>
         </ThemeProvider>
+        <Toaster richColors position="bottom-right" />
       </body>
     </html>
   );

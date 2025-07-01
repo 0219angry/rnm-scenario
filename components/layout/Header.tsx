@@ -2,6 +2,7 @@ import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
 import { UserMenu } from "./UserMenu";
 import { ThemeSwitcher } from "@/components/features/theme/ThemeSwitcher";
+import { NotificationMenu } from "@/components/ui/NotificationMenu";
 
 export async function Header() {
   const user = await getCurrentUser();
@@ -28,6 +29,7 @@ export async function Header() {
           <Link href="/sessions?status=upcoming" className="text-gray-800 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
             セッション一覧
           </Link>
+          {user && <NotificationMenu />} {/* 🔔 通知メニュー（ログイン時のみ） */}
           {user ? (
             <UserMenu user={user} />
           ) : (

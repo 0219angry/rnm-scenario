@@ -74,7 +74,6 @@ export default async function UserProfilePage({
   const pastParticipations = user.participations.filter(
     (p) => p.session.isFinished
   );
-  console.log("BIO:", user);
 
   return (
     <main className="container mx-auto mt-12 max-w-4xl px-4">
