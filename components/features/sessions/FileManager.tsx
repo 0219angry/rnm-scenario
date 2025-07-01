@@ -78,9 +78,9 @@ export function FileManager({
       setFiles([]);
       toast.success('すべてのファイルを削除しました。', { id: toastId });
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('ファイルの一括削除に失敗しました:', error);
-      toast.error(`ファイルの削除に失敗しました: ${error.message}`, { id: toastId });
+      toast.error(`ファイルの削除に失敗しました: ${error}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -108,7 +108,7 @@ export function FileManager({
       {
         // 各状態でのメッセージ
         loading: `ファイル「${fileName}」を削除しています...`,
-        success: (data) => {
+        success: () => {
           // ★ 成功時にローカルのstateを更新してUIからファイルを消す
           setFiles(currentFiles => currentFiles.filter(f => f.name !== fileName));
           return `ファイル「${fileName}」を削除しました。`;

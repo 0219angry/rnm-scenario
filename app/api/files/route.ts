@@ -29,10 +29,10 @@ export async function DELETE(req: Request) {
         { status: 400 }
       );
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error('[API DELETE Error]', error);
     return NextResponse.json(
-      { message: error.message || 'サーバー内部でエラーが発生しました。' },
+      { message: error || 'サーバー内部でエラーが発生しました。' },
       { status: 500 }
     );
   }

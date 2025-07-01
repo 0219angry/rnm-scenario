@@ -8,6 +8,7 @@ import { PencilIcon, TrashIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24
 import { RoleTag } from "@/components/ui/RoleTag";
 import { FaYoutube } from "react-icons/fa";
 import { EditYoutubeLinkModal } from "@/components/features/sessions/EditYoutubeLinkModal";
+import Link from 'next/link';
 
 // 親コンポーネントから受け取るデータの型
 type Participant = {
@@ -77,20 +78,30 @@ export function ParticipantRow({ sessionId, participant, isOwner, currentUserId 
   const { user } = participant;
 
   return (
-    <li className="flex items-center gap-3 rounded-lg bg-slate-50 dark:bg-slate-700 p-3">
-      <Image
-        width={40} height={40}
-        src={user.image ?? `https://avatar.vercel.sh/${user.id}`}
-        alt={user.name ?? "User avatar"}
-        className="h-10 w-10 rounded-full object-cover"
-      />
-      <div className="flex flex-grow items-center gap-2">
-        <span className="font-medium">{user.name ?? user.username}</span>
+    // ★ 変更点: li全体をLinkで囲むのをやめる
+    <li className="flex items-center gap-3 rounded-lg bg-slate-50 dark:bg-slate-700 p-3 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
+      
+      {/* ★ 変更点: アバターと名前の部分だけをLinkで囲む */}
+      <Link 
+        href={`/${user.username ?? user.id}`} // ユーザー名がなければIDにフォールバック
+        className="flex flex-grow items-center gap-3"
+      >
+        <Image
+          width={40} height={40}
+          src={user.image ?? `https://avatar.vercel.sh/${user.id}`}
+          alt={user.name ?? "User avatar"}
+          className="h-10 w-10 rounded-full object-cover"
+        />
+        <div className="flex flex-col items-start">
+          <span className="font-medium">{user.name ?? user.username}</span>
+          {/* 編集中でない場合、役割はユーザー名の下に表示するとレイアウトがスッキリします */}
+          {!isEditing && participant.role && <RoleTag role={participant.role} />}
+        </div>
+      </Link>
 
-        {!isEditing && participant.role && (
-          <RoleTag role={participant.role} />
-        )}
-
+      {/* --- 編集・操作エリア --- */}
+      <div className="flex items-center gap-4 ml-auto">
+        {/* 役割編集セレクトボックス */}
         {isEditing && (
           <select
             value={selectedRole ?? ""}
@@ -98,36 +109,43 @@ export function ParticipantRow({ sessionId, participant, isOwner, currentUserId 
               const value = e.target.value;
               setSelectedRole(value === "" ? null : (value as ParticipantRole));
             }}
-            // `gap-2` を親に追加したため、ml-2は不要になる場合があります
-            className="p-1 border rounded-md text-sm"
+            // クリックイベントが親に伝わらないようにする
+            onClick={(e) => e.stopPropagation()} 
+            className="p-1 border rounded-md text-sm bg-white dark:bg-gray-800"
           >
             <option value="">役割なし</option>
             {ROLES.map(role => <option key={role} value={role}>{role}</option>)}
           </select>
         )}
-        
-        {/* YouTubeリンク (常に表示) */}
+
+        {/* YouTubeリンク */}
         {participant.youtubeLink && (
-          <a href={participant.youtubeLink} target="_blank" rel="noopener noreferrer" title={`${user.name}の視点動画`} className="transition-colors text-red-500 flex items-center">
-            <FaYoutube size={28} /> {/* アイコンサイズを少し調整するとバランスが良くなる場合があります */}
+          <a 
+            href={participant.youtubeLink} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            title={`${user.name}の視点動画`} 
+            className="transition-colors text-gray-400 hover:text-red-500 flex items-center"
+            // クリックイベントが親に伝わらないようにする
+            onClick={(e) => e.stopPropagation()}
+          >
+            <FaYoutube size={24} />
           </a>
         )}
-      </div>
-
-      <div className="flex items-center gap-4">
-
 
         {/* 自分用の編集ボタン */}
         {isSelf && (
-          <EditYoutubeLinkModal
-            sessionId={sessionId}
-            currentLink={participant.youtubeLink ?? null}
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <EditYoutubeLinkModal
+              sessionId={sessionId}
+              currentLink={participant.youtubeLink ?? null}
+            />
+          </div>
         )}
 
         {/* オーナー用の管理ボタン */}
         {isOwner && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
             {isEditing ? (
               <>
                 <button onClick={handleUpdateRole} disabled={isPending} className="p-2 text-green-600 hover:text-green-800 disabled:text-gray-300"><CheckIcon className="h-5 w-5" /></button>

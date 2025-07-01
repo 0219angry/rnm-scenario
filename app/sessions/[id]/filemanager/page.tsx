@@ -5,6 +5,8 @@ import { FileInfo } from '@/components/features/sessions/SessionFileList';
 import { FileManager } from '@/components/features/sessions/FileManager';
 import { FileObject } from '@supabase/storage-js';
 import { supabase } from '@/lib/supabase';
+import { getCurrentUser } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
 // --- データ取得関数 ---
 
@@ -89,6 +91,35 @@ export default async function SessionFilePage({
 
   if (!id) {
     notFound();
+  }
+
+    // --- 1. ログイン中のユーザー情報を取得 ---
+  const user = await getCurrentUser();
+
+  // ログインしていない場合はログインページへ
+  if (!user) {
+    redirect('/signin');
+  }
+
+  // --- 2. このセッションでのユーザーの役割をデータベースで確認 ---
+  const participant = await prisma.sessionParticipant.findUnique({
+    where: {
+      // 複合主キーを指定
+      sessionId_userId: {
+        sessionId: id,
+        userId: user.id,
+      },
+    },
+    select: {
+      role: true, // 必要なのはロール情報のみ
+    },
+  });
+
+  // --- 3. 権限チェック ---
+  // 参加者でない、またはロールが'GM'でない場合はリダイレクト
+  if (participant?.role !== 'GM' && participant?.role !== 'KP') {
+    // 適切なエラーページやトップページにリダイレクト
+    redirect(`/filemanager/authority?sessionId=${id}`); 
   }
 
   // サーバーサイドで必要なデータをすべて並行して取得
