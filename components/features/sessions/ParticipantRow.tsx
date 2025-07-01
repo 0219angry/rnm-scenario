@@ -6,9 +6,10 @@ import { useState, useTransition, Fragment } from "react";
 import Image from "next/image";
 import Link from 'next/link';
 import { Menu, Transition } from '@headlessui/react'; // Headless UIをインポート
+import { EditYoutubeLinkModal } from "./EditYoutubeLinkModal";
 
 // アイコン
-import { EllipsisVerticalIcon, PencilIcon, TrashIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { EllipsisVerticalIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { FaYoutube, FaUserAlt } from "react-icons/fa";
 import { RoleTag } from "@/components/ui/RoleTag";
 
@@ -35,7 +36,6 @@ type Props = {
   currentUserId?: string;
 };
 
-const ROLES: ParticipantRole[] = ["PL", "PC", "GM", "KP", "SPECTATOR"];
 
 
 // --- コンポーネント本体 ---
@@ -47,30 +47,30 @@ export function ParticipantRow({ sessionId, participant, isOwner, currentUserId 
   const [isPending, startTransition] = useTransition();
   const [isEditing, setIsEditing] = useState(false);
   
-  const [selectedRole, setSelectedRole] = useState(participant.role);
-  const [character, setCharacter] = useState(participant.character ?? "");
+  // const [selectedRole, setSelectedRole] = useState(participant.role);
+  // const [character, setCharacter] = useState(participant.character ?? "");
 
   const isSelf = currentUserId ? participant.user.id === currentUserId : false;
 
   // --- イベントハンドラ ---
 
-  const handleUpdate = async () => {
-    try {
-      await fetch(`/api/sessions/${sessionId}/participants/${participant.user.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          role: selectedRole,
-          character: character 
-        }),
-      });
-      setIsEditing(false);
-      startTransition(() => router.refresh());
-    } catch (error) {
-      console.error("更新エラー:", error);
-      alert("更新に失敗しました");
-    }
-  };
+  // const handleUpdate = async () => {
+  //   try {
+  //     await fetch(`/api/sessions/${sessionId}/participants/${participant.user.id}`, {
+  //       method: "PATCH",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ 
+  //         role: selectedRole,
+  //         character: character 
+  //       }),
+  //     });
+  //     setIsEditing(false);
+  //     startTransition(() => router.refresh());
+  //   } catch (error) {
+  //     console.error("更新エラー:", error);
+  //     alert("更新に失敗しました");
+  //   }
+  // };
 
   const handleKick = async () => {
     if (!window.confirm(`${participant.user.name ?? participant.user.username}さんをセッションから削除しますか？`)) {
@@ -88,12 +88,12 @@ export function ParticipantRow({ sessionId, participant, isOwner, currentUserId 
   };
   
   // ★ 追加: 編集をキャンセルする処理
-  const handleCancelEdit = () => {
-    // stateを元のparticipantデータに戻す
-    setSelectedRole(participant.role);
-    setCharacter(participant.character ?? "");
-    setIsEditing(false);
-  };
+  // const handleCancelEdit = () => {
+  //   // stateを元のparticipantデータに戻す
+  //   setSelectedRole(participant.role);
+  //   setCharacter(participant.character ?? "");
+  //   setIsEditing(false);
+  // };
 
   const { user } = participant;
 
@@ -126,79 +126,71 @@ return (
       <div className="flex items-center gap-2 ml-auto">
         {/* YouTubeリンク */}
         {participant.youtubeLink && (
-          <a href={participant.youtubeLink} target="_blank" rel="noopener noreferrer" title="視点動画" className="text-gray-400 hover:text-red-500">
+          <a href={participant.youtubeLink} target="_blank" rel="noopener noreferrer" title="視点動画" className="text-red-500">
             <FaYoutube size={24} />
           </a>
         )}
 
-        {/* オーナー用の管理メニュー */}
-        {isOwner && (
+        {isSelf && !isOwner && !isEditing && (
+          <div onClick={(e) => e.stopPropagation()}>
+            <EditYoutubeLinkModal sessionId={sessionId} currentLink={participant.youtubeLink ?? null} />
+          </div>
+        )}
+
+        {/* ★ 変更点: isOwner または isSelf の場合にメニューを表示 */}
+        {(isOwner || isSelf) && (
           <Menu as="div" className="relative">
-            {/* メニューボタン (︙) */}
-            <Menu.Button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
+            <Menu.Button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600" disabled={isPending}>
               <EllipsisVerticalIcon className="h-5 w-5" />
             </Menu.Button>
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-100"
-              enterFrom="transform opacity-0 scale-95"
-              enterTo="transform opacity-100 scale-100"
-              leave="transition ease-in duration-75"
-              leaveFrom="transform opacity-100 scale-100"
-              leaveTo="transform opacity-0 scale-95"
-            >
-              {/* メニュー項目 */}
+            <Transition as={Fragment} /* ... */ >
               <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
                 
-                {/* --- 編集エリア --- */}
-                {/* このdivは、常にMenu.Itemsの直接の子です */}
-                <div className="p-1">
-                  {isEditing ? (
-                    // 【編集フォーム】
-                    // このフォーム自体はMenu.Itemで囲まない
-                    <div className="p-2 space-y-2">
-                      <div>
-                        <label className="text-xs font-medium">キャラクター名</label>
-                        <input type="text" value={character} onChange={(e) => setCharacter(e.target.value)} className="w-full p-1 border rounded text-sm"/>
+                {/* オーナー用の編集機能 */}
+                {isOwner && (
+                  <div className="p-1">
+                    {isEditing ? (
+                      <div className="p-2 space-y-2" onClick={(e) => e.stopPropagation()}>
+                        {/* 編集フォーム... */}
                       </div>
-                      <div>
-                        <label className="text-xs font-medium">役割</label>
-                        <select value={selectedRole ?? ""} onChange={(e) => setSelectedRole(e.target.value as ParticipantRole || null)} className="w-full p-1 border rounded text-sm">
-                          <option value="">役割なし</option>
-                          {ROLES.map(role => <option key={role} value={role}>{role}</option>)}
-                        </select>
-                      </div>
-                      <div className="flex justify-end gap-2 mt-2">
-                        <button onClick={handleCancelEdit} className="p-1 hover:bg-gray-100 rounded" title="キャンセル"><XMarkIcon className="h-5 w-5 text-gray-600"/></button>
-                        <button onClick={handleUpdate} className="p-1 hover:bg-gray-100 rounded" title="保存"><CheckIcon className="h-5 w-5 text-green-600"/></button>
-                      </div>
-                    </div>
-                  ) : (
-                    // 【編集ボタン】
-                    // ★★★ Menu.Itemで囲まず、ただのbuttonとして配置 ★★★
-                    <button 
-                      onClick={() => setIsEditing(true)} 
-                      className="group flex w-full items-center rounded-md px-2 py-2 text-sm text-gray-900 hover:bg-gray-100"
-                    >
-                      <PencilIcon className="mr-2 h-5 w-5 text-gray-500" /> 編集
-                    </button>
-                  )}
-                </div>
-
-                {/* --- 削除エリア（アクションを実行して閉じる） --- */}
-                <div className="p-1 border-t border-gray-100">
-                  <Menu.Item>
-                    {({ active }) => (
-                      <button 
-                        onClick={handleKick} 
-                        disabled={isEditing} // 編集中は無効化
-                        className={`${active ? 'bg-red-500 text-white' : 'text-red-600'} group flex w-full items-center rounded-md px-2 py-2 text-sm disabled:text-gray-400 disabled:bg-transparent`}
-                      >
-                        <TrashIcon className="mr-2 h-5 w-5" /> 削除する
+                    ) : (
+                      <button onClick={() => setIsEditing(true)} disabled={isPending} className="group flex w-full items-center rounded-md px-2 py-2 text-sm text-gray-900 hover:bg-gray-100">
+                        <PencilIcon className="mr-2 h-5 w-5 text-gray-500" /> 編集
                       </button>
                     )}
-                  </Menu.Item>
-                </div>
+                  </div>
+                )}
+
+                {/* ★ 追加: 自分自身の場合にYouTubeリンク編集メニューを表示 */}
+                {isSelf && !isEditing && (
+                  <div className="p-1" onClick={(e) => e.stopPropagation()}>
+                    {/* isMenuItem propを渡して表示を切り替える */}
+                    <EditYoutubeLinkModal
+                      sessionId={sessionId}
+                      currentLink={participant.youtubeLink ?? null}
+                      asMenuItem={true} 
+                    />
+                  </div>
+                )}
+
+                {/* オーナー用の削除機能 */}
+                {isOwner && (
+                  <div className="p-1 border-t border-gray-100">
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button 
+                          onClick={handleKick} 
+                          // ★ 変更点: 自分自身は削除できないように無効化
+                          disabled={isPending || isEditing || isSelf} 
+                          className={`${active ? 'bg-red-500 text-white' : 'text-red-600'} group flex w-full items-center rounded-md px-2 py-2 text-sm disabled:text-gray-400 disabled:bg-transparent`}
+                        >
+                          <TrashIcon className="mr-2 h-5 w-5" /> 削除する
+                        </button>
+                      )}
+                    </Menu.Item>
+                  </div>
+                )}
+
               </Menu.Items>
             </Transition>
           </Menu>
