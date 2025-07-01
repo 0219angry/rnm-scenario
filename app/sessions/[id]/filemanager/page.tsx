@@ -37,6 +37,8 @@ async function getPlayersForSession(sessionId: string): Promise<Player[]> {
     id: participant.user.id,
     name: participant.user.name || '名無しさん',
     avatar_url: participant.user.image || null,
+    role: participant.role,
+    character: participant.character,
   }));
 
   return players;

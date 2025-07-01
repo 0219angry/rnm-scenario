@@ -1,7 +1,11 @@
+import { ParticipantRole } from "@prisma/client";
+
 export type Player = {
   id: string; // ユーザーID
   name: string; // プレイヤー名
   avatar_url: string | null; // アバター画像のURL
+  role: ParticipantRole | null;
+  character: string | null;
 };
 
 export type Trigger = {

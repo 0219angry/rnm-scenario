@@ -237,7 +237,27 @@ ${assignments.length}人 のプレイヤーにファイルが配布されます�
                       className="rounded-full object-cover"
                     />
                   </div>
-                  <span className="text-xs">{player.name}</span>
+                  
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">{player.name}</span>
+                    <div className="flex items-center text-xs text-gray-500">
+                      {/* 役職 */}
+                      {player.role && (
+                        <span className="font-semibold text-blue-600">{player.role}</span>
+                      )}
+                      
+                      {/* ★ 役職とキャラクターの両方がある場合のみ区切り文字を表示 */}
+                      {player.role && player.character && (
+                        <span className="mx-1">/</span>
+                      )}
+                      
+                      {/* キャラクター名 */}
+                      {player.character && (
+                        <span>{player.character}</span>
+                      )}
+                    </div>
+                  </div>
+
                 </div>
               </td>
               {triggers.map((trigger) => {
