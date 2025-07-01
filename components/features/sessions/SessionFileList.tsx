@@ -8,6 +8,7 @@ import {
   FiDownload,
   FiMusic,
   FiVideo,
+  FiTrash2,
 } from 'react-icons/fi';
 import { FaFilePdf, FaFileWord, FaFileExcel } from 'react-icons/fa';
 import { GoPackage } from 'react-icons/go';
@@ -53,9 +54,10 @@ export type FileInfo = {
 type Props = {
   files: FileInfo[];
   loading: boolean;
+  onFileDelete: (fileName: string) => Promise<void>;
 };
 
-export function SessionFileList({ files, loading }: Props) {
+export function SessionFileList({ files, loading, onFileDelete }: Props) {
   // ドラッグが開始されたときに、ドラッグするファイルの情報をセットする
   const handleDragStart = (e: React.DragEvent<HTMLLIElement>, file: FileInfo) => {
     // データをJSON形式でDataTransferオブジェクトに保存
@@ -92,6 +94,13 @@ export function SessionFileList({ files, loading }: Props) {
                     <p className="font-medium text-gray-800 truncate">
                       {file.name}
                     </p>
+                      <button 
+                        onClick={() => onFileDelete(file.name)}
+                        className="text-red-500 hover:text-red-700"
+                        aria-label={`${file.name}を削除`}
+                      >
+                        <FiTrash2 />
+                      </button>
                     <p className="text-sm text-gray-500">
                       {formatFileSize(file.size)}
                     </p>

@@ -16,3 +16,13 @@ export async function createSignedUploadUrl(path: string) {
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function deleteFile(path: string) {
+  // removeメソッドはパスの配列を受け取ります
+  const { data, error } = await supabaseAdmin.storage
+    .from('session-files')
+    .remove([path]);
+
+  if (error) throw new Error(error.message);
+  return data;
+}
