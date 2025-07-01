@@ -2,17 +2,15 @@
 
 import { ParticipantRole } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, Fragment } from "react";
 import Image from "next/image";
 import Link from 'next/link';
+import { Menu, Transition } from '@headlessui/react'; // Headless UIをインポート
 
-// アイコンのインポート
-import { PencilIcon, TrashIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
+// アイコン
+import { EllipsisVerticalIcon, PencilIcon, TrashIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { FaYoutube, FaUserAlt } from "react-icons/fa";
-
-// 関連コンポーネントのインポート
 import { RoleTag } from "@/components/ui/RoleTag";
-import { EditYoutubeLinkModal } from "@/components/features/sessions/EditYoutubeLinkModal";
 
 
 // --- 型定義 ---
@@ -100,66 +98,110 @@ export function ParticipantRow({ sessionId, participant, isOwner, currentUserId 
   const { user } = participant;
 
   // --- レンダリング ---
-  return (
-    <li className="flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-lg bg-slate-50 dark:bg-slate-700 p-3 transition-colors">
+return (
+    <li className="flex items-center gap-3 rounded-lg bg-slate-50 dark:bg-slate-700 p-3">
       
+      {/* ユーザー情報（左側・プロフィールへのリンク） */}
       <Link href={`/${user.username ?? user.id}`} className="flex flex-grow items-center gap-3">
-        <Image
-          width={40} height={40}
-          src={user.image ?? `https://avatar.vercel.sh/${user.id}`}
-          alt={user.name ?? "User avatar"}
-          className="h-10 w-10 rounded-full object-cover flex-shrink-0"
+        <Image 
+          width={40} 
+          height={40} 
+          src={user.image ?? `https://avatar.vercel.sh/${user.id}`} 
+          alt={user.name ?? "avatar"}
+          className="h-10 w-10 rounded-full object-cover"
         />
         <div className="flex flex-col items-start">
           <span className="font-medium">{user.name ?? user.username}</span>
-          {!isEditing && participant.character && (
-            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-              <FaUserAlt />
-              {participant.character}
-            </span>
-          )}
+          {/* 役割とキャラクター名を横並びに表示 */}
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            {participant.role && <RoleTag role={participant.role} isCompact={true} />}
+            {participant.character && (
+              <span className="flex items-center gap-1"><FaUserAlt /> {participant.character}</span>
+            )}
+          </div>
         </div>
       </Link>
 
-      <div className="flex items-center gap-2 md:gap-4 ml-auto w-full sm:w-auto justify-end">
-        {isEditing ? (
-          <>
-            <input type="text" value={character} onChange={(e) => setCharacter(e.target.value)} placeholder="キャラクター名" className="p-1 border rounded-md text-sm w-full bg-white dark:bg-gray-800" onClick={(e) => e.stopPropagation()} />
-            <select value={selectedRole ?? ""} onChange={(e) => setSelectedRole(e.target.value as ParticipantRole || null)} onClick={(e) => e.stopPropagation()} className="p-1 border rounded-md text-sm bg-white dark:bg-gray-800">
-              <option value="">役割なし</option>
-              {ROLES.map(role => <option key={role} value={role}>{role}</option>)}
-            </select>
-          </>
-        ) : (
-          participant.role && <RoleTag role={participant.role} />
-        )}
-        
+      {/* --- 操作エリア（右側） --- */}
+      <div className="flex items-center gap-2 ml-auto">
+        {/* YouTubeリンク */}
         {participant.youtubeLink && (
-          <a href={participant.youtubeLink} target="_blank" rel="noopener noreferrer" title={`${user.name}の視点動画`} className="transition-colors text-gray-400 hover:text-red-500 flex items-center" onClick={(e) => e.stopPropagation()}>
+          <a href={participant.youtubeLink} target="_blank" rel="noopener noreferrer" title="視点動画" className="text-gray-400 hover:text-red-500">
             <FaYoutube size={24} />
           </a>
         )}
 
-        {isSelf && !isEditing && (
-          <div onClick={(e) => e.stopPropagation()}>
-            <EditYoutubeLinkModal sessionId={sessionId} currentLink={participant.youtubeLink ?? null} />
-          </div>
-        )}
-
+        {/* オーナー用の管理メニュー */}
         {isOwner && (
-          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-            {isEditing ? (
-              <>
-                <button onClick={handleUpdate} disabled={isPending} className="p-2 text-green-600 hover:text-green-800 disabled:text-gray-300" title="保存"><CheckIcon className="h-5 w-5" /></button>
-                <button onClick={handleCancelEdit} disabled={isPending} className="p-2 text-red-600 hover:text-red-800 disabled:text-gray-300" title="キャンセル"><XMarkIcon className="h-5 w-5" /></button>
-              </>
-            ) : (
-              <>
-                <button onClick={() => setIsEditing(true)} disabled={isPending} className="p-2 text-gray-500 hover:text-blue-600 disabled:text-gray-300" title="編集"><PencilIcon className="h-5 w-5" /></button>
-                <button onClick={handleKick} disabled={isPending} className="p-2 text-gray-500 hover:text-red-600 disabled:text-gray-300" title="削除"><TrashIcon className="h-5 w-5" /></button>
-              </>
-            )}
-          </div>
+          <Menu as="div" className="relative">
+            {/* メニューボタン (︙) */}
+            <Menu.Button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
+              <EllipsisVerticalIcon className="h-5 w-5" />
+            </Menu.Button>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
+            >
+              {/* メニュー項目 */}
+              <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                
+                {/* --- 編集エリア --- */}
+                {/* このdivは、常にMenu.Itemsの直接の子です */}
+                <div className="p-1">
+                  {isEditing ? (
+                    // 【編集フォーム】
+                    // このフォーム自体はMenu.Itemで囲まない
+                    <div className="p-2 space-y-2">
+                      <div>
+                        <label className="text-xs font-medium">キャラクター名</label>
+                        <input type="text" value={character} onChange={(e) => setCharacter(e.target.value)} className="w-full p-1 border rounded text-sm"/>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium">役割</label>
+                        <select value={selectedRole ?? ""} onChange={(e) => setSelectedRole(e.target.value as ParticipantRole || null)} className="w-full p-1 border rounded text-sm">
+                          <option value="">役割なし</option>
+                          {ROLES.map(role => <option key={role} value={role}>{role}</option>)}
+                        </select>
+                      </div>
+                      <div className="flex justify-end gap-2 mt-2">
+                        <button onClick={handleCancelEdit} className="p-1 hover:bg-gray-100 rounded" title="キャンセル"><XMarkIcon className="h-5 w-5 text-gray-600"/></button>
+                        <button onClick={handleUpdate} className="p-1 hover:bg-gray-100 rounded" title="保存"><CheckIcon className="h-5 w-5 text-green-600"/></button>
+                      </div>
+                    </div>
+                  ) : (
+                    // 【編集ボタン】
+                    // ★★★ Menu.Itemで囲まず、ただのbuttonとして配置 ★★★
+                    <button 
+                      onClick={() => setIsEditing(true)} 
+                      className="group flex w-full items-center rounded-md px-2 py-2 text-sm text-gray-900 hover:bg-gray-100"
+                    >
+                      <PencilIcon className="mr-2 h-5 w-5 text-gray-500" /> 編集
+                    </button>
+                  )}
+                </div>
+
+                {/* --- 削除エリア（アクションを実行して閉じる） --- */}
+                <div className="p-1 border-t border-gray-100">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button 
+                        onClick={handleKick} 
+                        disabled={isEditing} // 編集中は無効化
+                        className={`${active ? 'bg-red-500 text-white' : 'text-red-600'} group flex w-full items-center rounded-md px-2 py-2 text-sm disabled:text-gray-400 disabled:bg-transparent`}
+                      >
+                        <TrashIcon className="mr-2 h-5 w-5" /> 削除する
+                      </button>
+                    )}
+                  </Menu.Item>
+                </div>
+              </Menu.Items>
+            </Transition>
+          </Menu>
         )}
       </div>
     </li>
