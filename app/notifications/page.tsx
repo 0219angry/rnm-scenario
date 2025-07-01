@@ -37,6 +37,8 @@ export default async function NotificationsPage() {
               key={notification.id} 
               href={notification.linkUrl ?? '#'}
               className="block p-4 border rounded-lg hover:bg-gray-50"
+              target="_blank" 
+              rel="noopener noreferrer"
             >
               <p className={`${!notification.isRead ? 'font-semibold' : ''} text-gray-800`}>
                 {notification.message}

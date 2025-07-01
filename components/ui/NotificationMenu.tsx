@@ -175,6 +175,8 @@ export function NotificationMenu() {
                       className={`block px-4 py-3 text-sm ${
                         active ? 'bg-gray-100' : ''
                       }`}
+                      target="_blank" 
+                      rel="noopener noreferrer"
                     >
                       <div className="flex items-start gap-3">
                         {!notification.isRead && (

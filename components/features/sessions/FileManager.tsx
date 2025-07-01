@@ -8,6 +8,7 @@ import { Player, Trigger} from '@/types/types';
 import { FiPlus, FiMinus } from 'react-icons/fi';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
+import { prisma } from '@/lib/prisma';
 
 const INITIAL_TRIGGERS = 5;
 const MAX_TRIGGERS = 10;
@@ -61,12 +62,26 @@ const handleActivateTrigger = async (
     `トリガー「${triggerId}. ${triggerName}」: ${assignments.length}件の通知を送信中です...`
   );
 
+
+  // APIエンドポイントを呼び出す
+  const response = await fetch(`/api/sessions/${sessionId}`);
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'データの取得に失敗しました。');
+  }
+  const session = await response.json();
+
+
   try {
     // 2. 配布リストの各項目に対して、個別通知APIの呼び出しプロミスを作成
     const notificationPromises = assignments.map(assignment => {
       
       // 各ユーザーへの通知メッセージとリンクURLを生成
-      const message = `ファイル「${assignment.fileName}」があなたに共有されました。`;
+      const message = `
+        ${session?.title} / ${session?.scenario.title}で
+        ファイル「${assignment.fileName}」があなたに共有されました。
+      `;
       // ファイル詳細ページなど、実際のアプリケーションのパス構造に合わせる
       const { data } = supabase
         .storage
