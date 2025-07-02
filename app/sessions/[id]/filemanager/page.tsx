@@ -131,7 +131,7 @@ export default async function SessionFilePage({
   ]);
 
   return (
-    <main className="max-w-7xl mx-auto p-6">
+    <main className="p-2">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">セッションのファイル管理</h1>
         <p className="mt-1 text-gray-600">

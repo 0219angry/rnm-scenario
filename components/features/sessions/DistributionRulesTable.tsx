@@ -213,7 +213,11 @@ ${assignments.length}人 のプレイヤーにファイルが配布されます�
                         ) : (
                           <>
                             <FiPlay />
-                            <span>送信</span>
+                            {triggers.length < 6 ? (
+                              <span>送信</span>
+                            ) : (
+                              <></>
+                            )}
                           </>
                         )}
                       </button>

@@ -69,7 +69,7 @@ export function CommentSection({ initialComments, sessionId, currentUser }: Comm
         />
       ) : (
         <p className="text-center mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-          コメントするには<Link href="/api/auth/signin" className="text-blue-500 hover:underline">ログイン</Link>が必要です。
+          コメントするには<Link href="/signin" className="text-blue-500 hover:underline">ログイン</Link>が必要です。
         </p>
       )}
     </section>
