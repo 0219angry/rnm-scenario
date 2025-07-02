@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate && npx prisma migrate deploy && next build",
+    "build": "prisma generate && DATABASE_URL=$DATABASE_URL_MIGRATE prisma migrate deploy && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -13,7 +13,7 @@
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.1.1",
     "@prisma/client": "^6.10.1",
-    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.2",
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0",
