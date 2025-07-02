@@ -184,18 +184,48 @@ model Comment {
   @@index([userId])
 }
 
+enum NotificationType {
+  FILE_SHARE
+  CHAT_MESSAGE
+}
+
+model Channel {
+  id            String    @id @default(cuid())
+  name          String?
+  // ... その他のチャットルーム情報
+
+  // このチャンネルに関連する通知
+  notifications Notification[]
+
+  @@map("channels")
+}
+
 model Notification {
   id         String   @id @default(cuid())
-  toUserId   String   // 通知先のユーザーID
-  fromUserId String   // 通知元のユーザーID
-  message    String   // 通知メッセージ本文
-  linkUrl    String?  // (任意) 通知クリック時の遷移先URL
+  toUserId   String
+  fromUserId String
+
+  // --- 変更点 ---
+  // 1. 通知タイプを管理するフィールドを追加
+  type       NotificationType
+
+  // 2. (任意) チャットルームIDを追加
+  //    チャット通知の場合に利用。ファイル共有などではNULLのまま。
+  channelId  String?
+
+  message    String
+  linkUrl    String?
   isRead     Boolean  @default(false)
   createdAt  DateTime @default(now())
 
   // リレーション定義
-  toUser   User @relation("NotificationsToUser", fields: [toUserId], references: [id], onDelete: Cascade)
-  fromUser User @relation("NotificationsFromUser", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser     User     @relation("NotificationsToUser", fields: [toUserId], references: [id], onDelete: Cascade)
+  fromUser   User     @relation("NotificationsFromUser", fields: [fromUserId], references: [id], onDelete: Cascade)
+
+  // --- 変更点 ---
+  // 3. Channelモデルとのリレーションを定義
+  channel    Channel? @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
   @@index([toUserId])
+  @@index([channelId]) // channelIdでの検索も考慮してインデックスを追加
 }
