@@ -34,7 +34,7 @@ export default async function RootLayout({
   const { data: { user } } = await supabase.auth.getUser();
 
   // 🔽 チャット用のチャンネルIDを定義（実際のIDに置き換えてください）
-  const supportChannelId = "your-general-support-channel-id";
+  const supportChannelId = "ALLUSERCHANNEL";
 
   return (
     <html lang="ja" suppressHydrationWarning>
