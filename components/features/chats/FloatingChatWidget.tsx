@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase'; // Supabaseクライアントをインポート
-import { ChatWidget, AuthorInfo, MessageWithAuthor } from './ChatWidget';
+import { ChatWidget, MessageWithAuthor } from './ChatWidget';
 
 // --- アイコンコンポーネント (変更なし) ---
 const ChatIcon = () => (
