@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Message as MessageType, User } from '@prisma/client';
 import { ChatBubbleOvalLeftEllipsisIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 // 必要な型定義
 export type AuthorInfo = Pick<User, 'id' | 'name'>;
@@ -46,7 +47,7 @@ export function ChatWidget({ initialMessages, currentUserId, channelId }: Props)
     const usersCacheRef = { current: usersCache };
     usersCacheRef.current = usersCache;
 
-    const handleNewMessage = async (payload: any) => {
+    const handleNewMessage = async (payload: RealtimePostgresChangesPayload<MessageType>) => {
       const newMessage = payload.new as MessageType;
       let author: AuthorInfo | undefined = usersCacheRef.current.get(newMessage.authorId);
 
