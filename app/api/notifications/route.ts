@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/prisma"; // Neon用のPrisma
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth"; // セッションから現在のユーザー取得
+import { NotificationType } from "@prisma/client";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -48,6 +49,7 @@ export async function POST(request: Request) {
     // 3. データベースに通知レコードを作成
     const newNotification = await prisma.notification.create({
       data: {
+        type: NotificationType.FILE_SHARE,
         toUserId, // リクエストボディから取得
         fromUserId: currentUser.id, // 通知元は必ず現在のセッションユーザー
         message,    // リクエストボディから取得
