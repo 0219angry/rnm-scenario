@@ -2,18 +2,16 @@
 
 import { useState, useEffect, FormEvent, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import type { messages as Message, User } from '@prisma/client';
+import type { Message as MessageType, User } from '@prisma/client'; // MessageだとHTMLElementと衝突するため改名
 import { ChatBubbleOvalLeftEllipsisIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
-type MessageWithAuthor = Message & {
+type MessageWithAuthor = MessageType & {
   author: Pick<User, 'id' | 'name'>;
 };
 
 type Props = {
   initialMessages: MessageWithAuthor[];
   currentUserId: string;
-  // --- 変更点 ---
-  // どのチャットチャンネルかを特定するためのID
   channelId: string;
 };
 
@@ -28,21 +26,26 @@ export default function ChatWidget({ initialMessages, currentUserId, channelId }
   };
 
   useEffect(() => {
-    // --- 変更点 ---
-    // リアルタイム購読を特定のチャンネルIDに絞り込みます
     const channel = supabase
-      .channel(`chat-room-${channelId}`) // チャンネルごとにユニークな名前をつける
+      .channel(`chat-room-${channelId}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
-          // `channelId`が一致するレコードのINSERTのみをリッスンする
           filter: `channelId=eq.${channelId}`,
         },
         (payload) => {
-          setMessages((prevMessages) => [...prevMessages, payload.new as MessageWithAuthor]);
+          // TODO: author情報が含まれていないので、別途取得するか、
+          //       API側でブロードキャストする際に付与する必要がある。
+          //       一旦、authorIdのみで表示する。
+          const newMessage = payload.new as MessageType;
+          const messageWithAuthor = {
+            ...newMessage,
+            author: { id: newMessage.authorId, name: 'Unknown User' }, // 仮のユーザ名
+          };
+          setMessages((prevMessages) => [...prevMessages, messageWithAuthor]);
         }
       )
       .subscribe();
@@ -50,7 +53,7 @@ export default function ChatWidget({ initialMessages, currentUserId, channelId }
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [channelId]); // channelIdが変わったら購読し直す
+  }, [channelId]);
 
   useEffect(() => {
     if (isOpen) {
@@ -62,15 +65,12 @@ export default function ChatWidget({ initialMessages, currentUserId, channelId }
     e.preventDefault();
     if (newMessage.trim() === '') return;
 
-    // --- 変更点 ---
-    // APIにchannelIdも送信する
     await fetch('/api/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         content: newMessage,
-        authorId: currentUserId,
-        channelId: channelId, // どのチャンネルへの投稿かを指定
+        channelId: channelId,
       }),
     });
 
@@ -97,6 +97,7 @@ export default function ChatWidget({ initialMessages, currentUserId, channelId }
             return (
               <div key={msg.id} className={`flex items-end mb-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-xs px-3 py-2 rounded-lg ${isMe ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
+                  <p className="text-sm font-bold">{msg.author.name}</p>
                   <p>{msg.content}</p>
                 </div>
               </div>

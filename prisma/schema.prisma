@@ -32,6 +32,7 @@ model User {
   notificationsTo   Notification[] @relation("NotificationsToUser")
   // このユーザーが送信した通知
   notificationsFrom Notification[] @relation("NotificationsFromUser")
+  messages      Message[]
 }
 
 model Account {
@@ -196,6 +197,7 @@ model Channel {
 
   // このチャンネルに関連する通知
   notifications Notification[]
+  messages      Message[]
 
   @@map("channels")
 }
@@ -228,4 +230,18 @@ model Notification {
 
   @@index([toUserId])
   @@index([channelId]) // channelIdでの検索も考慮してインデックスを追加
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  channelId String
+
+  @@map("messages")
 }
