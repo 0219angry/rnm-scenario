@@ -3,6 +3,12 @@ import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { ThemeProvider } from "@/components/features/theme/ThemeProvider";
+import { Toaster } from 'sonner';
+
+// 🔽 SupabaseとChatWidget関連のインポートを追加
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import FloatingChatWidget from "@/components/features/chats/FloatingChatWidget";
 
 const notoSansJp = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
@@ -18,11 +24,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // 🔽 サーバーサイドでユーザー情報を取得
+  const supabase = createServerComponentClient({ cookies });
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // 🔽 チャット用のチャンネルIDを定義（実際のIDに置き換えてください）
+  const supportChannelId = "your-general-support-channel-id";
+
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className={`${notoSansJp.variable} font-sans antialiased`}>
@@ -42,6 +55,13 @@ export default function RootLayout({
           </footer>
           </div>
         </ThemeProvider>
+        <Toaster richColors position="bottom-right" />
+
+        {/* 🔽 FloatingChatWidgetを配置 */}
+        <FloatingChatWidget 
+          channelId={supportChannelId}
+          currentUser={user}
+        />
       </body>
     </html>
   );

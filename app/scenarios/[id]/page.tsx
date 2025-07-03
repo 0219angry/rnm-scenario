@@ -41,6 +41,7 @@ export default async function ScenarioDetailPage({ params }: { params: Promise<{
         <div className="space-y-4 text-lg">
           <p><span className="font-semibold">プレイヤー数:</span> {scenario.playerMin === scenario.playerMax ? scenario.playerMin : `${scenario.playerMin}〜${scenario.playerMax}`}人</p>
           <p><span className="font-semibold">所要時間:</span> {scenario.averageTime}分</p>
+          <p><span className="font-semibold">価格:</span> {scenario.priceMin === scenario.priceMax ? scenario.priceMin : `${scenario.priceMin}〜${scenario.priceMax}`}円</p>
           {scenario.distribution && (
             <p><span className="font-semibold">配布先:</span> <a href={scenario.distribution} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{scenario.distribution}</a></p>
           )}

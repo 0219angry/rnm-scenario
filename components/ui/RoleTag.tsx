@@ -1,32 +1,36 @@
 import { ParticipantRole } from "@prisma/client";
 
-// 各役割に対応するスタイルを定義
-const roleStyles: Record<ParticipantRole, string> = {
-  GM: "bg-red-100 text-red-800 border-red-300",
-  KP: "bg-purple-100 text-purple-800 border-purple-300",
-  PL: "bg-blue-100 text-blue-800 border-blue-300",
-  PC: "bg-sky-100 text-sky-800 border-sky-300",
-  SPECTATOR: "bg-gray-100 text-gray-800 border-gray-300",
-  UNDECIDED: "bg-yellow-100 text-yellow-800 border-yellow-300",
-};
-
 type Props = {
-  role: ParticipantRole | null;
+  role: ParticipantRole;
+  isCompact?: boolean;
 };
 
-export function RoleTag({ role }: Props) {
-  // 役割がない場合は何も表示しない
-  if (!role) {
-    return null;
-  }
+// ★ 変更点1: Record<ParticipantRole, string>で型を付け、
+//            UNDECIDEDのスタイルを追加する
+const roleStyles: Record<ParticipantRole, string> = {
+  GM: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+  KP: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+  PL: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  PC: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  SPECTATOR: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+  UNDECIDED: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200", // 未定用のスタイル
+};
 
-  const style = roleStyles[role] || roleStyles.SPECTATOR; // 未定義の役割はデフォルトスタイルに
+export function RoleTag({ role, isCompact = false }: Props) {
+  const sizeClasses = isCompact 
+    ? "px-2 py-0.5 text-xs" 
+    : "px-2.5 py-1 text-sm";
 
   return (
     <span
-      className={`ml-2 inline-block rounded-md border px-2 py-0.5 text-xs font-semibold ${style}`}
+      className={`
+        inline-block rounded-full font-semibold
+        ${sizeClasses} 
+        ${roleStyles[role]}
+      `}
     >
-      {role}
+      {/* ★ 変更点2: UNDECIDEDの場合の表示名を調整 */}
+      {role === 'UNDECIDED' ? '未定' : role}
     </span>
   );
 }

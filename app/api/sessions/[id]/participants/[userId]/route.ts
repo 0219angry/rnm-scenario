@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { ParticipantRole } from "@prisma/client";
 
 export async function PATCH(
   req: Request,
@@ -14,7 +13,7 @@ export async function PATCH(
     }
 
     const { id: sessionId, userId } = await params;
-    const { role } = (await req.json()) as { role: ParticipantRole };
+    const { role, character } = (await req.json());
 
     // このセッションのオーナーか確認
     const session = await prisma.session.findUnique({
@@ -37,6 +36,7 @@ export async function PATCH(
       },
       data: {
         role: role,
+        character: character,
       },
     });
 

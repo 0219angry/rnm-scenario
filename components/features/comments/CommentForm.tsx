@@ -2,8 +2,29 @@
 
 import { createComment } from '@/lib/comment';
 import { useFormStatus } from 'react-dom';
-import { useActionState } from 'react';
-import { useRef } from 'react';
+import { useActionState, useEffect, useRef } from 'react'; // ★ 変更点1: useEffectをインポート
+import { Prisma } from '@prisma/client';
+
+// ★ 変更点2: 親コンポーネントから渡される型を定義
+type CommentWithUser = Prisma.CommentGetPayload<{ include: { user: true } }>;
+
+// useActionStateが管理するstateの型
+type CreateCommentState = {
+  // バリデーションエラーがある場合
+  errors?: {
+    text?: string[];
+  };
+  // 一般的なエラーメッセージがある場合
+  error?: string;
+  // 成功した場合
+  success?: boolean;
+  data?: CommentWithUser;
+} | undefined; // 初期状態はundefined
+
+type Props = {
+  sessionId: string;
+  onCommentAdded: (newComment: CommentWithUser) => void; // コメント追加を通知するコールバック関数
+};
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -18,14 +39,23 @@ function SubmitButton() {
   );
 }
 
-export function CommentForm({ sessionId }: { sessionId: string }) {
-  const [state, dispatch] = useActionState(createComment, undefined);
+export function CommentForm({ sessionId, onCommentAdded }: Props) {
+  // ★ 変更点3: createCommentから返されるデータ型をジェネリクスで指定
+  const [state, dispatch] = useActionState<CreateCommentState, FormData>(createComment, undefined);
   const formRef = useRef<HTMLFormElement>(null);
 
-  // 投稿成功時にフォームをリセット
-  if (state?.success) {
-    formRef.current?.reset();
-  }
+  // ★ 変更点4: useEffectを使って、stateの変更を監視する
+  useEffect(() => {
+    // stateにsuccessフラグと新しいコメントデータがあれば処理実行
+    if (state?.success && state.data) {
+      // 親コンポーネントに新しいコメントデータを渡す
+      onCommentAdded(state.data);
+      // フォームをリセット
+      formRef.current?.reset();
+    }
+  }, [state, onCommentAdded]); // stateかonCommentAddedが変更された時に実行
+
+  // フォームリセットロジックをuseEffectに移動したため、ここは削除
 
   return (
     <form
@@ -50,8 +80,8 @@ export function CommentForm({ sessionId }: { sessionId: string }) {
       <div className="mt-2 flex justify-end">
         <SubmitButton />
       </div>
-       {state?.error && <p className="text-red-500 text-sm mt-2">{state.error}</p>}
-       {state?.errors?.text && <p className="text-red-500 text-sm mt-2">{state.errors.text}</p>}
+        {state?.error && <p className="text-red-500 text-sm mt-2">{state.error}</p>}
+        {state?.errors?.text && <p className="text-red-500 text-sm mt-2">{state.errors.text[0]}</p>}
     </form>
   );
 }

@@ -18,6 +18,7 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  bio           String?
 
   // シナリオ・セッションの所有
   scenarios     Scenario[]
@@ -27,6 +28,11 @@ model User {
   accounts      Account[]
   userSessions  UserSession[]
   comments      Comment[]
+  // このユーザーが受け取った通知
+  notificationsTo   Notification[] @relation("NotificationsToUser")
+  // このユーザーが送信した通知
+  notificationsFrom Notification[] @relation("NotificationsFromUser")
+  messages      Message[]
 }
 
 model Account {
@@ -102,6 +108,9 @@ model Scenario {
   content       String?   // シナリオ内容（Markdownなど）
   isPublic      Boolean   @default(true)
 
+  priceMax      Int?      // 価格上限（円）
+  priceMin      Int?      // 価格下限（円）
+
   rulebook      Rulebook? @relation(fields: [rulebookId], references: [id])
   rulebookId    String?   
 
@@ -150,6 +159,7 @@ model SessionParticipant {
 
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String
+  character   String?
 
   role        ParticipantRole   // GM / キャラ名なども書ける♪
   assignedAt  DateTime  @default(now())
@@ -173,4 +183,65 @@ model Comment {
 
   @@index([sessionId])
   @@index([userId])
+}
+
+enum NotificationType {
+  FILE_SHARE
+  CHAT_MESSAGE
+}
+
+model Channel {
+  id            String    @id @default(cuid())
+  name          String?
+  // ... その他のチャットルーム情報
+
+  // このチャンネルに関連する通知
+  notifications Notification[]
+  messages      Message[]
+
+  @@map("channels")
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  toUserId   String
+  fromUserId String
+
+  // --- 変更点 ---
+  // 1. 通知タイプを管理するフィールドを追加
+  type       NotificationType
+
+  // 2. (任意) チャットルームIDを追加
+  //    チャット通知の場合に利用。ファイル共有などではNULLのまま。
+  channelId  String?
+
+  message    String
+  linkUrl    String?
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  // リレーション定義
+  toUser     User     @relation("NotificationsToUser", fields: [toUserId], references: [id], onDelete: Cascade)
+  fromUser   User     @relation("NotificationsFromUser", fields: [fromUserId], references: [id], onDelete: Cascade)
+
+  // --- 変更点 ---
+  // 3. Channelモデルとのリレーションを定義
+  channel    Channel? @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@index([toUserId])
+  @@index([channelId]) // channelIdでの検索も考慮してインデックスを追加
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  channelId String
+
+  @@map("messages")
 }

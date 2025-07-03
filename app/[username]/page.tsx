@@ -68,6 +68,13 @@ export default async function UserProfilePage({
     { madamis: 0, trpg: 0 }
   );
 
+  const upcomingParticipations = user.participations.filter(
+    (p) => !p.session.isFinished
+  );
+  const pastParticipations = user.participations.filter(
+    (p) => p.session.isFinished
+  );
+
   return (
     <main className="container mx-auto mt-12 max-w-4xl px-4">
       {/* --- プロフィールヘッダー --- */}
@@ -79,13 +86,21 @@ export default async function UserProfilePage({
           height={128}
           className="h-32 w-32 flex-shrink-0 rounded-full object-cover ring-4 ring-sky-200"
         />
-        <div className="text-center md:text-left">
+        <div className="text-center md:text-left w-full">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
             {user.name ?? user.username}
           </h1>
           <p className="mt-1 text-lg font-semibold text-gray-500 dark:text-gray-400">
             @{user.username}
           </p>
+          {user.bio && (
+            <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+              {/* ✅ pタグからはボーダー関連のクラスを削除 */}
+              <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
+                {user.bio}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -109,39 +124,91 @@ export default async function UserProfilePage({
       </div>
 
       {/* ✅ ステップ3: 参加履歴一覧UI */}
-      <div className="mt-10">
-        <h2 className="text-xl font-bold text-gray-700 dark:text-gray-300">参加したセッション</h2>
-        {user.participations.length > 0 ? (
-          <ul className="mt-4 space-y-4">
-            {user.participations.map((p) => (
-              <li key={p.session.id} className="rounded-lg bg-white dark:bg-gray-800 p-4 shadow transition hover:shadow-lg">
-                <div className="flex flex-col justify-between gap-2 sm:flex-row">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {format(p.session.scheduledAt, "yyyy年MM月dd日", { locale: ja })}
-                    </p>
-                    <GenreTag genre={p.session.scenario.genre} />
-                    {/* ✅【変更点】リンク先をセッション詳細ページに修正 */}
-                    <Link href={`/sessions/${p.session.id}`} className="text-lg font-bold text-blue-600 dark:text-blue-400 hover:underline">
-                      {/* ✅ セッションタイトルがあればそれを、なければシナリオタイトルを表示 */}
-                      {p.session.title || p.session.scenario.title}
-                    </Link>
+      <div className="mt-10 space-y-10">
+        {/* --- 参加予定のセッション --- */}
+        <div>
+          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-300">
+            参加予定のセッション ({upcomingParticipations.length})
+          </h2>
+          {upcomingParticipations.length > 0 ? (
+            <ul className="mt-4 space-y-4">
+              {upcomingParticipations.map((p) => (
+                // リストアイテムのコンポーネントは履歴と同じものを使用
+                <li key={p.session.id} className="rounded-lg bg-white dark:bg-gray-800 shadow transition hover:shadow-lg">
+                  {/* ✅ Linkコンポーネントで全体を囲み、レイアウトとパディングはこちらに適用 */}
+                  <Link href={`/sessions/${p.session.id}`} className="block p-4">
+                    <div className="flex flex-col justify-between gap-2 sm:flex-row">
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {format(p.session.scheduledAt, "yyyy年MM月dd日", { locale: ja })}
+                        </p>
+                        <GenreTag genre={p.session.scenario.genre} />
 
-                    {/* ✅ セッションタイトルがある場合、補足としてシナリオタイトルを表示 */}
-                    {p.session.title && (
-                       <p className="text-sm text-gray-700 dark:text-gray-300">シナリオ: {p.session.scenario.title}</p>
-                    )}
-                  </div>
-                  <div className="flex-shrink-0">
-                    <RoleTag role={p.role} />
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-4 text-gray-500">参加したセッションはまだありません。</p>
-        )}
+                        {/* ✅ Linkではなくなり、通常のテキストとして表示。文字色を親要素に合わせる */}
+                        <p className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                          {p.session.title || p.session.scenario.title}
+                        </p>
+
+                        {p.session.title && (
+                            <p className="text-sm text-gray-700 dark:text-gray-300">シナリオ: {p.session.scenario.title}</p>
+                        )}
+                      </div>
+                      <div className="flex-shrink-0 self-center sm:self-auto"> {/* ✅ 中央揃えの微調整 */}
+                        <RoleTag role={p.role} />
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-4 text-center text-gray-500 bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+              参加予定のセッションはありません。
+            </p>
+          )}
+        </div>
+
+        {/* --- 参加履歴一覧 --- */}
+        <div>
+          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-300">
+            参加履歴 ({pastParticipations.length})
+          </h2>
+          {pastParticipations.length > 0 ? (
+            <ul className="mt-4 space-y-4">
+              {pastParticipations.map((p) => (
+                <li key={p.session.id} className="rounded-lg bg-white dark:bg-gray-800 shadow transition hover:shadow-lg">
+                  {/* ✅ Linkコンポーネントで全体を囲み、レイアウトとパディングはこちらに適用 */}
+                  <Link href={`/sessions/${p.session.id}`} className="block p-4">
+                    <div className="flex flex-col justify-between gap-2 sm:flex-row">
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {format(p.session.scheduledAt, "yyyy年MM月dd日", { locale: ja })}
+                        </p>
+                        <GenreTag genre={p.session.scenario.genre} />
+
+                        {/* ✅ Linkではなくなり、通常のテキストとして表示。文字色を親要素に合わせる */}
+                        <p className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                          {p.session.title || p.session.scenario.title}
+                        </p>
+
+                        {p.session.title && (
+                            <p className="text-sm text-gray-700 dark:text-gray-300">シナリオ: {p.session.scenario.title}</p>
+                        )}
+                      </div>
+                      <div className="flex-shrink-0 self-center sm:self-auto"> {/* ✅ 中央揃えの微調整 */}
+                        <RoleTag role={p.role} />
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-4 text-center text-gray-500 bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+              参加したセッションはまだありません。
+            </p>
+          )}
+        </div>
       </div>
     </main>
   );
