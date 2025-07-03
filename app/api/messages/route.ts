@@ -1,42 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
 
-export async function POST(req: NextRequest) {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  const { content, channelId } = await req.json();
+  const supabase = createPagesServerClient({ req, res });
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!content || !channelId) {
-    return NextResponse.json({ error: 'Missing content or channelId' }, { status: 400 });
+  if (!user) {
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  try {
-    const message = await prisma.message.create({
-      data: {
-        content,
-        channelId,
-        authorId: session.user.id,
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
+  const { content, channelId } = req.body;
 
-    // Supabase Realtimeへの通知（これはクライアント側でリッスンする）
-    // Prismaの操作が完了した時点で、Supabaseのトリガーが発動する想定
+  const { error } = await supabase
+    .from('messages')
+    .insert({ content, channelId, authorId: user.id });
 
-    return NextResponse.json(message, { status: 201 });
-  } catch (error) {
-    console.error('Message creation failed:', error);
-    return NextResponse.json({ error: 'Failed to create message' }, { status: 500 });
+  if (error) {
+    return res.status(500).json({ error: error.message });
   }
+
+  return res.status(201).json({ success: true });
 }
