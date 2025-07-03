@@ -49,6 +49,8 @@ export function ChatWidget({ initialMessages, currentUserId, channelId }: Props)
 
     const handleNewMessage = async (payload: RealtimePostgresChangesPayload<MessageType>) => {
       const newMessage = payload.new as MessageType;
+      if (!newMessage) return;
+      // 🔽 stateの代わりにrefからキャッシュを読む
       let author: AuthorInfo | undefined = usersCacheRef.current.get(newMessage.authorId);
 
       // キャッシュにユーザー情報がない場合のみDBから取得
