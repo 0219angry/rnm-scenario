@@ -1,30 +1,28 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
+import { NextResponse } from 'next/server';  
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';  
+import { cookies } from 'next/headers';  
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
-  }
+export async function POST(req: Request) {  
+  const supabase = createRouteHandlerClient({ cookies });  
+  const { data: { user } } = await supabase.auth.getUser();  
 
-  const supabase = createPagesServerClient({ req, res });
-  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {  
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });  
+  }  
 
-  if (!user) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
+  const { content, channelId } = await req.json();  
 
-  const { content, channelId } = req.body;
+  if (!content || !channelId) {  
+    return NextResponse.json({ error: 'Content and channelId are required' }, { status: 400 });  
+  }  
 
-  const { error } = await supabase
-    .from('messages')
-    .insert({ content, channelId, authorId: user.id });
+  const { error } = await supabase  
+    .from('messages')  
+    .insert({ content, channelId, authorId: user.id });  
 
-  if (error) {
-    return res.status(500).json({ error: error.message });
-  }
+  if (error) {  
+    return NextResponse.json({ error: error.message }, { status: 500 });  
+  }  
 
-  return res.status(201).json({ success: true });
-}
+  return NextResponse.json({ success: true }, { status: 201 });  
+}  
