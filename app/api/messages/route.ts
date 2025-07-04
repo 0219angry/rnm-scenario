@@ -1,28 +1,36 @@
-import { NextResponse } from 'next/server';  
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';  
-import { cookies } from 'next/headers';  
+import { NextResponse } from 'next/server';
+import { getCurrentUser } from '@/lib/auth';
+import { prisma } from '@/lib/prisma'
 
 export async function POST(req: Request) {  
-  const supabase = createRouteHandlerClient({ cookies });  
-  const { data: { user } } = await supabase.auth.getUser();  
+  try{
+    const currentUser = await getCurrentUser();
 
-  if (!user) {  
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });  
-  }  
+    if (!currentUser) {  
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });  
+    }  
 
-  const { content, channelId } = await req.json();  
+    const { content, channelId } = await req.json();  
 
-  if (!content || !channelId) {  
-    return NextResponse.json({ error: 'Content and channelId are required' }, { status: 400 });  
-  }  
+    if (!content || !channelId) {  
+      return NextResponse.json({ error: 'Content and channelId are required' }, { status: 400 });  
+    }  
 
-  const { error } = await supabase  
-    .from('messages')  
-    .insert({ content, channelId, authorId: user.id });  
-
-  if (error) {  
-    return NextResponse.json({ error: error.message }, { status: 500 });  
-  }  
-
-  return NextResponse.json({ success: true }, { status: 201 });  
+    const newMessage = await prisma.message.create({
+          data: {
+            content,
+            channelId,
+            authorId: currentUser.id,
+          },
+        });
+      return NextResponse.json({
+      message: "投稿完了"
+    });
+  } catch (error) {
+    console.error("投稿失敗: ", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }  
