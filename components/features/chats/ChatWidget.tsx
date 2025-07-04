@@ -18,7 +18,15 @@ type Props = {
   setNewMessage: (value: string) => void;
   handleSubmit: (e: FormEvent) => Promise<void>;
   onClose: () => void;
+  isLoading: boolean;
 };
+
+// --- ローディングスピナーのコンポーネント ---
+const Spinner = () => (
+  <div className="flex items-center justify-center h-full">
+    <div className="w-6 h-6 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+  </div>
+);
 
 export function ChatWindow({ 
   messages, 
@@ -27,7 +35,8 @@ export function ChatWindow({
   newMessage, 
   setNewMessage, 
   handleSubmit, 
-  onClose 
+  onClose,
+  isLoading
 }: Props) {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
@@ -46,21 +55,33 @@ export function ChatWindow({
         </button>
       </div>
 
-      {/* メッセージリスト */}
       <div className="flex-grow p-4 overflow-y-auto bg-gray-50">
-        {messages.map((msg) => {
-          const isMe = msg.authorId === currentUser.id;
-          return (
-            <div key={msg.id} className={`flex items-end mb-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-xs px-3 py-2 rounded-lg ${isMe ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-                {/* authorがnullでないことを確認 */}
-                <p className="text-sm font-bold">{msg.author?.name || 'Unknown'}</p>
-                <p>{msg.content}</p>
-              </div>
-            </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <>
+            {messages.map((msg) => {
+              const isMe = msg.authorId === currentUser.id;
+              return (
+                <div key={msg.id} className={`flex items-end mb-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
+                  {messages.map((msg) => {
+                    const isMe = msg.authorId === currentUser.id;
+                    return (
+                      <div key={msg.id} className={`flex items-end mb-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-xs px-3 py-2 rounded-lg ${isMe ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
+                          {/* authorがnullでないことを確認 */}
+                          <p className="text-sm font-bold">{msg.author?.name || 'Unknown'}</p>
+                          <p>{msg.content}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+            <div ref={messagesEndRef} />
+          </>
+        )}
       </div>
 
       {/* 入力フォーム */}
