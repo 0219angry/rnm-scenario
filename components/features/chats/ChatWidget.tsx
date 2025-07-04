@@ -3,7 +3,7 @@
 import { useState, useEffect, FormEvent, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Message as MessageType, User } from '@prisma/client';
-import { ChatBubbleOvalLeftEllipsisIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 // 必要な型定義
@@ -37,9 +37,9 @@ export function ChatWindow({ initialMessages, currentUserId, channelId, onClose 
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   // メッセージリストの最下部にスクロールする関数
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+  // const scrollToBottom = useCallback(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // }, []);
 
   // リアルタイムリスナーを設定
   useEffect(() => {
