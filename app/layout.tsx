@@ -27,6 +27,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
+  console.log("CurrentUser in RootLayout:", user);
 
   // 🔽 チャット用のチャンネルIDを定義（実際のIDに置き換えてください）
   const supportChannelId = "ALLUSERCHANNEL";
