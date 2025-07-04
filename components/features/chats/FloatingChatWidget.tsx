@@ -148,6 +148,7 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
             setNewMessage={setNewMessage}
             handleSubmit={handleSubmit}
             onClose={() => setIsOpen(false)}
+            isLoading={isLoading}
           />
         )}
       </div>
