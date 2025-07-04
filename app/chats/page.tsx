@@ -4,6 +4,7 @@
 
 import { ChatWindow } from '@/components/features/chats/ChatWidget'; // ChatWindowコンポーネントのパスを自身の環境に合わせてください
 import type { MessageWithAuthor } from '@/components/features/chats/ChatWidget';
+import { getCurrentUser } from '@/lib/auth';
 import { useState } from 'react';
 
 // テスト用のダミーメッセージデータ
@@ -29,7 +30,14 @@ const mockInitialMessages: MessageWithAuthor[] = [
 /**
  * ChatWindowコンポーネントのテスト表示専用ページ
  */
-export default function ChatTestPage() {
+export default async function ChatTestPage() {
+  const user = await getCurrentUser();
+
+  if(!user) {
+    return (
+      <div>Please login</div>
+    )
+  }
   // チャットウィンドウの表示/非表示を管理するstate
   const [isChatVisible, setIsChatVisible] = useState(true);
 
@@ -56,7 +64,7 @@ export default function ChatTestPage() {
         <ChatWindow
           // 必要なpropsを渡します
           initialMessages={mockInitialMessages}
-          currentUserId="user-B" // 自分のユーザーIDを 'user-B' に設定
+          currentUser={user} // 自分のユーザーIDを 'user-B' に設定
           channelId="test-channel-123" // テスト用のチャンネルID
           onClose={handleCloseChat}
         />

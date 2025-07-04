@@ -78,7 +78,7 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
           <ChatWindow
             initialMessages={messages}
             channelId={channelId}
-            currentUserId={currentUser.id}
+            currentUser={currentUser}
             onClose={handleClose} // 閉じる関数を渡す
           />
         )}
