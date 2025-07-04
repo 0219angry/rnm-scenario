@@ -25,6 +25,7 @@ interface FloatingChatWidgetProps {
 }
 
 export default function FloatingChatWidget({ channelId, currentUser }: FloatingChatWidgetProps) {
+  console.log("FloatingChatWidget received currentUser:", currentUser);
   const [isOpen, setIsOpen] = useState(false);
   
   // 1. メッセージリストと、取得済みかを管理するStateを追加
@@ -57,6 +58,7 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
   }, [isOpen, hasFetched, channelId]);
   
   // ユーザーがログインしていない場合は何も表示しない
+  console.log("Checking currentUser before render:", currentUser);
   if (!currentUser) {
     return null;
   }
