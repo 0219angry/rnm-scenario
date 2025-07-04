@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase'; // Supabaseクライアントをインポート
-import { ChatWidget, MessageWithAuthor } from './ChatWidget';
+import { ChatWindow, MessageWithAuthor } from './ChatWidget';
 
 // --- アイコンコンポーネント (変更なし) ---
 const ChatIcon = () => (
@@ -61,26 +61,31 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
     return null;
   }
 
+  const handleClose = () => setIsOpen(false);
+
   return (
-    <div className="fixed bottom-4 left-4 z-50 flex flex-col items-start gap-4">
-      {/* isOpenがtrueの時のみChatWidgetを描画 */}
-      {isOpen && (
-         <div
-           className={`transition-all duration-300 ease-in-out opacity-100 translate-y-0`}
-         >
-           {/* 3. ChatWidgetに正しいPropsを渡す */}
-           <ChatWidget
-             initialMessages={messages}
-             channelId={channelId}
-             currentUserId={currentUser.id}
-           />
-         </div>
-      )}
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-4"> {/* left-4 から right-4 に変更 */}
+      {/* チャットウィンドウのコンテナ */}
+      <div
+        className={`transition-all duration-300 ease-in-out ${
+          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+        }`}
+      >
+        {/* isOpenがtrue、かつデータ取得が完了したらChatWidgetを描画 */}
+        {isOpen && hasFetched && (
+          <ChatWindow
+            initialMessages={messages}
+            channelId={channelId}
+            currentUserId={currentUser.id}
+            onClose={handleClose} // 閉じる関数を渡す
+          />
+        )}
+      </div>
 
       {/* 開閉ボタン */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="self-start p-3 text-white bg-blue-500 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="p-3 text-white bg-blue-500 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         aria-label={isOpen ? "チャットを閉じる" : "チャットを開く"}
       >
         {isOpen ? <CloseIcon /> : <ChatIcon />}
