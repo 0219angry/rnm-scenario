@@ -1,6 +1,6 @@
 // components/ChatWidget.tsx
 
-import { useState, useEffect, FormEvent, useRef, useCallback } from 'react';
+import { useState, useEffect, FormEvent, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Message as MessageType, User } from '@prisma/client';
 import { XMarkIcon } from '@heroicons/react/24/solid';
