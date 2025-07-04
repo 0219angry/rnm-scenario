@@ -109,6 +109,7 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
     e.preventDefault();
     if (newMessage.trim() === '' || !currentUser) return;
 
+    // 楽観的更新のための仮メッセージ
     const optimisticMessage: MessageWithAuthor = {
       id: `temp-${Date.now()}`,
       content: newMessage,
@@ -118,19 +119,43 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
       author: { id: currentUser.id, name: currentUser.name || 'No Name' },
     };
 
+    // 楽観的UI更新：メッセージを送信前にUIに追加
     setMessages(prev => [...prev, optimisticMessage]);
-    setNewMessage('');
 
-    const { error } = await supabase.from('messages').insert({ 
-      content: newMessage, 
-      channelId: channelId, 
-      authorId: currentUser.id 
-    });
+    // エラー時に復元できるよう、送信内容を保持
+    const messageToSend = newMessage;
+    setNewMessage(''); // 入力欄をクリア
 
-    if (error) {
+    try {
+      // ▼▼▼ Supabase直接呼び出しからAPIへのfetchに変更 ▼▼▼
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: messageToSend,
+          channelId: channelId,
+        }),
+      });
+      // ▲▲▲ ここまで変更 ▲▲▲
+
+      if (!response.ok) {
+        // APIがエラーを返した場合、エラーをスローしてcatchブロックで処理
+        throw new Error('Failed to send message to the server.');
+      }
+      
+      // 成功した場合、必要であればレスポンスデータでUIを更新することも可能
+      // const savedMessage = await response.json();
+      // setMessages(prev => prev.map(m => m.id === optimisticMessage.id ? savedMessage : m));
+
+    } catch (error) {
       console.error('Failed to send message:', error);
+      // エラーが発生した場合、楽観的更新を元に戻す
       setMessages(prev => prev.filter(m => m.id !== optimisticMessage.id));
-      // TODO: ユーザーにエラーを通知
+      // ユーザーが入力したメッセージを失わないよう、入力欄に戻す
+      setNewMessage(messageToSend);
+      // TODO: トースト通知などでユーザーにエラーをフィードバックする
     }
   };
 
