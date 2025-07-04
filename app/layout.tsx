@@ -4,11 +4,8 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { ThemeProvider } from "@/components/features/theme/ThemeProvider";
 import { Toaster } from 'sonner';
-
-// 🔽 SupabaseとChatWidget関連のインポートを追加
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import FloatingChatWidget from "@/components/features/chats/FloatingChatWidget";
+import { getCurrentUser } from "@/lib/auth";
 
 const notoSansJp = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
@@ -29,9 +26,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // 🔽 サーバーサイドでユーザー情報を取得
-  const supabase = createServerComponentClient({ cookies });
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   // 🔽 チャット用のチャンネルIDを定義（実際のIDに置き換えてください）
   const supportChannelId = "ALLUSERCHANNEL";

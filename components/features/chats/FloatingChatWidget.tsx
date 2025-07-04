@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { User } from '@supabase/supabase-js';
+import type { User } from '@prisma/client';
 import { supabase } from '@/lib/supabase'; // Supabaseクライアントをインポート
 import { ChatWindow, MessageWithAuthor } from './ChatWidget';
 
