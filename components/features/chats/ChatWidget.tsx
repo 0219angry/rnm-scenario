@@ -64,18 +64,11 @@ export function ChatWindow({
               const isMe = msg.authorId === currentUser.id;
               return (
                 <div key={msg.id} className={`flex items-end mb-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
-                  {messages.map((msg) => {
-                    const isMe = msg.authorId === currentUser.id;
-                    return (
-                      <div key={msg.id} className={`flex items-end mb-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-xs px-3 py-2 rounded-lg ${isMe ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-                          {/* authorがnullでないことを確認 */}
-                          <p className="text-sm font-bold">{msg.author?.name || 'Unknown'}</p>
-                          <p>{msg.content}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  <div className={`max-w-xs px-3 py-2 rounded-lg ${isMe ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
+                    {/* authorがnullでないことを確認 */}
+                    <p className="text-sm font-bold">{msg.author?.name || 'Unknown'}</p>
+                    <p>{msg.content}</p>
+                  </div>
                 </div>
               );
             })}
