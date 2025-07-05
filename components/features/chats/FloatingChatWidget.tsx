@@ -38,20 +38,27 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
     const fetchData = async () => {
       setIsLoading(true);
 
-      // チャンネル情報とメッセージ履歴を並行して取得
-      const [channelRes, messagesRes] = await Promise.all([
-        supabase.from('channels').select('name').eq('id', channelId).single(),
-        supabase.from('messages').select('*, author:users(id, name)').eq('channelId', channelId).order('createdAt', { ascending: true })
-      ]);
+      try {
+        // ▼▼▼ ここから変更 ▼▼▼
+        // チャンネル情報取得と、API経由でのメッセージ履歴取得を並行して実行
+        const [channelRes, messagesRes] = await Promise.all([
+          supabase.from('channels').select('name').eq('id', channelId).single(),
+          fetch(`/api/messages?channelId=${channelId}`) // APIを呼び出す
+        ]);
+        // ▲▲▲ ここまで変更 ▲▲▲
 
-      // チャンネル名を設定
-      if (channelRes.data) {
-        setChannelName(channelRes.data.name || 'チャット');
-      }
+        // チャンネル名を設定
+        if (channelRes.data) {
+          setChannelName(channelRes.data.name || 'チャット');
+        }
 
-      // メッセージとユーザーキャッシュを設定
-      if (messagesRes.data) {
-        const loadedMessages = messagesRes.data as MessageWithAuthor[];
+        // APIからのレスポンスを処理
+        if (!messagesRes.ok) {
+          throw new Error('Failed to fetch messages');
+        }
+        const loadedMessages: MessageWithAuthor[] = await messagesRes.json();
+        
+        // メッセージとユーザーキャッシュを設定
         setMessages(loadedMessages);
         
         const newCache = new Map<string, AuthorInfo>();
@@ -63,9 +70,13 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
         // 現在のユーザーもキャッシュに追加
         newCache.set(currentUser.id, { id: currentUser.id, name: currentUser.name || 'No Name' });
         setUsersCache(newCache);
-      }
 
-      setIsLoading(false);
+      } catch (error) {
+        console.error("Failed to load chat data:", error);
+        // TODO: ユーザーへのエラー通知
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchData();
@@ -117,6 +128,7 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
       authorId: currentUser.id,
       createdAt: new Date(),
       author: { id: currentUser.id, name: currentUser.name || 'No Name' },
+      recipientId: null,
     };
 
     // 楽観的UI更新：メッセージを送信前にUIに追加

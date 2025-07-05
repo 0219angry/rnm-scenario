@@ -33,6 +33,7 @@ model User {
   // このユーザーが送信した通知
   notificationsFrom Notification[] @relation("NotificationsFromUser")
   messages      Message[]
+  receivedMessages Message[] @relation("RecipientMessages")
 }
 
 model Account {
@@ -239,6 +240,10 @@ model Message {
 
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String
+
+  // このメッセージを閲覧できる受信者のID（NULLの場合は全員に公開）
+  recipient   User?    @relation("RecipientMessages", fields: [recipientId], references: [id])
+  recipientId String?
 
   channel   Channel  @relation(fields: [channelId], references: [id])
   channelId String
