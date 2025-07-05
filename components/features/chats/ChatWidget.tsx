@@ -1,5 +1,3 @@
-// components/ChatWidget.tsx
-
 import { FormEvent, useRef, useEffect } from 'react';
 import type { Message as MessageType, User } from '@prisma/client';
 import { XMarkIcon } from '@heroicons/react/24/solid';
@@ -7,7 +5,7 @@ import { XMarkIcon } from '@heroicons/react/24/solid';
 // 型定義
 export type AuthorInfo = Pick<User, 'id' | 'name' | 'image'>;
 export type MessageWithAuthor = MessageType & {
-  author: AuthorInfo | null; // authorはnullの可能性も考慮
+  author: AuthorInfo | null;
 };
 
 type Props = {
@@ -20,8 +18,6 @@ type Props = {
   onClose: () => void;
   isLoading: boolean;
 };
-
-
 
 // --- ローディングスピナーのコンポーネント ---
 const Spinner = () => (
@@ -57,6 +53,7 @@ export function ChatWindow({
         </button>
       </div>
 
+      {/* メッセージリスト */}
       <div className="flex-grow p-4 overflow-y-auto bg-gray-50">
         {isLoading ? (
           <Spinner />
@@ -64,14 +61,51 @@ export function ChatWindow({
           <>
             {messages.map((msg) => {
               const isMe = msg.authorId === currentUser.id;
+              // 投稿時間を見やすい形式にフォーマット
+              const timeString = new Date(msg.createdAt).toLocaleTimeString('ja-JP', {
+                hour: '2-digit',
+                minute: '2-digit',
+              });
+
               return (
-                <div key={msg.id} className={`flex items-end mb-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-xs px-3 py-2 rounded-lg ${isMe ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-                    {/* authorがnullでないことを確認 */}
-                    <p className="text-sm font-bold">{msg.author?.name || 'Unknown'}</p>
-                    <p>{msg.content}</p>
+                // --- ▼▼▼ 表示部分を修正 ▼▼▼ ---
+                <div key={msg.id} className={`flex gap-2.5 mb-4 ${isMe ? 'justify-end' : 'justify-start'}`}>
+                  
+                  {/* アイコン (自分ではない場合) */}
+                  {!isMe && (
+                    <img 
+                      src={msg.author?.image || '/default-avatar.png'} // デフォルト画像へのパス
+                      alt={msg.author?.name || 'Avatar'}
+                      className="w-8 h-8 rounded-full self-end"
+                    />
+                  )}
+
+                  {/* メッセージ本文と時間 */}
+                  <div className={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <div className={`max-w-xs px-3 py-2 rounded-lg ${isMe ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
+                      {!isMe && (
+                        <p className="text-sm font-bold">{msg.author?.name || 'Unknown'}</p>
+                      )}
+                      <p className="text-base">{msg.content}</p>
+                    </div>
+
+                    {/* 投稿時間 */}
+                    <time className="text-xs text-gray-400 whitespace-nowrap self-end">
+                      {timeString}
+                    </time>
                   </div>
+                  
+                  {/* アイコン (自分の場合) */}
+                  {isMe && (
+                    <img 
+                      src={msg.author?.image || `https://avatar.vercel.sh/${msg.author?.id}`}
+                      alt={msg.author?.name || 'Avatar'}
+                      className="w-8 h-8 rounded-full self-end"
+                    />
+                  )}
+                  
                 </div>
+                // --- ▲▲▲ ここまで修正 ▲▲▲ ---
               );
             })}
             <div ref={messagesEndRef} />
