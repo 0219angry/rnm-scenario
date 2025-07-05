@@ -37,7 +37,7 @@ export async function GET(req: Request) {
       },
       include: {
         author: { // authorリレーションを含める
-          select: { id: true, name: true },
+          select: { id: true, name: true, image: true },
         },
       },
       orderBy: { createdAt: 'asc' },

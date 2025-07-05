@@ -5,7 +5,7 @@ import type { Message as MessageType, User } from '@prisma/client';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 
 // 型定義
-export type AuthorInfo = Pick<User, 'id' | 'name'>;
+export type AuthorInfo = Pick<User, 'id' | 'name' | 'image'>;
 export type MessageWithAuthor = MessageType & {
   author: AuthorInfo | null; // authorはnullの可能性も考慮
 };
@@ -20,6 +20,8 @@ type Props = {
   onClose: () => void;
   isLoading: boolean;
 };
+
+
 
 // --- ローディングスピナーのコンポーネント ---
 const Spinner = () => (
