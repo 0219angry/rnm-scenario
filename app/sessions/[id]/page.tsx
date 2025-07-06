@@ -45,6 +45,9 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
         sessionId: session.id
       }
     });
+    if (!newSupportChannel) {
+      return notFound();
+    }
     window.location.reload();
   }
 
