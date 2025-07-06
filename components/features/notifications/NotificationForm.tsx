@@ -57,7 +57,7 @@ export function NotificationForm({ players, sessionId }: Props) {
           },
           body: JSON.stringify({
             toUserId: player.id, // 各プレイヤーのIDを指定
-            formattedMessage,
+            message: formattedMessage,
             linkUrl,
           }),
         }).then(res => {
