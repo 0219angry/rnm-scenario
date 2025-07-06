@@ -108,13 +108,17 @@ useEffect(() => {
 
     const subscription = supabase
       .channel(`chat-room-${channelId}`)
-      .on('postgres_changes', 
-        { 
-          event: 'INSERT', 
-          schema: 'public', 
-          table: 'messages', 
-          filter: `channelId=eq.${channelId},and(recipientId.is.null,or(recipientId.eq.${currentUser.id}))`
-        }, handleNewMessage)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          // and()を削除し、よりシンプルなフィルターに修正
+          filter: `channelId=eq.${channelId},or(recipientId.is.null,recipientId.eq.${currentUser.id})`,
+        },
+        handleNewMessage
+      )
       .subscribe();
 
     return () => {
