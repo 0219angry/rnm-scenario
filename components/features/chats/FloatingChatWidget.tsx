@@ -115,7 +115,7 @@ useEffect(() => {
           schema: 'public',
           table: 'messages',
           // and()を削除し、よりシンプルなフィルターに修正
-          filter: `channelId=eq.${channelId},or(recipientId.is.null,recipientId.eq.${currentUser.id})`,
+          // filter: `channelId=eq.${channelId},or(recipientId.is.null,recipientId.eq.${currentUser.id})`,
         },
         handleNewMessage
       )
