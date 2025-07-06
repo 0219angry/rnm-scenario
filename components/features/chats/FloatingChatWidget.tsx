@@ -57,6 +57,9 @@ useEffect(() => {
         // ★参加者リストをAPIからのレスポンスで設定
         if (!participantsRes.ok) throw new Error('Failed to fetch participants');
         const loadedParticipants: AuthorInfo[] = await participantsRes.json();
+
+        console.log('【Widget】APIから取得した参加者:', loadedParticipants);
+        
         setParticipants(loadedParticipants);
 
         // メッセージ履歴を設定

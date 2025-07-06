@@ -49,12 +49,16 @@ export function ChatWindow({
 }: Props) {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
+  console.log('【ChatWindow】受け取った参加者プロパティ:', participants);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   // 自分以外の参加者リスト
   const recipientOptions = participants.filter(p => p.id !== currentUser.id);
+
+  console.log('【ChatWindow】自分を除いた宛先オプション:', recipientOptions);
 
   return (
     <div className="bg-white w-full h-full flex flex-col">
