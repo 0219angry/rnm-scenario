@@ -33,6 +33,7 @@ model User {
   // このユーザーが送信した通知
   notificationsFrom Notification[] @relation("NotificationsFromUser")
   messages      Message[]
+  receivedMessages Message[] @relation("RecipientMessages")
 }
 
 model Account {
@@ -141,6 +142,7 @@ model Session {
   createdAt     DateTime   @default(now())
 
   participants  SessionParticipant[]
+  supportChannels Channel[]
   comments  Comment[]
 }
 
@@ -193,11 +195,14 @@ enum NotificationType {
 model Channel {
   id            String    @id @default(cuid())
   name          String?
+  createdAt     DateTime @default(now())
   // ... その他のチャットルーム情報
 
   // このチャンネルに関連する通知
   notifications Notification[]
   messages      Message[]
+  sessionId     String?
+  session       Session? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@map("channels")
 }
@@ -240,7 +245,11 @@ model Message {
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String
 
-  channel   Channel  @relation(fields: [channelId], references: [id])
+  // このメッセージを閲覧できる受信者のID（NULLの場合は全員に公開）
+  recipient   User?    @relation("RecipientMessages", fields: [recipientId], references: [id])
+  recipientId String?
+
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId String
 
   @@map("messages")

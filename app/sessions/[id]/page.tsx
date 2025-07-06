@@ -1,7 +1,8 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { fetchCommentsBySessionId } from "@/lib/data";
+
 
 // 新しく作成するコンポーネントをインポート
 import { SessionHeader } from "@/components/features/sessions/SessionHeader";
@@ -10,10 +11,13 @@ import { ScenarioInfoCard } from "@/components/features/sessions/ScenarioInfoCar
 import { ParticipantList } from "@/components/features/sessions/ParticipantList";
 import { CommentSection } from "@/components/features/comments/CommentSection";
 import { OwnerInfo } from "@/components/features/sessions/OwnerInfo";
+import FloatingChatWidget from "@/components/features/chats/FloatingChatWidget"
 
 export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
+
+
   const session = await prisma.session.findUnique({
     where: { id },
     include: {
@@ -26,10 +30,29 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
     },
   });
 
+  const channel = await prisma.channel.findMany({
+    where: { sessionId: id },
+    orderBy: { createdAt: 'asc' },
+  });
+
   if (!session) {
     notFound();
   }
 
+  if (channel.length === 0) {
+    const newSupportChannel = await prisma.channel.create({
+      data: {
+        name: "メインチャット",
+        sessionId: session.id
+      }
+    });
+    if (!newSupportChannel) {
+      return notFound();
+    }
+    redirect(`/sessions/${id}`);
+  }
+
+  const supportChannelId = channel[0].id;
   const currentUser = await getCurrentUser();
   const comments = await fetchCommentsBySessionId(session.id);
   const isOwner = currentUser?.id === session.ownerId;
@@ -66,6 +89,11 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
 
         <OwnerInfo owner={session.owner} />
       </div>
+      {/* 🔽 FloatingChatWidgetを配置 */}
+      <FloatingChatWidget 
+        channelId={supportChannelId}
+        currentUser={currentUser}
+      />
     </div>
   );
 }
