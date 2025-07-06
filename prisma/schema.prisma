@@ -202,7 +202,7 @@ model Channel {
   notifications Notification[]
   messages      Message[]
   sessionId     String?
-  session       Session? @relation(fields: [sessionId], references: [id])
+  session       Session? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@map("channels")
 }
@@ -249,7 +249,7 @@ model Message {
   recipient   User?    @relation("RecipientMessages", fields: [recipientId], references: [id])
   recipientId String?
 
-  channel   Channel  @relation(fields: [channelId], references: [id])
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId String
 
   @@map("messages")
