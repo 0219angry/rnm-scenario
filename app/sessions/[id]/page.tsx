@@ -39,7 +39,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
     notFound();
   }
 
-  if (!channel) {
+  if (channel.length === 0) {
     const newSupportChannel = await prisma.channel.create({
       data: {
         name: "メインチャット",
