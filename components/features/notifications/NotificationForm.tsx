@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useTransition } from 'react';
+import { useRef, useState } from 'react';
 import { Player } from '@/types/types'; // Player型をインポート
 
 type Props = {
