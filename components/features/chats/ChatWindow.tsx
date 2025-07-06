@@ -167,7 +167,16 @@ export function ChatWindow({
                   </Listbox.Option>
                   {/* 参加者オプション */}
                   {recipientOptions.map((person) => (
-                    <Listbox.Option key={person.id} className={({ active }) => `relative ...`} value={person}>
+                    <Listbox.Option
+                      key={person.id}
+                      // 'active' を使って、ホバー時に背景色が変わるようにする
+                      className={({ active }) =>
+                        `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                          active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'
+                        }`
+                      }
+                      value={person}
+                    >
                       {({ selected }) => (
                       <>
                         <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>全員</span>

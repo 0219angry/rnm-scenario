@@ -6,12 +6,11 @@ import { ParticipantRole } from "@prisma/client";
 import type { AuthorInfo } from '@/components/features/chats/ChatWindow';
 
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: { sessionId: string } }
 ) {
   try {
     const { sessionId } = params;
-    req.body
 
     if (!sessionId) {
       return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
