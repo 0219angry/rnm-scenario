@@ -1,7 +1,8 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { fetchCommentsBySessionId } from "@/lib/data";
+
 
 // 新しく作成するコンポーネントをインポート
 import { SessionHeader } from "@/components/features/sessions/SessionHeader";
@@ -48,7 +49,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
     if (!newSupportChannel) {
       return notFound();
     }
-    window.location.reload();
+    redirect(`/sessions/${id}`);
   }
 
   const supportChannelId = channel[0].id;
