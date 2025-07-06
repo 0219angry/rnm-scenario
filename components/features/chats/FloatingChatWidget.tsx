@@ -140,11 +140,11 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
   if (!currentUser) return null;
 
   // --- JSXによるレンダリング ---
-  return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-4">
-      {/* [変更] ウィンドウのトランジションと影を調整 */}
-      <div className={`transition-all duration-300 ease-in-out ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-        {/* [変更] 表示/非表示のロジックはそのままに、ウィンドウコンポーネントを呼び出す */}
+    return (
+    // [変更] コンテナを画面右下に固定し、タブがそこから生えるように調整
+    <div className="fixed bottom-0 right-8 z-50 flex flex-col items-end">
+      {/* [変更] ウィンドウの表示位置をタブボタンの上に調整 */}
+      <div className={`transition-all duration-300 ease-in-out mb-2 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
         <div className="w-80 h-[30rem] rounded-xl shadow-2xl overflow-hidden">
           {isOpen && (
             <ChatWindow
@@ -161,13 +161,23 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
         </div>
       </div>
       
-      {/* [変更] ボタンの配色をインディゴに変更 */}
+      {/* [変更] ボタンを横長のタブ形式に変更 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-3 text-white bg-indigo-600 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-transform transform hover:scale-110"
+        className="flex items-center gap-2 px-6 py-3 font-bold text-white bg-indigo-600 rounded-t-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
         aria-label={isOpen ? "チャットを閉じる" : "チャットを開く"}
       >
-        {isOpen ? <CloseIcon /> : <ChatIcon />}
+        {isOpen ? (
+          <>
+            <CloseIcon />
+            <span>閉じる</span>
+          </>
+        ) : (
+          <>
+            <ChatIcon />
+            <span>チャットで質問</span>
+          </>
+        )}
       </button>
     </div>
   );
