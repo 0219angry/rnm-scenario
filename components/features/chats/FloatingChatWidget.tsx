@@ -114,6 +114,8 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
       author: { id: currentUser.id, name: currentUser.name || 'No Name', image: currentUser.image },
     };
 
+    console.log("【ステップ1】先行表示用のメッセージ:", optimisticMessage);
+
     setMessages(prev => [...prev, optimisticMessage]);
     const messageToSend = newMessage;
     setNewMessage('');
@@ -128,6 +130,8 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
       if (!response.ok) throw new Error('Failed to send message to the server.');
 
       const savedMessage: MessageType = await response.json();
+
+      console.log("【ステップ3】サーバーから返ってきたメッセージ:", savedMessage);
       
       // 先行表示していたメッセージを、サーバーからの正式なデータで置き換える
       // この際、先行表示で使っていたauthor情報を引き継ぐ
