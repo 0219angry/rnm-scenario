@@ -139,7 +139,7 @@ export function FileManager({
 
       const notificationPromises = assignments.map(assignment => {
         const message = `
-          ${session?.title} / ${session?.scenario.title}で
+          ${session?.title} / ${session?.scenario.title}
           ファイル「${assignment.fileName}」があなたに共有されました。
         `;
         const { data } = supabase

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { Player } from '@/types/types';
 import { FileInfo } from '@/components/features/sessions/SessionFileList';
 import { FileManager } from '@/components/features/sessions/FileManager';
+import { NotificationForm } from '@/components/features/notifications/NotificationForm';
 import { FileObject } from '@supabase/storage-js';
 import { supabase } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/auth';
@@ -147,6 +148,8 @@ export default async function SessionFilePage({
         initialPlayers={players}
         initialFiles={files}
       />
+
+      <NotificationForm players={players} sessionId={id}/>
     </main>
   );
 }

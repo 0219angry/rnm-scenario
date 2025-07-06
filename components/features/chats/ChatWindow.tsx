@@ -1,6 +1,7 @@
 import { FormEvent, useRef, useEffect } from 'react';
 import type { Message as MessageType, User } from '@prisma/client';
 import { XMarkIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid'; 
+import Image from "next/image";
 
 // 型定義
 export type AuthorInfo = Pick<User, 'id' | 'name' | 'image'>;
@@ -78,9 +79,11 @@ export function ChatWindow({
                   className={`flex items-end gap-2 ${isMe ? 'justify-end' : 'justify-start'}`}
                 >
                   {!isMe && (
-                    <img
+                    <Image
                       src={msg.author?.image || `https://avatar.vercel.sh/${msg.author?.id}`}
                       alt={msg.author?.name || 'Avatar'}
+                      width={32}
+                      height={32}
                       className="w-8 h-8 rounded-full self-start"
                     />
                   )}
