@@ -3,7 +3,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import type { User, Message as MessageType } from '@prisma/client';
 import { supabase } from '@/lib/supabase';
-import { ChatWindow, MessageWithAuthor, AuthorInfo } from './ChatWidget';
+import { ChatWindow, MessageWithAuthor, AuthorInfo } from '@/components/features/chats/ChatWindow'; // ChatWindowのパスを修正
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 // --- アイコンコンポーネント ---
@@ -34,7 +34,6 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
   const [usersCache, setUsersCache] = useState<Map<string, AuthorInfo>>(new Map());
 
   // --- 1. 初期データ読み込み ---
-  // チャットを開いた時にチャンネル情報とメッセージ履歴を読み込む
   useEffect(() => {
     if (!isOpen || !currentUser) return;
 
@@ -54,7 +53,6 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
         const loadedMessages: MessageWithAuthor[] = await messagesRes.json();
         setMessages(loadedMessages);
         
-        // 取得したデータからユーザー情報をキャッシュ
         const newCache = new Map<string, AuthorInfo>();
         loadedMessages.forEach(msg => {
           if (msg.author) newCache.set(msg.author.id, msg.author);
@@ -75,7 +73,6 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
   }, [isOpen, channelId, currentUser]);
 
   // --- 2. リアルタイムリスナー設定 ---
-  // 新しいメッセージをリアルタイムで受信する
   useEffect(() => {
     if (!isOpen || !currentUser) return;
 
@@ -145,23 +142,29 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
   // --- JSXによるレンダリング ---
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-4">
+      {/* [変更] ウィンドウのトランジションと影を調整 */}
       <div className={`transition-all duration-300 ease-in-out ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-        {isOpen && (
-          <ChatWindow
-            messages={messages}
-            currentUser={currentUser}
-            channelName={channelName}
-            newMessage={newMessage}
-            setNewMessage={setNewMessage}
-            handleSubmit={handleSubmit}
-            onClose={() => setIsOpen(false)}
-            isLoading={isLoading}
-          />
-        )}
+        {/* [変更] 表示/非表示のロジックはそのままに、ウィンドウコンポーネントを呼び出す */}
+        <div className="w-80 h-[30rem] rounded-xl shadow-2xl overflow-hidden">
+          {isOpen && (
+            <ChatWindow
+              messages={messages}
+              currentUser={currentUser}
+              channelName={channelName}
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+              handleSubmit={handleSubmit}
+              onClose={() => setIsOpen(false)}
+              isLoading={isLoading}
+            />
+          )}
+        </div>
       </div>
+      
+      {/* [変更] ボタンの配色をインディゴに変更 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-3 text-white bg-blue-500 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="p-3 text-white bg-indigo-600 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-transform transform hover:scale-110"
         aria-label={isOpen ? "チャットを閉じる" : "チャットを開く"}
       >
         {isOpen ? <CloseIcon /> : <ChatIcon />}
