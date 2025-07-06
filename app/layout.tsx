@@ -4,7 +4,6 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { ThemeProvider } from "@/components/features/theme/ThemeProvider";
 import { Toaster } from 'sonner';
-import FloatingChatWidget from "@/components/features/chats/FloatingChatWidget";
 import { getCurrentUser } from "@/lib/auth";
 
 const notoSansJp = Noto_Sans_JP({
@@ -29,8 +28,6 @@ export default async function RootLayout({
   const user = await getCurrentUser();
   console.log("CurrentUser in RootLayout:", user);
 
-  // 🔽 チャット用のチャンネルIDを定義（実際のIDに置き換えてください）
-  const supportChannelId = "ALLUSERCHANNEL";
 
   return (
     <html lang="ja" suppressHydrationWarning>

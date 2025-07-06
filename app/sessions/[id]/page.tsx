@@ -15,10 +15,7 @@ import FloatingChatWidget from "@/components/features/chats/FloatingChatWidget"
 export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
-  const channel = await prisma.channel.findMany({
-    where: { sessionId: id },
-    orderBy: { createdAt: 'asc' },
-  });
+
 
   const session = await prisma.session.findUnique({
     where: { id },
@@ -32,8 +29,23 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
     },
   });
 
+  const channel = await prisma.channel.findMany({
+    where: { sessionId: id },
+    orderBy: { createdAt: 'asc' },
+  });
+
   if (!session) {
     notFound();
+  }
+
+  if (!channel) {
+    const newSupportChannel = await prisma.channel.create({
+      data: {
+        name: "メインチャット",
+        sessionId: session.id
+      }
+    });
+    window.location.reload();
   }
 
   const supportChannelId = channel[0].id;
