@@ -180,7 +180,7 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
         ) : (
           <>
             <ChatIcon />
-            <span>チャットで質問</span>
+            <span>チャット</span>
           </>
         )}
       </button>

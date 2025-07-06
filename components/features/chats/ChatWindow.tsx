@@ -1,9 +1,8 @@
 import { FormEvent, useRef, useEffect } from 'react';
 import type { Message as MessageType, User } from '@prisma/client';
-// [追加] アイコンをインポート
 import { XMarkIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid'; 
 
-// 型定義 (変更なし)
+// 型定義
 export type AuthorInfo = Pick<User, 'id' | 'name' | 'image'>;
 export type MessageWithAuthor = MessageType & {
   author: AuthorInfo | null;
@@ -20,14 +19,14 @@ type Props = {
   isLoading: boolean;
 };
 
-// --- ローディングスピナー (変更なし) ---
+// --- ローディングスピナー ---
 const Spinner = () => (
   <div className="flex items-center justify-center h-full">
     <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-500 rounded-full animate-spin"></div>
   </div>
 );
 
-// --- [デザイン全面改修] ChatWindowコンポーネント ---
+// --- ChatWindowコンポーネント ---
 export function ChatWindow({ 
   messages, 
   currentUser, 
@@ -40,15 +39,12 @@ export function ChatWindow({
 }: Props) {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
-  // メッセージリストが更新されるたびに最下部にスクロール (変更なし)
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   return (
-    // [変更] 全体のコンテナ。h-fullで親の高さに追従
     <div className="bg-white w-full h-full flex flex-col">
-      {/* [変更] ヘッダーのデザインを刷新 */}
       <header className="bg-indigo-600 text-white p-3 flex justify-between items-center border-b border-indigo-700 shadow-sm">
         <h3 className="font-bold text-lg truncate">{channelName}</h3>
         <button onClick={onClose} className="hover:bg-indigo-700 p-1.5 rounded-full transition-colors">
@@ -56,7 +52,6 @@ export function ChatWindow({
         </button>
       </header>
 
-      {/* [変更] メッセージリストのデザインを刷新 */}
       <main className="flex-grow p-4 overflow-y-auto bg-gray-100">
         {isLoading ? (
           <Spinner />
@@ -64,18 +59,24 @@ export function ChatWindow({
           <div className="space-y-4">
             {messages.map((msg) => {
               const isMe = msg.authorId === currentUser.id;
-              const timeString = new Date(msg.createdAt).toLocaleTimeString('ja-JP', {
-                hour: '2-digit',
-                minute: '2-digit',
-              });
+
+              // msg.createdAtが有効な日付かチェックする
+              const createdAtDate = msg.createdAt ? new Date(msg.createdAt) : null;
+              const isValidDate = createdAtDate && !isNaN(createdAtDate.getTime());
+
+              // 有効な日付の場合のみ時刻をフォーマットし、無効な場合は空文字にする
+              const timeString = isValidDate
+                ? createdAtDate.toLocaleTimeString('ja-JP', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : ''; 
 
               return (
-                // [変更] メッセージ一行のコンテナ。アバターと吹き出しを配置
                 <div 
                   key={msg.id} 
                   className={`flex items-end gap-2 ${isMe ? 'justify-end' : 'justify-start'}`}
                 >
-                  {/* アバター (相手の場合) */}
                   {!isMe && (
                     <img
                       src={msg.author?.image || `https://avatar.vercel.sh/${msg.author?.id}`}
@@ -84,9 +85,7 @@ export function ChatWindow({
                     />
                   )}
 
-                  {/* 吹き出しと時間 */}
                   <div className={`flex flex-col max-w-[80%] ${isMe ? 'items-end' : 'items-start'}`}>
-                    {/* 名前 (相手の場合のみ) */}
                     {!isMe && (
                       <span className="text-xs text-gray-600 px-2 mb-0.5">
                         {msg.author?.name || 'Unknown'}
@@ -94,14 +93,12 @@ export function ChatWindow({
                     )}
                     
                     <div className="flex items-end gap-2">
-                       {/* 時間 (自分の場合) */}
                       {isMe && (
                         <time className="text-xs text-gray-400 whitespace-nowrap">
                           {timeString}
                         </time>
                       )}
 
-                      {/* 吹き出し */}
                       <div 
                         className={`px-3 py-2 text-base ${isMe 
                           ? 'bg-indigo-500 text-white rounded-2xl rounded-br-none' 
@@ -111,7 +108,6 @@ export function ChatWindow({
                         <p>{msg.content}</p>
                       </div>
 
-                      {/* 時間 (相手の場合) */}
                       {!isMe && (
                         <time className="text-xs text-gray-400 whitespace-nowrap">
                           {timeString}
@@ -127,7 +123,6 @@ export function ChatWindow({
         )}
       </main>
 
-      {/* [変更] 入力フォームのデザインを刷新 */}
       <footer className="p-2 bg-white border-t border-gray-200">
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
           <input
@@ -151,3 +146,5 @@ export function ChatWindow({
     </div>
   );
 }
+
+// `https://avatar.vercel.sh/${msg.author?.id}`
