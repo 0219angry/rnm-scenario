@@ -187,7 +187,7 @@ export function ChatWindow({
                     >
                       {({ selected }) => (
                       <>
-                        <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>全員</span>
+                        <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{person.name}</span>
                         {selected ? <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600"><CheckIcon className="h-5 w-5" aria-hidden="true" /></span> : null}
                       </>
                     )}
