@@ -78,7 +78,7 @@ export function ChatWindow({
                   {/* アバター (相手の場合) */}
                   {!isMe && (
                     <img
-                      src={msg.author?.image || '/default-avatar.png'}
+                      src={msg.author?.image || `https://avatar.vercel.sh/${msg.author?.id}`}
                       alt={msg.author?.name || 'Avatar'}
                       className="w-8 h-8 rounded-full self-start"
                     />

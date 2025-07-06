@@ -3,7 +3,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import type { User, Message as MessageType } from '@prisma/client';
 import { supabase } from '@/lib/supabase';
-import { ChatWindow, MessageWithAuthor, AuthorInfo } from '@/components/features/chats/ChatWindow'; // ChatWindowのパスを修正
+import { ChatWindow, MessageWithAuthor, AuthorInfo } from './ChatWindow';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 // --- アイコンコンポーネント ---
@@ -127,11 +127,19 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
 
       if (!response.ok) throw new Error('Failed to send message to the server.');
 
-      const savedMessage: MessageWithAuthor = await response.json();
-      setMessages(prev => prev.map(m => m.id === optimisticMessage.id ? savedMessage : m));
+      const savedMessage: MessageType = await response.json();
+      
+      // 先行表示していたメッセージを、サーバーからの正式なデータで置き換える
+      // この際、先行表示で使っていたauthor情報を引き継ぐ
+      setMessages(prev => prev.map(m => 
+        m.id === optimisticMessage.id 
+          ? { ...savedMessage, author: optimisticMessage.author } 
+          : m
+      ));
 
     } catch (error) {
       console.error('Failed to send message:', error);
+      // エラー時は先行表示したメッセージを削除し、入力内容を復元
       setMessages(prev => prev.filter(m => m.id !== optimisticMessage.id));
       setNewMessage(messageToSend);
     }
@@ -140,10 +148,8 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
   if (!currentUser) return null;
 
   // --- JSXによるレンダリング ---
-    return (
-    // [変更] コンテナを画面右下に固定し、タブがそこから生えるように調整
+  return (
     <div className="fixed bottom-0 right-8 z-50 flex flex-col items-end">
-      {/* [変更] ウィンドウの表示位置をタブボタンの上に調整 */}
       <div className={`transition-all duration-300 ease-in-out mb-2 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
         <div className="w-80 h-[30rem] rounded-xl shadow-2xl overflow-hidden">
           {isOpen && (
@@ -161,7 +167,6 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
         </div>
       </div>
       
-      {/* [変更] ボタンを横長のタブ形式に変更 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-6 py-3 font-bold text-white bg-indigo-600 rounded-t-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
