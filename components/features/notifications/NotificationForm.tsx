@@ -2,11 +2,10 @@
 
 import { useRef, useState } from 'react';
 import { Player } from '@/types/types'; // Player型をインポート
-import { Session } from '@prisma/client';
 
 type Props = {
   players: Player[]; // 参加者リストを受け取る
-  sessionId: String;
+  sessionId: string;
 };
 
 // ローディングスピナーコンポーネント
