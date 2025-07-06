@@ -7,17 +7,17 @@ import type { AuthorInfo } from '@/components/features/chats/ChatWindow';
 
 export async function GET(
   _req: Request,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { sessionId } = params;
+    const { id } = params;
 
-    if (!sessionId) {
+    if (!id) {
       return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
     }
 
     const session = await prisma.session.findUnique({
-      where: { id: sessionId },
+      where: { id: id },
       include: {
         // 参加者情報と、それに関連するユーザー情報を取得
         participants: {
