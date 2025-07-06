@@ -92,6 +92,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
       {/* 🔽 FloatingChatWidgetを配置 */}
       <FloatingChatWidget 
         channelId={supportChannelId}
+        sessionId={session.id}
         currentUser={currentUser}
       />
     </div>

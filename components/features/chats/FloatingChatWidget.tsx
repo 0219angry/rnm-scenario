@@ -21,10 +21,11 @@ const CloseIcon = () => (
 // --- Propsの型定義 ---
 interface FloatingChatWidgetProps {
   channelId: string;
+  sessionId: string;
   currentUser: User | null;
 }
 
-export default function FloatingChatWidget({ channelId, currentUser }: FloatingChatWidgetProps) {
+export default function FloatingChatWidget({ channelId, sessionId, currentUser }: FloatingChatWidgetProps) {
   // --- State管理 ---
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +47,7 @@ useEffect(() => {
         const [channelRes, messagesRes, participantsRes] = await Promise.all([
           supabase.from('channels').select('name').eq('id', channelId).single(),
           fetch(`/api/messages?channelId=${channelId}`),
-          fetch(`/api/sessions/${channelId}/participants`) // ★新しくAPIを呼び出す
+          fetch(`/api/sessions/${sessionId}/participants`) // ★新しくAPIを呼び出す
         ]);
 
         // チャンネル名を設定

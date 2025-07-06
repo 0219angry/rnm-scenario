@@ -190,6 +190,7 @@ export default async function SessionFilePage({
       {/* 🔽 FloatingChatWidgetを配置 */}
       <FloatingChatWidget 
         channelId={supportChannelId}
+        sessionId={session.id}
         currentUser={user}
       />
     </main>
