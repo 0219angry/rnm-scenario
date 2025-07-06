@@ -7,10 +7,10 @@ import type { AuthorInfo } from '@/components/features/chats/ChatWindow';
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const id = (await context.params).id;
 
     if (!id) {
       return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
