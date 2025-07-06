@@ -10,10 +10,16 @@ import { ScenarioInfoCard } from "@/components/features/sessions/ScenarioInfoCar
 import { ParticipantList } from "@/components/features/sessions/ParticipantList";
 import { CommentSection } from "@/components/features/comments/CommentSection";
 import { OwnerInfo } from "@/components/features/sessions/OwnerInfo";
+import FloatingChatWidget from "@/components/features/chats/FloatingChatWidget"
 
 export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
+  const channel = await prisma.channel.findMany({
+    where: { sessionId: id },
+    orderBy: { createdAt: 'asc' },
+  });
+
   const session = await prisma.session.findUnique({
     where: { id },
     include: {
@@ -30,6 +36,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
     notFound();
   }
 
+  const supportChannelId = channel[0].id;
   const currentUser = await getCurrentUser();
   const comments = await fetchCommentsBySessionId(session.id);
   const isOwner = currentUser?.id === session.ownerId;
@@ -66,6 +73,11 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
 
         <OwnerInfo owner={session.owner} />
       </div>
+      {/* 🔽 FloatingChatWidgetを配置 */}
+      <FloatingChatWidget 
+        channelId={supportChannelId}
+        currentUser={currentUser}
+      />
     </div>
   );
 }

@@ -142,6 +142,7 @@ model Session {
   createdAt     DateTime   @default(now())
 
   participants  SessionParticipant[]
+  supportChannels Channel[]
   comments  Comment[]
 }
 
@@ -194,11 +195,14 @@ enum NotificationType {
 model Channel {
   id            String    @id @default(cuid())
   name          String?
+  createdAt     DateTime @default(now())
   // ... その他のチャットルーム情報
 
   // このチャンネルに関連する通知
   notifications Notification[]
   messages      Message[]
+  sessionId     String?
+  session       Session? @relation(fields: [sessionId], references: [id])
 
   @@map("channels")
 }

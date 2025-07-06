@@ -53,11 +53,7 @@ export default async function RootLayout({
         </ThemeProvider>
         <Toaster richColors position="bottom-right" />
 
-        {/* 🔽 FloatingChatWidgetを配置 */}
-        <FloatingChatWidget 
-          channelId={supportChannelId}
-          currentUser={user}
-        />
+
       </body>
     </html>
   );
