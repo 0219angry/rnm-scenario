@@ -149,7 +149,7 @@ export default async function SessionFilePage({
         initialFiles={files}
       />
 
-      <NotificationForm players={players} />
+      <NotificationForm players={players} sessionId={id}/>
     </main>
   );
 }

@@ -2,9 +2,11 @@
 
 import { useRef, useState } from 'react';
 import { Player } from '@/types/types'; // Player型をインポート
+import { Session } from '@prisma/client';
 
 type Props = {
   players: Player[]; // 参加者リストを受け取る
+  sessionId: String;
 };
 
 // ローディングスピナーコンポーネント
@@ -12,11 +14,13 @@ const Spinner = () => (
   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
 );
 
-export function NotificationForm({ players }: Props) {
+export function NotificationForm({ players, sessionId }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,6 +38,16 @@ export function NotificationForm({ players }: Props) {
       return;
     }
 
+    const response = await fetch(`/api/sessions/${sessionId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'セッションデータの取得に失敗しました。');
+      }
+    const session = await response.json();
+
+    const formattedMessage = `${session?.title}/${session?.scenario.title}
+                              ${message}`;
+
     try {
       // 全参加者に対して、API呼び出しを並行して実行
       const notificationPromises = players.map(player => 
@@ -44,7 +58,7 @@ export function NotificationForm({ players }: Props) {
           },
           body: JSON.stringify({
             toUserId: player.id, // 各プレイヤーのIDを指定
-            message,
+            formattedMessage,
             linkUrl,
           }),
         }).then(res => {
