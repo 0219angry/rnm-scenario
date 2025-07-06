@@ -65,16 +65,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Content and channelId are required' }, { status: 400 });  
     }  
 
-    await prisma.message.create({
-          data: {
-            content,
-            channelId,
-            authorId: currentUser.id,
+    // 1. 作成したメッセージを変数に格納する
+    const newMessage = await prisma.message.create({
+      data: {
+        content,
+        channelId,
+        authorId: currentUser.id,
+      },
+      // 2. 関連する投稿者の情報も一緒に取得する
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
           },
-        });
-      return NextResponse.json({
-      message: "投稿完了"
+        },
+      },
     });
+
+    // 3. 作成されたメッセージオブジェクトそのものを返す
+    return NextResponse.json(newMessage);
   } catch (error) {
     console.error("投稿失敗: ", error);
     return NextResponse.json(
