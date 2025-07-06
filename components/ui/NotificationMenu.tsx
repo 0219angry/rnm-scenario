@@ -7,6 +7,9 @@ import { FaBell } from "react-icons/fa";
 import { formatDistanceToNow } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import Link from 'next/link';
+import { getCurrentUser } from "@/lib/auth";
+import { User } from "@prisma/client";
+import { supabase } from "@/lib/supabase";
 
 // (Notification型、formatRelativeTime関数は変更なし)
 type Notification = {
@@ -33,7 +36,17 @@ export function NotificationMenu() {
    * 通知リストを保持するためのState。
    */
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      // useEffectの中で非同期関数を定義して呼び出す
+      const user = await getCurrentUser();
+      setCurrentUser(user);
+    };
+
+    fetchUser();
+  }, []);
   /**
    * 通知アイテムがクリックされたときに呼び出される関数。
    * 通知を既読状態に更新する。
@@ -82,13 +95,34 @@ export function NotificationMenu() {
     // 1. 初回読み込み: コンポーネントが表示された直後に一度データを取得する。
     fetchNotifications();
 
-    // 2. 定期的なポーリング: 15秒ごとに新しい通知がないかサーバーに問い合わせる。
-    const interval = setInterval(fetchNotifications, 15000);
+    const channel = supabase
+      .channel(`realtime-notifications-${currentUser?.id}`) // ユーザーごとに一意のチャンネル名
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'Notification', // "Notification"テーブルのINSERTイベントを監視
+          filter: `toUserId=eq.${currentUser?.id}`, // 自分宛の通知のみをフィルタリング
+        },
+        (payload) => {
+          // 新しい通知が届いた時の処理
+          const newNotification = payload.new as Notification;
+          // 新しい通知をリストの先頭に追加してUIを更新
+          setNotifications((prevNotifications) => [
+            newNotification,
+            ...prevNotifications,
+          ]);
+        }
+      )
+      .subscribe();
 
-    // 3. クリーンアップ: コンポーネントが不要になった際に、
-    // ポーリングを停止してメモリリークを防ぐ。
-    return () => clearInterval(interval);
-  }, []); // 空の依存配列は、このEffectがマウント時に一度だけ実行されることを意味する。
+    // 3. クリーンアップ: コンポーネントがアンマウントされたら購読を解除
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    
+  }, [currentUser]);
 
   /**
    * メニューが開かれたときに、すべての未読通知を既読としてマークする
