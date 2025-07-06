@@ -3,7 +3,7 @@ import { XMarkIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
 import Image from "next/image";
 import { FormEvent, useRef, useEffect, Fragment } from 'react'; // Fragmentを追加
 import { Listbox, Transition } from '@headlessui/react'; // Listboxをインポート
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'; // アイコンをインポート
+import { CheckIcon, ChevronUpDownIcon, LockClosedIcon } from '@heroicons/react/20/solid'; // アイコンをインポート
 
 
 // 型定義
@@ -75,25 +75,24 @@ export function ChatWindow({
         ) : (
           <div className="space-y-4">
             {messages.map((msg) => {
-              const isMe = msg.authorId === currentUser.id;
-
-              // msg.createdAtが有効な日付かチェックする
+              const isMe = String(msg.authorId) === String(currentUser.id);
               const createdAtDate = msg.createdAt ? new Date(msg.createdAt) : null;
               const isValidDate = createdAtDate && !isNaN(createdAtDate.getTime());
-
-              // 有効な日付の場合のみ時刻をフォーマットし、無効な場合は空文字にする
-              const timeString = isValidDate
-                ? createdAtDate.toLocaleTimeString('ja-JP', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })
-                : ''; 
+              const timeString = isValidDate ? createdAtDate.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) : '';
+              
+              const isDirectMessage = !!msg.recipientId;
+              
+              const dmRecipient = isMe && isDirectMessage 
+                ? participants.find(p => String(p.id) === String(msg.recipientId)) 
+                : null;
+              
+              // ★ --- メッセージの背景色を決定するロジックを修正 --- ★
+              const bubbleColor = isMe 
+                ? (isDirectMessage ? 'bg-green-600' : 'bg-indigo-500') // 自分：DMなら緑、全体なら青
+                : (isDirectMessage ? 'bg-slate-100' : 'bg-white');      // 相手：DMなら薄いグレー、全体なら白
 
               return (
-                <div 
-                  key={msg.id} 
-                  className={`flex items-end gap-2 ${isMe ? 'justify-end' : 'justify-start'}`}
-                >
+                <div key={msg.id} className={`flex items-end gap-2 ${isMe ? 'justify-end' : 'justify-start'}`}>
                   {!isMe && (
                     <Image
                       src={msg.author?.image || `https://avatar.vercel.sh/${msg.author?.id}`}
@@ -105,33 +104,39 @@ export function ChatWindow({
                   )}
 
                   <div className={`flex flex-col max-w-[80%] ${isMe ? 'items-end' : 'items-start'}`}>
+                    
+                    {dmRecipient && (
+                      <div className="text-xs text-gray-500 px-2 mb-0.5 flex items-center gap-1">
+                        <LockClosedIcon className="h-3 w-3" />
+                        <span>To: {dmRecipient.name}</span>
+                      </div>
+                    )}
+
+                    {/* ★ --- 相手のDMに鍵アイコンを追加 --- ★ */}
                     {!isMe && (
-                      <span className="text-xs text-gray-600 px-2 mb-0.5">
-                        {msg.author?.name || 'Unknown'}
-                      </span>
+                      <div className="flex items-center gap-1.5 px-2 mb-0.5">
+                        <span className="text-xs text-gray-600">{msg.author?.name || 'Unknown'}</span>
+                        {isDirectMessage && (
+                           <LockClosedIcon className="h-3 w-3 text-gray-400" aria-hidden="true" />
+                        )}
+                      </div>
                     )}
                     
                     <div className="flex items-end gap-2">
-                      {isMe && (
-                        <time className="text-xs text-gray-400 whitespace-nowrap">
-                          {timeString}
-                        </time>
-                      )}
+                      {isMe && ( <time className="text-xs text-gray-400 whitespace-nowrap">{timeString}</time> )}
 
+                      {/* ★ --- bubbleColor変数を適用 --- ★ */}
                       <div 
-                        className={`px-3 py-2 text-base ${isMe 
-                          ? 'bg-indigo-500 text-white rounded-2xl rounded-br-none' 
-                          : 'bg-white text-black rounded-2xl rounded-bl-none shadow-sm'}`
-                        }
+                        className={`px-3 py-2 text-base rounded-2xl shadow-sm ${
+                          isMe 
+                            ? `${bubbleColor} text-white rounded-br-none` 
+                            : `${bubbleColor} text-black rounded-bl-none`
+                        }`}
                       >
-                        <p>{msg.content}</p>
+                        <p className="break-words">{msg.content}</p>
                       </div>
 
-                      {!isMe && (
-                        <time className="text-xs text-gray-400 whitespace-nowrap">
-                          {timeString}
-                        </time>
-                      )}
+                      {!isMe && ( <time className="text-xs text-gray-400 whitespace-nowrap">{timeString}</time> )}
                     </div>
                   </div>
                 </div>
