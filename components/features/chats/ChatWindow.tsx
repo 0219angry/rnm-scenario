@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FormEvent, useRef, useEffect, Fragment } from 'react'; // Fragmentを追加
 import { Listbox, Transition } from '@headlessui/react'; // Listboxをインポート
 import { CheckIcon, ChevronUpDownIcon, LockClosedIcon } from '@heroicons/react/20/solid'; // アイコンをインポート
-
+import { LocalDateTime } from '@/components/ui/LocalDateTime';
 
 // 型定義
 export type AuthorInfo = Pick<User, 'id' | 'name' | 'image'>;
@@ -76,9 +76,6 @@ export function ChatWindow({
           <div className="space-y-4">
             {messages.map((msg) => {
               const isMe = String(msg.authorId) === String(currentUser.id);
-              const createdAtDate = msg.createdAt ? new Date(msg.createdAt) : null;
-              const isValidDate = createdAtDate && !isNaN(createdAtDate.getTime());
-              const timeString = isValidDate ? createdAtDate.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) : '';
               
               const isDirectMessage = !!msg.recipientId;
               
@@ -123,7 +120,12 @@ export function ChatWindow({
                     )}
                     
                     <div className="flex items-end gap-2">
-                      {isMe && ( <time className="text-xs text-gray-400 whitespace-nowrap">{timeString}</time> )}
+                      {isMe && ( <time className="text-xs text-gray-400 whitespace-nowrap">
+                        <LocalDateTime 
+                          utcDate={msg.createdAt} 
+                          formatStr="HH:mm" 
+                        />
+                      </time> )}
 
                       {/* ★ --- bubbleColor変数を適用 --- ★ */}
                       <div 
@@ -136,7 +138,12 @@ export function ChatWindow({
                         <p className="break-words">{msg.content}</p>
                       </div>
 
-                      {!isMe && ( <time className="text-xs text-gray-400 whitespace-nowrap">{timeString}</time> )}
+                      {!isMe && ( <time className="text-xs text-gray-400 whitespace-nowrap">
+                        <LocalDateTime 
+                          utcDate={msg.createdAt} 
+                          formatStr="HH:mm" 
+                        />
+                      </time> )}
                     </div>
                   </div>
                 </div>
