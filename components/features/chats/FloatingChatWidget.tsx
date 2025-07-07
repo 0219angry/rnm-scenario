@@ -104,7 +104,17 @@ useEffect(() => {
         author = data || { id: newMessagePayload.authorId, name: 'Unknown', image: null };
         setUsersCache(prev => new Map(prev).set(author!.id, author!));
       }
-      setMessages(prev => [...prev, { ...newMessagePayload, author }]);
+      // 1. 新しいメッセージオブジェクトを作成する
+      const newMessageWithAuthor: MessageWithAuthor = {
+        ...newMessagePayload,
+        // 2. createdAtを明示的にDateオブジェクトに変換する
+        createdAt: new Date(newMessagePayload.createdAt), 
+        author: author,
+      };
+
+      // 3. 型を統一したオブジェクトを状態に追加する
+      setMessages(prev => [...prev, newMessageWithAuthor]);
+
     };
 
     const subscription = supabase
