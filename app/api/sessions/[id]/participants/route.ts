@@ -3,6 +3,57 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { ParticipantRole } from "@prisma/client";
 
+import type { AuthorInfo } from '@/components/features/chats/ChatWindow';
+
+export async function GET(
+  _req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const id = (await context.params).id;
+
+    if (!id) {
+      return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
+    }
+
+    const session = await prisma.session.findUnique({
+      where: { id: id },
+      include: {
+        // 参加者情報と、それに関連するユーザー情報を取得
+        participants: {
+          include: {
+            user: {
+              select: { // 必要なユーザー情報のみを選択
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!session) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
+
+    // フロントエンドで使いやすいAuthorInfo[]の形式に変換
+    const participants: AuthorInfo[] = session.participants.map(
+      p => p.user
+    );
+
+    return NextResponse.json(participants);
+
+  } catch (error) {
+    console.error('Failed to fetch session participants:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+
+
+
 // ✅【新規追加】オーナーがユーザーをセッションに追加するためのPOSTメソッド
 export async function POST(
   req: Request,

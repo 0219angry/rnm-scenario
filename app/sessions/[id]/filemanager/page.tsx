@@ -8,6 +8,7 @@ import { FileObject } from '@supabase/storage-js';
 import { supabase } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import FloatingChatWidget  from "@/components/features/chats/FloatingChatWidget"
 
 // --- データ取得関数 ---
 
@@ -96,6 +97,42 @@ export default async function SessionFilePage({
     notFound();
   }
 
+  const session = await prisma.session.findUnique({
+    where: { id },
+    include: {
+      scenario: { include: { rulebook: true } },
+      owner: true,
+      participants: {
+        orderBy: { assignedAt: 'asc' },
+        include: { user: true },
+      },
+    },
+  });
+
+  const channel = await prisma.channel.findMany({
+    where: { sessionId: id },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  if (!session) {
+    notFound();
+  }
+
+  if (channel.length === 0) {
+    const newSupportChannel = await prisma.channel.create({
+      data: {
+        name: "メインチャット",
+        sessionId: session.id
+      }
+    });
+    if (!newSupportChannel) {
+      return notFound();
+    }
+    redirect(`/sessions/${id}`);
+  }
+
+  const supportChannelId = channel[0].id;
+
     // --- 1. ログイン中のユーザー情報を取得 ---
   const user = await getCurrentUser();
 
@@ -150,6 +187,12 @@ export default async function SessionFilePage({
       />
 
       <NotificationForm players={players} sessionId={id}/>
+      {/* 🔽 FloatingChatWidgetを配置 */}
+      <FloatingChatWidget 
+        channelId={supportChannelId}
+        sessionId={session.id}
+        currentUser={user}
+      />
     </main>
   );
 }

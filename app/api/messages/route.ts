@@ -59,7 +59,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });  
     }  
 
-    const { content, channelId } = await req.json();  
+    const { content, channelId, recipientId } = await req.json();  
 
     if (!content || !channelId) {  
       return NextResponse.json({ error: 'Content and channelId are required' }, { status: 400 });  
@@ -71,6 +71,7 @@ export async function POST(req: Request) {
         content,
         channelId,
         authorId: currentUser.id,
+        recipientId,
       },
       // 2. 関連する投稿者の情報も一緒に取得する
       include: {

@@ -21,10 +21,11 @@ const CloseIcon = () => (
 // --- Propsの型定義 ---
 interface FloatingChatWidgetProps {
   channelId: string;
+  sessionId: string;
   currentUser: User | null;
 }
 
-export default function FloatingChatWidget({ channelId, currentUser }: FloatingChatWidgetProps) {
+export default function FloatingChatWidget({ channelId, sessionId, currentUser }: FloatingChatWidgetProps) {
   // --- State管理 ---
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,34 +33,50 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
   const [messages, setMessages] = useState<MessageWithAuthor[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [usersCache, setUsersCache] = useState<Map<string, AuthorInfo>>(new Map());
+  const [selectedRecipient, setSelectedRecipient] = useState<AuthorInfo | null>(null);
+  const [participants, setParticipants] = useState<AuthorInfo[]>([]);
 
   // --- 1. 初期データ読み込み ---
-  useEffect(() => {
+useEffect(() => {
     if (!isOpen || !currentUser) return;
 
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [channelRes, messagesRes] = await Promise.all([
+        // APIからチャンネル情報、メッセージ履歴、参加者リストを並行して取得
+        const [channelRes, messagesRes, participantsRes] = await Promise.all([
           supabase.from('channels').select('name').eq('id', channelId).single(),
-          fetch(`/api/messages?channelId=${channelId}`)
+          fetch(`/api/messages?channelId=${channelId}`),
+          fetch(`/api/sessions/${sessionId}/participants`) // ★新しくAPIを呼び出す
         ]);
 
+        // チャンネル名を設定
         if (channelRes.data) {
           setChannelName(channelRes.data.name || 'チャット');
         }
 
+        // ★参加者リストをAPIからのレスポンスで設定
+        if (!participantsRes.ok) throw new Error('Failed to fetch participants');
+        const loadedParticipants: AuthorInfo[] = await participantsRes.json();
+
+        console.log('【Widget】APIから取得した参加者:', loadedParticipants);
+        
+        setParticipants(loadedParticipants);
+
+        // メッセージ履歴を設定
         if (!messagesRes.ok) throw new Error('Failed to fetch messages');
         const loadedMessages: MessageWithAuthor[] = await messagesRes.json();
         setMessages(loadedMessages);
         
+        // ユーザー情報のキャッシュを作成
+        // (参加者リストとメッセージの投稿者の両方から作成し、キャッシュを充実させる)
         const newCache = new Map<string, AuthorInfo>();
+        loadedParticipants.forEach(p => newCache.set(p.id, p));
         loadedMessages.forEach(msg => {
-          if (msg.author) newCache.set(msg.author.id, msg.author);
+          if (msg.author && !newCache.has(msg.author.id)) {
+            newCache.set(msg.author.id, msg.author);
+          }
         });
-        if (currentUser) {
-          newCache.set(currentUser.id, { id: currentUser.id, name: currentUser.name, image: currentUser.image });
-        }
         setUsersCache(newCache);
 
       } catch (error) {
@@ -79,6 +96,7 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
     const handleNewMessage = async (payload: RealtimePostgresChangesPayload<MessageType>) => {
       const newMessagePayload = payload.new as MessageType;
       if (newMessagePayload.authorId === currentUser.id) return;
+      if ( newMessagePayload.recipientId && newMessagePayload.recipientId !== currentUser.id) return;
 
       let author = usersCache.get(newMessagePayload.authorId);
       if (!author) {
@@ -86,12 +104,34 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
         author = data || { id: newMessagePayload.authorId, name: 'Unknown', image: null };
         setUsersCache(prev => new Map(prev).set(author!.id, author!));
       }
-      setMessages(prev => [...prev, { ...newMessagePayload, author }]);
+      // 1. 新しいメッセージオブジェクトを作成する
+      const createdAtString = newMessagePayload.createdAt as unknown as string;
+      const utcCreatedAt = new Date(createdAtString.replace(' ', 'T') + 'Z');
+      const newMessageWithAuthor: MessageWithAuthor = {
+        ...newMessagePayload,
+        // 2. createdAtを明示的にDateオブジェクトに変換する
+        createdAt: utcCreatedAt, 
+        author: author,
+      };
+
+      // 3. 型を統一したオブジェクトを状態に追加する
+      setMessages(prev => [...prev, newMessageWithAuthor]);
+
     };
 
     const subscription = supabase
       .channel(`chat-room-${channelId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `channelId=eq.${channelId}` }, handleNewMessage)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          // and()を削除し、よりシンプルなフィルターに修正
+          // filter: `channelId=eq.${channelId},or(recipientId.is.null,recipientId.eq.${currentUser.id})`,
+        },
+        handleNewMessage
+      )
       .subscribe();
 
     return () => {
@@ -110,11 +150,10 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
       channelId: channelId,
       authorId: currentUser.id,
       createdAt: new Date(),
-      recipientId: null,
+      recipientId: selectedRecipient ? selectedRecipient.id : null,
       author: { id: currentUser.id, name: currentUser.name || 'No Name', image: currentUser.image },
     };
 
-    console.log("【ステップ1】先行表示用のメッセージ:", optimisticMessage);
 
     setMessages(prev => [...prev, optimisticMessage]);
     const messageToSend = newMessage;
@@ -124,14 +163,17 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
       const response = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: messageToSend, channelId: channelId }),
+        body: JSON.stringify({ 
+          content: messageToSend, 
+          channelId: channelId,
+          recipientId: optimisticMessage.recipientId,
+        }),
       });
 
       if (!response.ok) throw new Error('Failed to send message to the server.');
 
       const savedMessage: MessageType = await response.json();
 
-      console.log("【ステップ3】サーバーから返ってきたメッセージ:", savedMessage);
       
       // 先行表示していたメッセージを、サーバーからの正式なデータで置き換える
       // この際、先行表示で使っていたauthor情報を引き継ぐ
@@ -166,6 +208,9 @@ export default function FloatingChatWidget({ channelId, currentUser }: FloatingC
               handleSubmit={handleSubmit}
               onClose={() => setIsOpen(false)}
               isLoading={isLoading}
+              participants={participants}
+              selectedRecipient={selectedRecipient}
+              setSelectedRecipient={setSelectedRecipient}
             />
           )}
         </div>
