@@ -105,10 +105,12 @@ useEffect(() => {
         setUsersCache(prev => new Map(prev).set(author!.id, author!));
       }
       // 1. 新しいメッセージオブジェクトを作成する
+      const createdAtString = newMessagePayload.createdAt as unknown as string;
+      const utcCreatedAt = new Date(createdAtString.replace(' ', 'T') + 'Z');
       const newMessageWithAuthor: MessageWithAuthor = {
         ...newMessagePayload,
         // 2. createdAtを明示的にDateオブジェクトに変換する
-        createdAt: new Date(newMessagePayload.createdAt), 
+        createdAt: utcCreatedAt, 
         author: author,
       };
 
