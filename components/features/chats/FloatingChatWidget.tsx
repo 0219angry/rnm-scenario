@@ -96,6 +96,7 @@ useEffect(() => {
     const handleNewMessage = async (payload: RealtimePostgresChangesPayload<MessageType>) => {
       const newMessagePayload = payload.new as MessageType;
       if (newMessagePayload.authorId === currentUser.id) return;
+      if ( newMessagePayload.recipientId && newMessagePayload.recipientId !== currentUser.id) return;
 
       let author = usersCache.get(newMessagePayload.authorId);
       if (!author) {
