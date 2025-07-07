@@ -109,25 +109,20 @@ export function ChatWindow({
                       </div>
                     )}
 
-                    {/* ★ --- 相手のDMに鍵アイコンを追加 --- ★ */}
+                    {/* ★ --- 相手の名前とDMアイコン（変更なし） --- ★ */}
                     {!isMe && (
                       <div className="flex items-center gap-1.5 px-2 mb-0.5">
                         <span className="text-xs text-gray-600">{msg.author?.name || 'Unknown'}</span>
                         {isDirectMessage && (
-                           <LockClosedIcon className="h-3 w-3 text-gray-400" aria-hidden="true" />
+                          <LockClosedIcon className="h-3 w-3 text-gray-400" aria-hidden="true" />
                         )}
                       </div>
                     )}
-                    
-                    <div className="flex items-end gap-2">
-                      {isMe && ( <time className="text-xs text-gray-400 whitespace-nowrap">
-                        <LocalDateTime 
-                          utcDate={msg.createdAt} 
-                          formatStr="HH:mm" 
-                        />
-                      </time> )}
 
-                      {/* ★ --- bubbleColor変数を適用 --- ★ */}
+                    {/* ▼▼▼ ここから修正 ▼▼▼ */}
+                    <div className={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : ''}`}>
+
+                      {/* チャットの吹き出し */}
                       <div 
                         className={`px-3 py-2 text-base rounded-2xl shadow-sm ${
                           isMe 
@@ -138,12 +133,14 @@ export function ChatWindow({
                         <p className="break-words">{msg.content}</p>
                       </div>
 
-                      {!isMe && ( <time className="text-xs text-gray-400 whitespace-nowrap">
+                      {/* 時刻表示（一つにまとめる） */}
+                      <time className="text-xs text-gray-400 whitespace-nowrap">
                         <LocalDateTime 
                           utcDate={msg.createdAt} 
                           formatStr="HH:mm" 
                         />
-                      </time> )}
+                      </time>
+                      
                     </div>
                   </div>
                 </div>
