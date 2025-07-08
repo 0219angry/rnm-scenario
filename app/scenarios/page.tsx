@@ -3,17 +3,46 @@ import ScenarioList from '@/components/features/scenarios/ScenarioList';
 import ScenarioFilter from '@/components/features/scenarios/ScenarioFilter';
 import { fetchScenarios } from '@/lib/data'; // 作成した関数をインポート
 import Link from 'next/link';
+import { ScenarioWithRelations } from '@/components/features/scenarios/ScenarioCard';
+import { getCurrentUser } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 type ScenariosPageProps = {
   params: Promise<{ [key: string]: string }>;
   searchParams: Promise<{ [key:string]: string | string[] | undefined }>;
 };
 
+async function getScenariosWithPlayStatus(
+  searchParams: { [key:string]: string | string[] | undefined }
+): Promise<ScenarioWithRelations[]> {
+  // ユーザー認証
+  const user = await getCurrentUser();
+
+  // プレイ済みリストの作成
+  let playedScenarioIds = new Set<string>();
+  if (user) {
+    const playedSessions = await prisma.session.findMany({
+      where: { participants: { some: { userId: user.id } } },
+      select: { scenarioId: true },
+    });
+    playedScenarioIds = new Set(playedSessions.map(s => s.scenarioId));
+  }
+
+  // ★ ここで本来のデータ取得関数を呼ぶ (引数の型を合わせる)
+  const scenarios = await fetchScenarios(searchParams);
+
+  // isPlayedフラグを追加
+  return scenarios.map(scenario => ({
+    ...scenario,
+    isPlayed: playedScenarioIds.has(scenario.id),
+  }));
+}
+
 export default async function ScenariosPage({
    searchParams
 }: ScenariosPageProps) {
   // 分離したデータ取得関数を呼び出す
-  const scenarios = await fetchScenarios(await searchParams);
+  const scenarios = await getScenariosWithPlayStatus(await searchParams);
 
   return (
     <div className="container mx-auto p-4">

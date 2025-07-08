@@ -1,10 +1,6 @@
-import { Scenario, Rulebook, User } from '@prisma/client';
-import ScenarioCard from './ScenarioCard';
+import ScenarioCard, { ScenarioWithRelations } from './ScenarioCard';
 
-type ScenarioWithRelations = Scenario & {
-  rulebook: Rulebook | null;
-  owner: User;
-};
+
 
 export default function ScenarioList({ scenarios }: { scenarios: ScenarioWithRelations[] }) {
   if (scenarios.length === 0) {

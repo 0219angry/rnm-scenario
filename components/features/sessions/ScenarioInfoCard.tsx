@@ -1,5 +1,6 @@
 import { GenreTag } from '@/components/ui/GenreTag';
 import { Scenario, Rulebook } from '@prisma/client';
+import { RulebookHoverCard } from '../rulebooks/RulebookHoverCard';
 
 type ScenarioInfoCardProps = {
   scenario: Scenario & { rulebook: Rulebook | null };
@@ -13,7 +14,11 @@ export function ScenarioInfoCard({ scenario }: ScenarioInfoCardProps) {
         <p><span className="font-semibold">タイトル:</span> {scenario.title}</p>
         <p className="flex items-center gap-2">
           <span className="font-semibold">ジャンル:</span> <GenreTag genre={scenario.genre} />
-          {scenario.rulebook && <span className="text-gray-500 dark:text-gray-300 text-base">/ {scenario.rulebook.name}</span>}
+          {scenario.rulebook && (
+            <span>
+              / <RulebookHoverCard rulebook={scenario.rulebook} />
+            </span>
+          )}
         </p>
         <p><span className="font-semibold">プレイヤー数:</span> {scenario.playerMin === scenario.playerMax ? scenario.playerMin : `${scenario.playerMin}〜${scenario.playerMax}`}人</p>
         <p><span className="font-semibold">GM:</span> {scenario.requiresGM ? "必須" : "不要"}</p>

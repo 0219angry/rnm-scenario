@@ -5,6 +5,7 @@ import Link from "next/link";
 import { GenreTag } from "@/components/ui/GenreTag";
 import Image from "next/image";
 import { GmTag } from "@/components/ui/GmTag";
+import { RulebookHoverCard } from "@/components/features/rulebooks/RulebookHoverCard";
 
 export default async function ScenarioDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -35,7 +36,11 @@ export default async function ScenarioDetailPage({ params }: { params: Promise<{
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6">
           <GenreTag genre={scenario.genre} linkable={true} />
           <GmTag requiresGM={scenario.requiresGM} />
-          {scenario.rulebook && <span className="text-gray-700 dark:text-gray-300 text-md">/ {scenario.rulebook.name}</span>}
+          {scenario.rulebook && (
+              <span>
+                / <RulebookHoverCard rulebook={scenario.rulebook} />
+              </span>
+            )}
         </div>
 
         <div className="space-y-4 text-lg">
