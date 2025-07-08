@@ -22,7 +22,13 @@ async function getScenariosWithPlayStatus(
   let playedScenarioIds = new Set<string>();
   if (user) {
     const playedSessions = await prisma.session.findMany({
-      where: { participants: { some: { userId: user.id } } },
+      where: {
+        // 参加者であることに加え、セッションが完了していることを条件にする
+        AND: [
+          { participants: { some: { userId: user.id } } },
+          { isFinished: true } 
+        ]
+      },
       select: { scenarioId: true },
     });
     playedScenarioIds = new Set(playedSessions.map(s => s.scenarioId));
