@@ -1,9 +1,10 @@
+"use client";
 import * as HoverCard from '@radix-ui/react-hover-card';
 import { Rulebook } from '@prisma/client';
 import Link from 'next/link';
 
 // このコンポーネントはクライアントコンポーネントとして動作する必要があります
-"use client";
+
 
 export function RulebookHoverCard({ rulebook }: { rulebook: Rulebook }) {
   return (
