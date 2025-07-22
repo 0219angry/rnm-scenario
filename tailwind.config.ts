@@ -13,6 +13,8 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'), // ← これを追加
+  ],
 }
 export default config

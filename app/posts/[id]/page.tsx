@@ -20,7 +20,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
       <p className="text-gray-600 mb-8">
         <LocalDateTime
           utcDate={post.createdAt}
-          formatStr="M月d日(E) HH:mm"
+          formatStr="Y年M月d日(E) HH:mm"
         />
       </p>
       <div className="prose lg:prose-xl">
