@@ -7,8 +7,8 @@ type PageProps = {
   params: { id: string };
 };
 
-export default async function EditPostPage({ params }: PageProps) {
-  const id = params.id
+export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const id = (await params).id;
   const post = await prisma.post.findUnique({
     where: { id },
   });
