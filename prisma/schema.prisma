@@ -34,6 +34,7 @@ model User {
   notificationsFrom Notification[] @relation("NotificationsFromUser")
   messages      Message[]
   receivedMessages Message[] @relation("RecipientMessages")
+  posts         Post[]
 }
 
 model Account {
@@ -253,4 +254,16 @@ model Message {
   channelId String
 
   @@map("messages")
+}
+
+model Post {
+  id String @id @default(cuid())
+  title String
+  content String @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  authorId String
+  author User @relation(fields: [authorId], references: [id])
+  
 }
