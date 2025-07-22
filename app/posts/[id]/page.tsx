@@ -9,6 +9,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
   const post = await prisma.post.findUnique({
     where: { id },
   });
+  console.log("Fetched post:", post?.content);
 
   if (!post) {
     notFound();
