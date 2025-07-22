@@ -14,7 +14,7 @@ const config: Config = {
     },
   },
   plugins: [
-    require('@tailwindcss/typography'), // ← これを追加
+    require('@tailwindcss/typography'), 
   ],
 }
 export default config

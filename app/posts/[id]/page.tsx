@@ -2,6 +2,10 @@ import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { LocalDateTime } from '@/components/ui/LocalDateTime';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github.css'; // お好みのテーマに変更可！
+
 
 export default async function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -24,8 +28,13 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
           formatStr="Y年M月d日(E) HH:mm"
         />
       </p>
-      <div className="prose lg:prose-xl max-w-none">
-        <ReactMarkdown>{post.content}</ReactMarkdown>
+      <div className="prose max-w-none">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeHighlight]}
+        >
+          {post.content}
+        </ReactMarkdown>
       </div>
     </div>
   );
