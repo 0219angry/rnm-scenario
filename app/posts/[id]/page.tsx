@@ -23,7 +23,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
           formatStr="Y年M月d日(E) HH:mm"
         />
       </p>
-      <div className="prose lg:prose-xl">
+      <div className="prose lg:prose-xl max-w-none">
         <ReactMarkdown>{post.content}</ReactMarkdown>
       </div>
     </div>
