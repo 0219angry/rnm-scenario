@@ -1,5 +1,7 @@
 /* app/globals.css */
 @import "tailwindcss";
+@import "@tailwindcss/typography"; /* <-- この行を追加！ */
+
 @reference "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
