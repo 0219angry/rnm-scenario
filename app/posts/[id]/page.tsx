@@ -28,7 +28,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
           formatStr="Y年M月d日(E) HH:mm"
         />
       </p>
-      <div className="prose max-w-none">
+      <div className="prose">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeHighlight]}
