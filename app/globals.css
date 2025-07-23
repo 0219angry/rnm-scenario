@@ -1,4 +1,7 @@
 /* app/globals.css */
+
+@import 'github-markdown-css/github-markdown.css';
+
 @import "tailwindcss/preflight";
 @import "tailwindcss/utilities";
 
