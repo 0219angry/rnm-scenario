@@ -12,11 +12,13 @@ export async function createPost(formData: FormData) {
     throw new Error('Unauthorized');
   }
   const title = formData.get('title') as string;
+  const summary = formData.get('summary') as string;
   const content = formData.get('content') as string;
 
   await prisma.post.create({
     data: {
       title,
+      summary,
       content,
       authorId: user.id, // 作成者のユーザーIDを設定
     },
@@ -33,6 +35,7 @@ export async function updatePost(formData: FormData) {
     throw new Error('Unauthorized');
   }
   const id = formData.get('id') as string;
+  const summary = formData.get('summary') as string;
   const title = formData.get('title') as string;
   const content = formData.get('content') as string;
 
@@ -43,6 +46,7 @@ export async function updatePost(formData: FormData) {
     data: {
       title,
       content,
+      summary,
     },
   });
 

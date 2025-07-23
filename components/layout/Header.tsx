@@ -20,6 +20,7 @@ export async function Header() {
             <Link href="/scenarios?genre=MADAMIS" className="hover:text-blue-500 dark:hover:text-blue-400">マダミス</Link>
             <Link href="/scenarios?genre=TRPG" className="hover:text-blue-500 dark:hover:text-blue-400">TRPG</Link>
             <Link href="/users" className="hover:text-blue-500 dark:hover:text-blue-400">メンバー</Link>
+            <Link href="/posts" className="hover:text-blue-500 dark:hover:text-blue-400">記事</Link>
           </div>
         </div>
 
