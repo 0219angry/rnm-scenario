@@ -1,8 +1,6 @@
 /* app/globals.css */
 @import "@tailwindcss/typography"; /* Tailwind CSS Typography プラグインのインポート */
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
-
+@import "tailwindcss";
 
 @reference "tailwindcss";
 
