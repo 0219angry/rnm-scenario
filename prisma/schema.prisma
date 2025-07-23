@@ -259,6 +259,7 @@ model Message {
 model Post {
   id String @id @default(cuid())
   title String
+  summary String @db.Text
   content String @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
