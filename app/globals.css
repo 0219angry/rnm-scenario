@@ -1,6 +1,5 @@
 /* app/globals.css */
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
 @reference "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
