@@ -4,7 +4,7 @@ import { LocalDateTime } from '@/components/ui/LocalDateTime';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import 'highlight.js/styles/github.css'; // お好みのテーマに変更可！
+// import 'highlight.js/styles/github.css'; // お好みのテーマに変更可！
 
 
 export default async function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
