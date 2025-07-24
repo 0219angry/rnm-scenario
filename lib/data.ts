@@ -134,3 +134,22 @@ export async function fetchCommentsBySessionId(sessionId: string) {
     throw new Error('コメントの取得に失敗しました。');
   }
 }
+
+export async function fetchLatestPosts() {
+  try {
+    const posts = await prisma.post.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 5, // ホームに表示する件数を指定
+      include: {
+        author: true, // 著者情報も一緒に取得
+        tags: true,   // タグ情報も一緒に取得
+      },
+    });
+    return posts;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('最新の記事の取得に失敗しました。');
+  }
+}
