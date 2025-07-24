@@ -93,3 +93,4 @@ export default async function PostDetailPage({ params }: { params: { id: string 
       </div>
     </div>
   );
+}
