@@ -30,3 +30,59 @@ html {
 .dark .CodeMirror-cursor {
   border-left-color: #D1D5DB !important;
 }
+
+/* .markdown-body のダークモード用スタイル */
+  .dark .markdown-body {
+    color-scheme: dark; /* ブラウザのUI（スクロールバーなど）をダークに */
+    
+    /* Tailwind CSSのユーティリティクラスを使ってスタイルを適用 */
+    @apply bg-gray-900 text-gray-300;
+  }
+
+  /* 見出しの色 */
+  .dark .markdown-body h1,
+  .dark .markdown-body h2,
+  .dark .markdown-body h3,
+  .dark .markdown-body h4,
+  .dark .markdown-body h5,
+  .dark .markdown-body h6 {
+    @apply text-gray-50 border-b-gray-700;
+  }
+
+  /* リンクの色 */
+  .dark .markdown-body a {
+    @apply text-blue-400;
+  }
+
+  /* インラインコード (`code`) の背景色と文字色 */
+  .dark .markdown-body code:not(pre > code) {
+    @apply bg-gray-700 text-gray-200;
+  }
+  
+  /* コードブロック (`pre`) の背景色 */
+  .dark .markdown-body pre {
+    @apply bg-gray-800 text-gray-300;
+  }
+
+  /* 引用 (blockquote) の文字色と左ボーダーの色 */
+  .dark .markdown-body blockquote {
+    @apply text-gray-400 border-l-gray-600;
+  }
+
+  /* 水平線 (hr) の色 */
+  .dark .markdown-body hr {
+    @apply bg-gray-700;
+  }
+
+  /* テーブルのボーダーや背景色 */
+  .dark .markdown-body table tr {
+    border-top-color: theme('colors.gray.600');
+  }
+  .dark .markdown-body table th,
+  .dark .markdown-body table td {
+    @apply border-gray-600;
+  }
+  .dark .markdown-body table tr:nth-child(2n) {
+    @apply bg-gray-800;
+  }
+}
