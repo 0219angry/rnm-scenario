@@ -64,7 +64,7 @@ export default async function PostsPage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">記事一覧</h1>
         {
-          !user?
+          user?
           <Link href="/posts/new" className="inline-flex items-center gap-x-2 rounded-lg bg-indigo-600 dark:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:hover:bg-indigo-600">
             <PlusIcon className="h-5 w-5" />
             新規作成

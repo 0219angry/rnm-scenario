@@ -66,14 +66,25 @@ export default function PostForm({ post, allTags, action }: PostFormProps) {
             options={tagOptions}
             defaultValue={defaultTags}
             placeholder="タグを選択または入力してEnter..."
+            // 👇 以下のclassNamesに置き換える
             classNames={{
-              control: () => 'mt-1 block w-full rounded-lg border border-gray-300 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-1.5 shadow-sm text-sm',
-              input: () => 'dark:text-white',
-              menu: () => 'bg-white dark:bg-gray-700 rounded-lg shadow-lg mt-1',
-              option: ({ isFocused }) => `px-4 py-2 ${isFocused ? 'bg-indigo-100 dark:bg-indigo-600' : ''}`,
-              multiValue: () => 'bg-gray-200 dark:bg-gray-600 rounded-sm',
-              multiValueLabel: () => 'text-gray-800 dark:text-gray-200 text-sm',
-              multiValueRemove: () => 'text-gray-500 hover:bg-gray-300 dark:hover:bg-gray-500',
+              control: ({ isFocused }) => `
+                mt-1 rounded-lg border bg-gray-50 p-1.5 shadow-sm transition-colors
+                dark:bg-gray-700
+                ${isFocused ? 'border-indigo-500 ring-1 ring-indigo-500' : 'border-gray-300 dark:border-gray-600'}
+              `,
+              input: () => 'text-gray-900 dark:text-gray-200',
+              placeholder: () => 'text-gray-500 dark:text-gray-400',
+              menu: () => 'mt-1 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700',
+              option: ({ isFocused, isSelected }) => `
+                p-2 rounded-md cursor-pointer
+                dark:text-gray-200
+                ${isFocused ? 'bg-indigo-100 dark:bg-indigo-600' : ''}
+                ${isSelected ? 'bg-indigo-200 dark:bg-indigo-700 font-semibold' : ''}
+              `,
+              multiValue: () => 'flex items-center rounded-sm bg-gray-200 dark:bg-gray-600 m-0.5',
+              multiValueLabel: () => 'px-2 py-0.5 text-sm text-gray-800 dark:text-gray-200',
+              multiValueRemove: () => 'px-1 text-gray-500 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500 hover:text-red-500',
             }}
           />
         </div>
