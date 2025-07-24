@@ -15,23 +15,7 @@
   body {
     @apply bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200;
   }
-}
-
-html {
-  scrollbar-gutter: stable;
-}
-
-.dark .editor-toolbar, .dark .CodeMirror, .dark .editor-statusbar {
-  background-color: #374151 !important; /* bg-gray-700 */
-  color: #D1D5DB !important; /* text-gray-300 */
-  border-color: #4B5563 !important; /* border-gray-600 */
-}
-
-.dark .CodeMirror-cursor {
-  border-left-color: #D1D5DB !important;
-}
-
-/* .markdown-body のダークモード用スタイル */
+  /* .markdown-body のダークモード用スタイル */
   .dark .markdown-body {
     color-scheme: dark; /* ブラウザのUI（スクロールバーなど）をダークに */
     
@@ -86,3 +70,19 @@ html {
     @apply bg-gray-800;
   }
 }
+
+html {
+  scrollbar-gutter: stable;
+}
+
+.dark .editor-toolbar, .dark .CodeMirror, .dark .editor-statusbar {
+  background-color: #374151 !important; /* bg-gray-700 */
+  color: #D1D5DB !important; /* text-gray-300 */
+  border-color: #4B5563 !important; /* border-gray-600 */
+}
+
+.dark .CodeMirror-cursor {
+  border-left-color: #D1D5DB !important;
+}
+
+
