@@ -16,11 +16,22 @@
     @apply bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200;
   }
   /* .markdown-body のダークモード用スタイル */
+/* .markdown-body のダークモード用スタイル */
   .dark .markdown-body {
-    color-scheme: dark; /* ブラウザのUI（スクロールバーなど）をダークに */
-    
-    /* Tailwind CSSのユーティリティクラスを使ってスタイルを適用 */
-    @apply bg-gray-900 text-gray-300;
+    color-scheme: dark;
+    @apply bg-gray-900; /* 背景色のみここに残す */
+  }
+
+  /* 本文テキストの色を、より具体的なセレクタで指定 */
+  .dark .markdown-body, /* 全体にも適用 */
+  .dark .markdown-body p, /* 段落 */
+  .dark .markdown-body li, /* リスト */
+  .dark .markdown-body ol,
+  .dark .markdown-body ul,
+  .dark .markdown-body blockquote, /* 引用 */
+  .dark .markdown-body td, /* テーブルのセル */
+  .dark .markdown-body th {
+    @apply text-gray-300; /* ダークモード時の文字色 */
   }
 
   /* 見出しの色 */
