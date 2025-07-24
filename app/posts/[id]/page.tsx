@@ -7,11 +7,13 @@ import { TagBadge } from '@/components/ui/TagBadge'; // タグ表示用の
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
+import { getCurrentUser } from '@/lib/auth'; // ユーザー情報を取得するヘルパー関数
 // import 'highlight.js/styles/github.css'; // お好みのテーマに変更可！
 
 
 export default async function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const user = await getCurrentUser();
 
   const post = await prisma.post.findUnique({
     where: { id },
@@ -20,7 +22,6 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
       tags: { select: { name: true, color: true } },
     },
   });
-  console.log("Fetched post:", post?.content);
 
   if (!post) {
     notFound();
@@ -46,9 +47,12 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
             <p className="text-xs text-gray-500 dark:text-gray-400"><LocalDateTime utcDate={post.createdAt} formatStr="y/MM/dd" /></p>
           </div>
         </div>
-        <Link href={`/posts/${id}/edit`} className="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
-          編集する
-        </Link>
+        {/* 編集ボタンを表示 */}
+        {user && user.id === post.author?.id && (
+          <Link href={`/posts/${post.id}/edit`} className="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+            編集する
+          </Link>
+        )}
       </div>
       <p className="text-gray-600 mb-8">
         <LocalDateTime

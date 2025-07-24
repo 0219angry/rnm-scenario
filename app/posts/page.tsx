@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { LocalDateTime } from '@/components/ui/LocalDateTime';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getCurrentUser } from '@/lib/auth'; // ユーザー情報を取得するヘルパー関数
 
 // アイコン用のコンポーネント
 const PlusIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -35,6 +36,7 @@ const TagBadge = ({ name, color }: { name: string; color: string }) => (
 // =======================================================
 
 export default async function PostsPage() {
+  const user = await getCurrentUser();
   const posts = await prisma.post.findMany({
     orderBy: {
       createdAt: 'desc',
@@ -61,10 +63,15 @@ export default async function PostsPage() {
     <div className="max-w-4xl mx-auto p-4 sm:p-6">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">記事一覧</h1>
-        <Link href="/posts/new" className="inline-flex items-center gap-x-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-          <PlusIcon className="h-5 w-5" />
-          新規作成
-        </Link>
+        {
+          !user?
+          <Link href="/posts/new" className="inline-flex items-center gap-x-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            <PlusIcon className="h-5 w-5" />
+            新規作成
+          </Link>:
+          <></>
+        }
+
       </div>
 
       <div className="flex flex-col gap-y-4">
