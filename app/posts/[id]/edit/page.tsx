@@ -4,8 +4,8 @@ import { notFound } from 'next/navigation';
 import { updatePost } from '@/lib/actions/postActions';
 import PostForm from '@/components/features/posts/PostForm'; // PostFormコンポーネントをインポート
 
-export default async function EditPostPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   // 投稿データと、それに関連するタグを取得
   const post = await prisma.post.findUnique({
