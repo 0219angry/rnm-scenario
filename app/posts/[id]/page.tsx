@@ -82,7 +82,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
       </div>
       
       {/* Markdown本文 */}
-      <div className="markdown-body">
+      <div className="markdown-body dark:markdown-body bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeHighlight]}
