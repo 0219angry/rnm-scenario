@@ -14,9 +14,8 @@ import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 
 // ページコンポーネントのPropsの型定義を修正
-export default async function PostDetailPage({ params }: { params: { id: string } }) {
-  // `await`なしでidを直接取得
-  const { id } = params;
+export default async function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const user = await getCurrentUser();
 
   const post = await prisma.post.findUnique({
