@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma'; // PrismaClientのインスタンスをインポート
+import { LocalDateTime } from '@/components/ui/LocalDateTime'; // 日付表示コンポーネント
 
 type Props = {
   params: {
