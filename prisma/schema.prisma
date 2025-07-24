@@ -266,5 +266,14 @@ model Post {
 
   authorId String
   author User @relation(fields: [authorId], references: [id])
+  tags PostTag[] @relation("PostTags")
   
 }
+
+model PostTag {
+  id String @id @default(cuid())
+  name String @unique
+  color String @default("#cccccc")
+  posts Post[] @relation("PostTags")
+}
+
