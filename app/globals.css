@@ -20,3 +20,13 @@
 html {
   scrollbar-gutter: stable;
 }
+
+.dark .editor-toolbar, .dark .CodeMirror, .dark .editor-statusbar {
+  background-color: #374151 !important; /* bg-gray-700 */
+  color: #D1D5DB !important; /* text-gray-300 */
+  border-color: #4B5563 !important; /* border-gray-600 */
+}
+
+.dark .CodeMirror-cursor {
+  border-left-color: #D1D5DB !important;
+}

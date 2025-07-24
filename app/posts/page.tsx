@@ -65,7 +65,7 @@ export default async function PostsPage() {
         <h1 className="text-3xl font-bold">記事一覧</h1>
         {
           !user?
-          <Link href="/posts/new" className="inline-flex items-center gap-x-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          <Link href="/posts/new" className="inline-flex items-center gap-x-2 rounded-lg bg-indigo-600 dark:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:hover:bg-indigo-600">
             <PlusIcon className="h-5 w-5" />
             新規作成
           </Link>:
@@ -77,11 +77,11 @@ export default async function PostsPage() {
       <div className="flex flex-col gap-y-4">
         {posts?.map((post) => (
           <Link href={`/posts/${post.id}`} key={post.id} className="group block">
-            <div className="bg-white rounded-lg p-6 border border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-indigo-500">
-              <h2 className="text-xl font-bold text-gray-800 group-hover:text-indigo-600 mb-3">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-indigo-500">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 group-hover:text-indigo-600 mb-3">
                 {post.title}
               </h2>
-              <p className="text-gray-600 text-sm mb-4">{post.summary}</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">{post.summary}</p>
 
               {/* ===== タグ表示エリアを追加 ===== */}
               {post.tags && post.tags.length > 0 && (
@@ -96,9 +96,9 @@ export default async function PostsPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-3">
                   <Image src={post.author?.image ?? `https://avatar.vercel.sh/${post.author?.id}`} alt={post.author?.name || '著者アバター'} width={32} height={32} className="rounded-full bg-gray-100" />
-                  <p className="text-sm font-medium text-gray-700">{post.author?.name}</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{post.author?.name}</p>
                 </div>
-                <p className="text-gray-500 text-xs">
+                <p className="text-gray-500 dark:text-gray-400 text-xs">
                   <LocalDateTime utcDate={post.createdAt} formatStr="y/MM/dd" />
                 </p>
               </div>
