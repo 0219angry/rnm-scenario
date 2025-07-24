@@ -3,12 +3,7 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma'; // PrismaClientのインスタンスをインポート
 import { LocalDateTime } from '@/components/ui/LocalDateTime'; // 日付表示コンポーネント
 
-type Props = {
-  params: {
-    // ディレクトリ名 [name] に対応
-    name: string; 
-  };
-};
+
 
 // 1. ビルド時に静的なページを生成する（推奨）
 export async function generateStaticParams() {
@@ -23,9 +18,10 @@ export async function generateStaticParams() {
 }
 
 // 2. ページのメインコンポーネント
-export default async function TagPage({ params }: Props) {
+export default async function TagPage({ params }: { params: Promise<{ name: string }>}) {
   // URLのタグ名はエンコードされている可能性があるのでデコードする
-  const tagName = decodeURIComponent(params.name);
+  const { name } = await params;
+  const tagName = decodeURIComponent(name);
 
   // 3. Prismaでタグと、そのタグに紐づく記事を取得
   const tagWithPosts = await prisma.postTag.findUnique({
