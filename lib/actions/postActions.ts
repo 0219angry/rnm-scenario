@@ -47,7 +47,9 @@ export async function createPost(formData: FormData) {
       title,
       summary,
       content,
-      authorId: user.id,
+      author: {
+        connect: { id: user.id },
+      },
       // 👇 暗黙リレーションのシンプルな構文
       tags: {
         connect: tagsToConnect,

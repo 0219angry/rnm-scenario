@@ -13,6 +13,8 @@ type PostFormProps = {
 };
 
 export default function PostForm({ post, allTags, action }: PostFormProps) {
+  const [title, setTitle] = useState(post?.title || '');
+  const [summary, setSummary] = useState(post?.summary || '');
   const [content, setContent] = useState(post?.content || '');
 
   const tagOptions = allTags.map((tag) => ({
@@ -25,6 +27,8 @@ export default function PostForm({ post, allTags, action }: PostFormProps) {
     label: tag.name,
   }));
 
+  const isFormValid = title.trim() && summary.trim() && content.trim();
+
   return (
     // 👇 全体の背景色をダークモードに対応
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8">
@@ -36,9 +40,15 @@ export default function PostForm({ post, allTags, action }: PostFormProps) {
 
         <div className="mb-6">
           <label htmlFor="title" className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            タイトル
+            タイトル <span className="text-red-500">*</span>
           </label>
-          <input type="text" id="title" name="title" required defaultValue={post?.title}
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            required 
+            defaultValue={post?.title}
+            onChange={(e) => setTitle(e.target.value)}
             // 👇 ダークモード用のクラスを追加
             className="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 px-4 py-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-colors duration-200"
             placeholder="記事のタイトルを入力..."
@@ -46,9 +56,14 @@ export default function PostForm({ post, allTags, action }: PostFormProps) {
         </div>
         <div className="mb-6">
           <label htmlFor="summary" className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            サマリー
+            サマリー <span className="text-red-500">*</span>
           </label>
-          <textarea id="summary" name="summary" rows={3} defaultValue={post?.summary || ''}
+          <textarea 
+            id="summary" 
+            name="summary" 
+            rows={3} 
+            defaultValue={post?.summary || ''}
+            onChange={(e) => setSummary(e.target.value)}
             // 👇 ダークモード用のクラスを追加
             className="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 px-4 py-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-colors duration-200"
             placeholder="記事の簡単な要約（一覧ページなどで表示されます）"
@@ -91,17 +106,27 @@ export default function PostForm({ post, allTags, action }: PostFormProps) {
 
         <div className="mb-8">
           <label htmlFor="content" className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            本文
+            本文 <span className="text-red-500">*</span>
           </label>
           {/* 👇 Markdownエディタのコンテナ */}
           <div className="editor-container">
             <SimpleMdeReact id="content" value={content} onChange={setContent} />
+            <input type="hidden" name="content" value={content} />
           </div>
         </div>
 
         <div className="flex justify-end">
-          <button type="submit" className="inline-flex justify-center rounded-lg border border-transparent bg-indigo-600 py-3 px-6 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-transform hover:scale-105">
-            {post ? '更新する' : '投稿する'}
+          <button 
+          type="submit" 
+          disabled={!isFormValid}
+          className={`inline-flex justify-center rounded-lg border border-transparent py-3 px-6 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-transform
+                      ${isFormValid
+                        ? 'bg-indigo-600 hover:bg-indigo-700 hover:scale-105'
+                        : 'bg-gray-400 cursor-not-allowed opacity-70'
+                      }
+                    `}
+          >
+          {post ? '更新する' : '投稿する'}
           </button>
         </div>
       </form>
