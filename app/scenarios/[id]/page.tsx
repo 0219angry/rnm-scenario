@@ -1,11 +1,55 @@
 import { fetchScenarioById } from "@/lib/data";
 import { notFound } from "next/navigation";
+import type { Metadata } from 'next';
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
 import { GenreTag } from "@/components/ui/GenreTag";
 import Image from "next/image";
 import { GmTag } from "@/components/ui/GmTag";
 import { RulebookHoverCard } from "@/components/features/rulebooks/RulebookHoverCard";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const scenario = await fetchScenarioById(id);
+  if (!scenario) return {};
+
+  const base = process.env.NEXT_PUBLIC_SITE_URL;
+  const url = new URL(`/posts/${scenario.id}`, base);
+
+  // 説明文：内容があれば先頭を、なければ要点を短く整形
+  const metaDesc =
+    (scenario.content?.trim() || '')
+      .replace(/\s+/g, ' ')
+     .slice(0, 120) ||
+    `${scenario.genre}｜${scenario.playerMin === scenario.playerMax ? scenario.playerMin : `${scenario.playerMin}〜${scenario.playerMax}`}人｜${scenario.averageTime}分`;
+
+  const qs = new URLSearchParams({
+    title: scenario.title,
+    site: 'シナリオ管理アプリ',
+    desc: metaDesc,
+    accent: '#3b82f6',
+    v: String(scenario.updatedAt?.getTime?.() ?? Date.now()), // キャッシュ破り
+  });
+  const ogImage = new URL(`/api/og/post?${qs.toString()}`, base);
+
+  return {
+    title: scenario.title,
+    description: metaDesc,
+    openGraph: {
+      title: scenario.title,
+      description: metaDesc,
+      url: url.toString(),
+      images: [{ url: ogImage.toString(), width: 1200, height: 630, type: 'image/png' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: scenario.title,
+      description: metaDesc,
+      images: [ogImage.toString()],
+    },
+  };
+}
+
 
 export default async function ScenarioDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

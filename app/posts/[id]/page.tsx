@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   });
   if (!post) return {};
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
+  const base = process.env.NEXT_PUBLIC_SITE_URL;
   const url = new URL(`/posts/${post.id}`, base);
   const qs = new URLSearchParams({
     title: post.title,
