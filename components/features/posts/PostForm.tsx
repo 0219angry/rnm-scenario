@@ -111,6 +111,7 @@ export default function PostForm({ post, allTags, action }: PostFormProps) {
           {/* 👇 Markdownエディタのコンテナ */}
           <div className="editor-container">
             <SimpleMdeReact id="content" value={content} onChange={setContent} />
+            <input type="hidden" name="content" value={content} />
           </div>
         </div>
 
