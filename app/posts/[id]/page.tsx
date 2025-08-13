@@ -22,8 +22,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   });
   if (!post) return {};
 
-  const url = new URL(`/posts/${post.id}`, process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com');
   const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
+  const url = new URL(`/posts/${post.id}`, base);
   const qs = new URLSearchParams({
     title: post.title,
     site: 'シナリオ管理アプリ',
@@ -39,7 +39,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       title: post.title,
       description: post.summary,
       url: url.toString(),
-      images: [{ url: ogImage.toString() }],
+      images: [
+        { url: ogImage.toString(), width: 1200, height: 630, type: 'image/png' },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
