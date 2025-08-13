@@ -118,8 +118,14 @@ export default function PostForm({ post, allTags, action }: PostFormProps) {
           <button 
           type="submit" 
           disabled={!isFormValid}
-          className="inline-flex justify-center rounded-lg border border-transparent bg-indigo-600 py-3 px-6 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-transform hover:scale-105">
-            {post ? '更新する' : '投稿する'}
+          className={`inline-flex justify-center rounded-lg border border-transparent py-3 px-6 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-transform
+                      ${isFormValid
+                        ? 'bg-indigo-600 hover:bg-indigo-700 hover:scale-105'
+                        : 'bg-gray-400 cursor-not-allowed opacity-70'
+                      }
+                    `}
+          >
+          {post ? '更新する' : '投稿する'}
           </button>
         </div>
       </form>
