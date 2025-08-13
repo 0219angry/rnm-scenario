@@ -18,13 +18,20 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const post = await prisma.post.findUnique({
     where: { id },
-    select: { title: true, summary: true, id: true, createdAt: true },
+    select: { title: true, summary: true, id: true, createdAt: true, updatedAt: true },
   });
   if (!post) return {};
 
   const url = new URL(`/posts/${post.id}`, process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com');
-  const ogImage = new URL(`/api/og/post?title=${encodeURIComponent(post.title)}`, process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com');
-
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com';
+  const qs = new URLSearchParams({
+    title: post.title,
+    site: 'シナリオ管理アプリ',
+    desc: post.summary ?? '',
+    accent: '#3b82f6', // 好きなブランド色にしてねっ
+    v: String(post.updatedAt?.getTime?.() ?? Date.now()), // キャッシュ破り
+  });
+  const ogImage = new URL(`/api/og/post?${qs.toString()}`, base);
   return {
     title: post.title,
     description: post.summary,
