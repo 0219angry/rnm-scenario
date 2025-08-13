@@ -1,6 +1,7 @@
 // app/posts/[id]/page.tsx
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { LocalDateTime } from '@/components/ui/LocalDateTime';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -12,6 +13,34 @@ import rehypeHighlight from 'rehype-highlight';
 
 // シンタックスハイライト用のCSS（お好みのテーマに）
 import 'highlight.js/styles/github-dark.css';
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const post = await prisma.post.findUnique({
+    where: { id: params.id },
+    select: { title: true, summary: true, id: true, createdAt: true },
+  });
+  if (!post) return {};
+
+  const url = new URL(`/posts/${post.id}`, process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com');
+  const ogImage = new URL(`/api/og/post?title=${encodeURIComponent(post.title)}`, process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com');
+
+  return {
+    title: post.title,
+    description: post.summary,
+    openGraph: {
+      title: post.title,
+      description: post.summary,
+      url: url.toString(),
+      images: [{ url: ogImage.toString() }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.summary,
+      images: [ogImage.toString()],
+    },
+  };
+ }
 
 // ページコンポーネントのPropsの型定義を修正
 export default async function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {

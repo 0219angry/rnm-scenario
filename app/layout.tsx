@@ -13,11 +13,28 @@ const notoSansJp = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "シナリオ管理アプリ",
-  description: "マーダーミステリーやTRPGのシナリオとセッションを管理するアプリです。",
+ metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://example.com'),
+ title: {
+   default: "シナリオ管理アプリ",
+   template: "%s | シナリオ管理アプリ",
+ },
+  description: "シナリオの保管・タグ付け、セッションのスケジュール共有、プレイ履歴の振り返りをスマートに。仲間と遊ぶ準備がもっと楽しくなる管理アプリ。",
   icons: {
-    icon: '/favicon.ico', // ← ここ！
+    icon: '/favicon.ico',
   },
+ openGraph: {
+   type: 'website',
+   locale: 'ja_JP',
+   siteName: 'シナリオ管理アプリ',
+   title: 'シナリオ管理アプリ',
+   description: 'シナリオの保管・タグ付け、セッションのスケジュール共有、プレイ履歴の振り返りをスマートに。仲間と遊ぶ準備がもっと楽しくなる管理アプリ。',
+ },
+ twitter: {
+   card: 'summary_large_image',
+   title: 'シナリオ管理アプリ',
+   description: 'シナリオの保管・タグ付け、セッションのスケジュール共有、プレイ履歴の振り返りをスマートに。仲間と遊ぶ準備がもっと楽しくなる管理アプリ。',
+   creator: '@0219Angry',
+ },
 };
 
 export default async function RootLayout({
