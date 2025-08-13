@@ -14,9 +14,10 @@ import rehypeHighlight from 'rehype-highlight';
 // シンタックスハイライト用のCSS（お好みのテーマに）
 import 'highlight.js/styles/github-dark.css';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
   const post = await prisma.post.findUnique({
-    where: { id: params.id },
+    where: { id },
     select: { title: true, summary: true, id: true, createdAt: true },
   });
   if (!post) return {};
