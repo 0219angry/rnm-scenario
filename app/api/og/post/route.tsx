@@ -14,6 +14,15 @@ function clampText(input: string, max = 200) {
   return arr.length > max ? arr.slice(0, max).join('') + '…' : input;
 }
 
+async function loadFont(path: string, req: Request) {
+  const origin = new URL(req.url).origin;
+  const res = await fetch(`${origin}${path}`);
+  if (!res.ok) {
+    throw new Error(`Failed to load font from ${path}`);
+  }
+  return res.arrayBuffer();
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
@@ -21,6 +30,11 @@ export async function GET(req: Request) {
   const site = clampText(searchParams.get('site') ?? 'シナリオ管理アプリ', 50);
   const desc = clampText(searchParams.get('desc') ?? '', 220);
   const accent = searchParams.get('accent') ?? '#3b82f6'; // 例: %233b82f6
+
+  const [fontRegular, fontBold] = await Promise.all([
+    loadFont('/fonts/Inter-Regular.ttf', req),
+    loadFont('/fonts/Inter-Bold.ttf', req),
+  ]);
 
   return new ImageResponse(
     (
@@ -32,6 +46,7 @@ export async function GET(req: Request) {
           alignItems: 'center',
           justifyContent: 'center',
           background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #eef2ff 100%)',
+          fontFamily: "NotoSansJP, sans-serif",
         }}
       >
         <div
@@ -44,6 +59,7 @@ export async function GET(req: Request) {
             display: 'flex',
             flexDirection: 'column',
             gap: 24,
+            fontFamily: "NotoSansJP, sans-serif",
           }}
         >
           {/* ヘッダー（サイト名＋アクセント） */}
@@ -92,6 +108,24 @@ export async function GET(req: Request) {
         </div>
       </div>
     ),
-    { width: WIDTH, height: HEIGHT }
+    { 
+      width: WIDTH, 
+      height: HEIGHT,
+      emoji: 'twemoji',
+      fonts: [
+        {
+          name: 'NotoSansJP',
+          data: fontRegular,
+          style: 'normal',
+          weight: 400,
+        },
+        {
+          name: 'NotoSansJP',
+          data: fontBold,
+          style: 'normal',
+          weight: 700,
+        },
+      ] 
+    }
   );
 }
