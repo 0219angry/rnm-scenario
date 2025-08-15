@@ -16,8 +16,8 @@ const origin = `${proto}://${host}`;
 
   // public/fonts から実行時に取得（ビルド時fetchを避ける）
   const [serifRegular, serifBold] = await Promise.all([
-    fetch(`${origin}/fonts/NotoSerifJP-Regular.woff2`).then(r => r.arrayBuffer()),
-    fetch(`${origin}/fonts/NotoSerifJP-Bold.woff2`).then(r => r.arrayBuffer()),
+    fetch(`${origin}/fonts/NotoSerifJP-Regular.ttf`).then(r => r.arrayBuffer()),
+    fetch(`${origin}/fonts/NotoSerifJP-Bold.ttf`).then(r => r.arrayBuffer()),
   ]);
 
   return new ImageResponse(

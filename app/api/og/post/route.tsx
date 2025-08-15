@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
             opacity: 0.95,
             color: "#E5E7EB",
           }}>
-            {site || "調査手帖"}
+            {"調査手帖"}
           </div>
 
           {/* タイトル */}
