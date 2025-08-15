@@ -15,8 +15,8 @@ const notoSansJp = Noto_Sans_JP({
 export const metadata: Metadata = {
  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://example.com'),
  title: {
-   default: "シナリオ管理アプリ",
-   template: "%s | シナリオ管理アプリ",
+   default: "調査手帖",
+   template: "%s | 調査手帖",
  },
   description: "シナリオの保管・タグ付け、セッションのスケジュール共有、プレイ履歴の振り返りをスマートに。仲間と遊ぶ準備がもっと楽しくなる管理アプリ。",
   icons: {
@@ -25,13 +25,13 @@ export const metadata: Metadata = {
  openGraph: {
    type: 'website',
    locale: 'ja_JP',
-   siteName: 'シナリオ管理アプリ',
-   title: 'シナリオ管理アプリ',
+   siteName: '調査手帖',
+   title: '調査手帖',
    description: 'シナリオの保管・タグ付け、セッションのスケジュール共有、プレイ履歴の振り返りをスマートに。仲間と遊ぶ準備がもっと楽しくなる管理アプリ。',
  },
  twitter: {
    card: 'summary_large_image',
-   title: 'シナリオ管理アプリ',
+   title: '調査手帖',
    description: 'シナリオの保管・タグ付け、セッションのスケジュール共有、プレイ履歴の振り返りをスマートに。仲間と遊ぶ準備がもっと楽しくなる管理アプリ。',
    creator: '@0219Angry',
  },

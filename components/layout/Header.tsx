@@ -14,53 +14,41 @@ export async function Header() {
         <div className="flex items-center space-x-6">
           <Link
             href="/"
-            className="text-gray-800 dark:text-gray-100 hover:opacity-90"
+            className="text-gray-800 dark:text-gray-100 hover:opacity-90 shrink-0"
             aria-label="調査手帖 ホーム"
           >
+            {/* ヘッダー向けコンパクトロゴ（タイトルのみ） */}
             <svg
-              width="180"
+              width="156"
               height="40"
-              viewBox="0 0 720 160"
+              viewBox="0 0 520 160"
               xmlns="http://www.w3.org/2000/svg"
               role="img"
-              aria-labelledby="t d"
+              aria-labelledby="t"
             >
-              <title id="t">調査手帖 ロゴ</title>
-              <desc id="d">ノート＋虫眼鏡のシンボルに、動詞強調サブタイトル（テーマ連動配色）</desc>
+              <title id="t">調査手帖 ロゴ（コンパクト）</title>
 
-              {/* アイコン（ベース＝currentColor／アクセント＝固定ゴールド） */}
-              <g transform="translate(0,16)">
-                <rect x="12" y="12" width="88" height="104" rx="16" fill="currentColor" opacity="0.95" />
-                <rect x="12" y="12" width="12" height="104" fill="currentColor" opacity="0.75" />
-                <circle cx="92" cy="92" r="26" fill="none" stroke="#C89F65" strokeWidth="8" />
-                <line x1="110" y1="110" x2="128" y2="128" stroke="#C89F65" strokeWidth="8" strokeLinecap="round" />
-                <path d="M88 20 h18 v26 l-9 -7 -9 7 z" fill="#C89F65" />
+              {/* アイコン：currentColor＋アクセントを少し明るめに */}
+              <g transform="translate(0,16)" filter="drop-shadow(0 0 0.5px rgba(0,0,0,.2))">
+                <rect x="12" y="12" width="88" height="104" rx="16" fill="currentColor" opacity="0.95"/>
+                <rect x="12" y="12" width="12" height="104" fill="currentColor" opacity="0.75"/>
+                <circle cx="92" cy="92" r="26" fill="none" stroke="#E5B979" strokeWidth="9"/>
+                <line x1="110" y1="110" x2="128" y2="128" stroke="#E5B979" strokeWidth="9" strokeLinecap="round"/>
+                <path d="M88 20 h18 v26 l-9 -7 -9 7 z" fill="#E5B979"/>
               </g>
 
-              {/* ロゴタイプ */}
-              <g transform="translate(168,0)">
+              {/* タイトルのみ（大きめ・太め） */}
+              <g transform="translate(148,0)">
                 <text
                   x="0"
-                  y="102"
-                  fontFamily="'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif"
-                  fontSize="64"
+                  y="108"
+                  fontFamily="'Noto Sans JP','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif"
+                  fontSize="72"
                   fill="currentColor"
-                  fontWeight="600"
+                  fontWeight="700"
+                  letterSpacing=".01em"
                 >
                   調査手帖
-                </text>
-                <text
-                  x="4"
-                  y="136"
-                  fontFamily="'Noto Sans JP','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif"
-                  fontSize="18"
-                  fill="currentColor"
-                  letterSpacing=".04em"
-                >
-                  <tspan fontWeight="700" fill="#C89F65">探す</tspan>、
-                  <tspan fontWeight="700" fill="#C89F65">記す</tspan>、
-                  <tspan fontWeight="700" fill="#C89F65">遊ぶ</tspan>。
-                  すべてをひとつの手帖に。
                 </text>
               </g>
             </svg>
