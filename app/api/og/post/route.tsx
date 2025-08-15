@@ -18,10 +18,10 @@ export async function GET(req: NextRequest) {
   const accent = searchParams.get("accent") ?? "#3b82f6";
 
   // フォントを public/fonts から実行時に取得
-  // const [serifRegular, serifBold] = await Promise.all([
-  //   fetch(`${origin}/fonts/NotoSerifJP-Regular.woff2`).then(r => r.arrayBuffer()),
-  //   fetch(`${origin}/fonts/NotoSerifJP-Bold.woff2`).then(r => r.arrayBuffer()),
-  // ]);
+  const [serifRegular, serifBold] = await Promise.all([
+    fetch(`${origin}/fonts/NotoSerifJP-Regular.ttf`).then(r => r.arrayBuffer()),
+    fetch(`${origin}/fonts/NotoSerifJP-Bold.ttf`).then(r => r.arrayBuffer()),
+  ]);
 
   try{
     return new ImageResponse(
@@ -106,10 +106,10 @@ export async function GET(req: NextRequest) {
       {
         width: 1200,
         height: 630,
-        // fonts: [
-        //   { name: "NotoSerifJP-Regular", data: serifRegular, weight: 400, style: "normal" },
-        //   { name: "NotoSerifJP-Bold", data: serifBold, weight: 700, style: "normal" },
-        // ],
+        fonts: [
+          { name: "NotoSerifJP-Regular", data: serifRegular, weight: 400, style: "normal" },
+          { name: "NotoSerifJP-Bold", data: serifBold, weight: 700, style: "normal" },
+        ],
       }
     );
     } catch (e) {
