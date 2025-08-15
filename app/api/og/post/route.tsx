@@ -1,131 +1,160 @@
-/* eslint-disable @next/next/no-img-element */
-import { ImageResponse } from 'next/og';
-import React from 'react';
+import { NextRequest } from "next/server";
+import { ImageResponse } from "next/og";
+import { headers } from "next/headers";
 
-export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
+export const runtime = "edge";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-const WIDTH = 1200;
-const HEIGHT = 630;
+export async function GET(req: NextRequest) {
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const host = h.get("host") ?? "localhost:3000";
+  const origin = `${proto}://${host}`;
 
-// 長過ぎる文字を安全に裁断（サロゲートペア考慮のため Array.from）
-function clampText(input: string, max = 200) {
-  const arr = Array.from(input);
-  return arr.length > max ? arr.slice(0, max).join('') + '…' : input;
-}
-
-async function loadFont(path: string, req: Request) {
-  const origin = new URL(req.url).origin;
-  const res = await fetch(`${origin}${path}`);
-  if (!res.ok) {
-    throw new Error(`Failed to load font from ${path}`);
-  }
-  return res.arrayBuffer();
-}
-
-export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
-  const title = clampText(searchParams.get('title') ?? 'Post', 140);
-  const site = clampText(searchParams.get('site') ?? 'シナリオ管理アプリ', 50);
-  const desc = clampText(searchParams.get('desc') ?? '', 220);
-  const accent = searchParams.get('accent') ?? '#3b82f6'; // 例: %233b82f6
+  // 受け取り（未指定は空文字でフォールバック）
+  const title  = searchParams.get("title")  ?? "";
+  const site   = searchParams.get("site")   ?? "";
+  const desc   = searchParams.get("desc")   ?? "";
+  const author = searchParams.get("author") ?? "";
+  const tags   = searchParams.get("tags")   ?? "";
+  const date   = searchParams.get("date")   ?? "";
+  const accent = searchParams.get("accent") ?? "#3b82f6";
 
-  const [fontRegular, fontBold] = await Promise.all([
-    loadFont('/fonts/Inter-Regular.ttf', req),
-    loadFont('/fonts/Inter-Bold.ttf', req),
+  // フォントを public/fonts から実行時に取得
+  const [serifRegular, serifBold] = await Promise.all([
+    fetch(`${origin}/fonts/NotoSerifJP-Regular.woff2`).then(r => r.arrayBuffer()),
+    fetch(`${origin}/fonts/NotoSerifJP-Bold.woff2`).then(r => r.arrayBuffer()),
   ]);
 
   return new ImageResponse(
     (
-      <div
-        style={{
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #eef2ff 100%)',
-          fontFamily: "NotoSansJP, sans-serif",
-        }}
-      >
-        <div
-          style={{
-            width: 1040,
-            background: 'white',
-            borderRadius: 24,
-            border: '1px solid #e5e7eb',
-            padding: 64,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 24,
-            fontFamily: "NotoSansJP, sans-serif",
-          }}
-        >
-          {/* ヘッダー（サイト名＋アクセント） */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div
-              style={{
-                padding: '8px 14px',
-                borderRadius: 9999,
-                background: accent,
-                color: 'white',
-                fontSize: 24,
-                fontWeight: 700,
-              }}
-            >
-              🎲
-            </div>
-            <div style={{ fontSize: 28, opacity: 0.85, fontWeight: 600 }}>{site}</div>
-          </div>
-
-          {/* タイトル */}
-          <div
-            style={{
-              fontSize: 64,
-              fontWeight: 800,
-              lineHeight: 1.1,
-              letterSpacing: '-0.02em',
-              wordBreak: 'break-word',
-            }}
-          >
-            {title}
-          </div>
-
-          {/* 説明（任意） */}
-          {desc && (
-            <div
-              style={{
-                fontSize: 28,
-                color: '#475569',
-                lineHeight: 1.4,
-                wordBreak: 'break-word',
-              }}
-            >
-              {desc}
-            </div>
-          )}
+      <div style={{
+        width: "1200px",
+        height: "630px",
+        display: "flex",
+        background: "linear-gradient(180deg,#0B1220 0%,#1B2435 100%)",
+        color: "#F5F0E6",
+        padding: "64px",
+        boxSizing: "border-box",
+        gap: "32px",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "flex-start",
+      }}>
+        {/* サイト名 */}
+        <div style={{
+          display: "flex",
+          fontFamily: "NotoSerifJP-Bold",
+          fontSize: 42,
+          opacity: 0.95,
+          color: "#E5E7EB",
+        }}>
+          {site || "調査手帖"}
         </div>
+
+        {/* タイトル */}
+        <div style={{
+          display: "flex",
+          fontFamily: "NotoSerifJP-Bold",
+          fontSize: 64,
+          lineHeight: 1.2,
+          maxWidth: 1000,
+        }}>
+          {title}
+        </div>
+
+        {/* 要約 */}
+        {desc ? (
+          <div style={{
+            display: "flex",
+            fontFamily: "NotoSerifJP-Regular",
+            fontSize: 28,
+            lineHeight: 1.5,
+            color: "#E5E7EB",
+            maxWidth: 1000,
+          }}>
+            {desc}
+          </div>
+        ) : null}
+
+        {/* メタ行（著者・日付・タグ） */}
+        <div style={{
+          display: "flex",
+          gap: 16,
+          flexWrap: "wrap",
+          alignItems: "center",
+          marginTop: 8,
+        }}>
+          {author ? <Badge label={`by ${author}`} color="sub" /> : null}
+          {date   ? <Badge label={date} color="sub" /> : null}
+          {tags
+            ? tags.split("／").slice(0, 6).map((t, i) => (
+                <Badge key={i} label={t} accent={accent} />
+              ))
+            : null}
+        </div>
+
+        {/* フッター：ブランドライン */}
+        <div style={{
+          display: "flex",
+          height: 6,
+          width: 640,
+          background: accent,
+          borderRadius: 3,
+          marginTop: 16,
+        }} />
       </div>
     ),
-    { 
-      width: WIDTH, 
-      height: HEIGHT,
-      emoji: 'twemoji',
+    {
+      width: 1200,
+      height: 630,
       fonts: [
-        {
-          name: 'NotoSansJP',
-          data: fontRegular,
-          style: 'normal',
-          weight: 400,
-        },
-        {
-          name: 'NotoSansJP',
-          data: fontBold,
-          style: 'normal',
-          weight: 700,
-        },
-      ] 
+        { name: "NotoSerifJP-Regular", data: serifRegular, weight: 400, style: "normal" },
+        { name: "NotoSerifJP-Bold", data: serifBold, weight: 700, style: "normal" },
+      ],
     }
   );
+}
+
+/** 小バッジ */
+function Badge({
+  label,
+  color = "primary",
+  accent = "#3b82f6",
+}: {
+  label: string;
+  color?: "primary" | "sub";
+  accent?: string;
+}) {
+  const isSub = color === "sub";
+  const bg = isSub ? "rgba(255,255,255,0.10)" : hexToRgba(accent, 0.20);
+  const border = isSub ? "rgba(255,255,255,0.22)" : hexToRgba(accent, 0.45);
+  const text = isSub ? "#CBD5E1" : "#E6F0FF";
+  return (
+    <div style={{
+      display: "flex",
+      fontFamily: "NotoSerifJP-Bold",
+      fontSize: 24,
+      padding: "8px 14px",
+      borderRadius: 14,
+      background: bg,
+      color: text,
+      border: `1px solid ${border}`,
+    }}>
+      {label}
+    </div>
+  );
+}
+
+// #RRGGBB → rgba()
+function hexToRgba(hex: string, alpha = 1) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!m) return `rgba(59,130,246,${alpha})`; // blue-500
+  const r = parseInt(m[1], 16);
+  const g = parseInt(m[2], 16);
+  const b = parseInt(m[3], 16);
+  return `rgba(${r},${g},${b},${alpha})`;
 }
