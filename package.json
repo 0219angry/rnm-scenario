@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/write-version.mjs",
     "build": "prisma generate && DATABASE_URL=$DATABASE_URL_MIGRATE prisma migrate deploy && next build",
     "start": "next start",
     "lint": "next lint"
