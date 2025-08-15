@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/components/features/theme/ThemeProvider";
 import { Toaster } from 'sonner';
 import { getCurrentUser } from "@/lib/auth";
 
+import { APP_VERSION } from "@/version";
+
 const notoSansJp = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
   subsets: ["latin"],
@@ -63,8 +65,11 @@ export default async function RootLayout({
               {children}
             </main>
             <footer className="bg-gray-200 dark:bg-gray-800 p-4 text-center">
-            <p>© 2025 RNM</p>
-          </footer>
+              <p>© 2025 RNM</p>
+              <span className="absolute right-4 bottom-2 text-xs text-gray-500 dark:text-gray-400">
+                v{APP_VERSION}
+              </span>
+            </footer>
           </div>
         </ThemeProvider>
         <Toaster richColors position="bottom-right" />
