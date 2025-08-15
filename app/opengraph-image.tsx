@@ -6,12 +6,15 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 // Webフォント（Noto Sans JP 400/700）
+const baseUrl =
+  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 const notoSansJpRegular = fetch(
-  new URL("../public/fonts/NotoSansJP-Regular.ttf", import.meta.url)
+  `${baseUrl}/fonts/NotoSansJP-Regular.woff2`
 ).then((r) => r.arrayBuffer());
 
 const notoSansJpBold = fetch(
-  new URL("../public/fonts/NotoSansJP-Bold.ttf", import.meta.url)
+  `${baseUrl}/fonts/NotoSansJP-Bold.woff2`
 ).then((r) => r.arrayBuffer());
 
 export default async function Image() {
