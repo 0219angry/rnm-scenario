@@ -29,94 +29,105 @@ export async function GET(req: NextRequest) {
     fetch(`${origin}/fonts/NotoSerifJP-Bold.woff2`).then(r => r.arrayBuffer()),
   ]);
 
-  return new ImageResponse(
-    (
-      <div style={{
-        width: "1200px",
-        height: "630px",
-        display: "flex",
-        background: "linear-gradient(180deg,#0B1220 0%,#1B2435 100%)",
-        color: "#F5F0E6",
-        padding: "64px",
-        boxSizing: "border-box",
-        gap: "32px",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "flex-start",
-      }}>
-        {/* サイト名 */}
+  try{
+    return new ImageResponse(
+      (
         <div style={{
+          width: "1200px",
+          height: "630px",
           display: "flex",
-          fontFamily: "NotoSerifJP-Bold",
-          fontSize: 42,
-          opacity: 0.95,
-          color: "#E5E7EB",
+          background: "linear-gradient(180deg,#0B1220 0%,#1B2435 100%)",
+          color: "#F5F0E6",
+          padding: "64px",
+          boxSizing: "border-box",
+          gap: "32px",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "flex-start",
         }}>
-          {site || "調査手帖"}
-        </div>
-
-        {/* タイトル */}
-        <div style={{
-          display: "flex",
-          fontFamily: "NotoSerifJP-Bold",
-          fontSize: 64,
-          lineHeight: 1.2,
-          maxWidth: 1000,
-        }}>
-          {title}
-        </div>
-
-        {/* 要約 */}
-        {desc ? (
+          {/* サイト名 */}
           <div style={{
             display: "flex",
-            fontFamily: "NotoSerifJP-Regular",
-            fontSize: 28,
-            lineHeight: 1.5,
+            fontFamily: "NotoSerifJP-Bold",
+            fontSize: 42,
+            opacity: 0.95,
             color: "#E5E7EB",
+          }}>
+            {site || "調査手帖"}
+          </div>
+
+          {/* タイトル */}
+          <div style={{
+            display: "flex",
+            fontFamily: "NotoSerifJP-Bold",
+            fontSize: 64,
+            lineHeight: 1.2,
             maxWidth: 1000,
           }}>
-            {desc}
+            {title}
           </div>
-        ) : null}
 
-        {/* メタ行（著者・日付・タグ） */}
-        <div style={{
-          display: "flex",
-          gap: 16,
-          flexWrap: "wrap",
-          alignItems: "center",
-          marginTop: 8,
-        }}>
-          {author ? <Badge label={`by ${author}`} color="sub" /> : null}
-          {date   ? <Badge label={date} color="sub" /> : null}
-          {tags
-            ? tags.split("／").slice(0, 6).map((t, i) => (
-                <Badge key={i} label={t} accent={accent} />
-              ))
-            : null}
+          {/* 要約 */}
+          {desc ? (
+            <div style={{
+              display: "flex",
+              fontFamily: "NotoSerifJP-Regular",
+              fontSize: 28,
+              lineHeight: 1.5,
+              color: "#E5E7EB",
+              maxWidth: 1000,
+            }}>
+              {desc}
+            </div>
+          ) : null}
+
+          {/* メタ行（著者・日付・タグ） */}
+          <div style={{
+            display: "flex",
+            gap: 16,
+            flexWrap: "wrap",
+            alignItems: "center",
+            marginTop: 8,
+          }}>
+            {author ? <Badge label={`by ${author}`} color="sub" /> : null}
+            {date   ? <Badge label={date} color="sub" /> : null}
+            {tags
+              ? tags.split("／").slice(0, 6).map((t, i) => (
+                  <Badge key={i} label={t} accent={accent} />
+                ))
+              : null}
+          </div>
+
+          {/* フッター：ブランドライン */}
+          <div style={{
+            display: "flex",
+            height: 6,
+            width: 640,
+            background: accent,
+            borderRadius: 3,
+            marginTop: 16,
+          }} />
         </div>
-
-        {/* フッター：ブランドライン */}
-        <div style={{
-          display: "flex",
-          height: 6,
-          width: 640,
-          background: accent,
-          borderRadius: 3,
-          marginTop: 16,
-        }} />
-      </div>
-    ),
-    {
-      width: 1200,
-      height: 630,
-      fonts: [
-        { name: "NotoSerifJP-Regular", data: serifRegular, weight: 400, style: "normal" },
-        { name: "NotoSerifJP-Bold", data: serifBold, weight: 700, style: "normal" },
-      ],
-    }
-  );
+      ),
+      {
+        width: 1200,
+        height: 630,
+        fonts: [
+          { name: "NotoSerifJP-Regular", data: serifRegular, weight: 400, style: "normal" },
+          { name: "NotoSerifJP-Bold", data: serifBold, weight: 700, style: "normal" },
+        ],
+      }
+    );
+    } catch (e) {
+    // フォールバック（絶対にPNGを返す）
+    const msg = e instanceof Error ? e.message : "unknown";
+    return new ImageResponse(
+      <div style={{ width: 1200, height: 630, display: "flex", padding: 60, background: "#111827", color: "#F9FAFB", fontSize: 32, lineHeight: 1.4 }}>
+        OGP fallback / {msg}
+      </div>,
+      { width: 1200, height: 630 }
+    );
+  }
 }
 
 /** 小バッジ */
