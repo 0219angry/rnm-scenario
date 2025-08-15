@@ -7,11 +7,11 @@ export const contentType = "image/png";
 
 // Webフォント（Noto Sans JP 400/700）
 const notoSansJpRegular = fetch(
-  "https://fonts.gstatic.com/s/notosansjp/v52/-F6ofjtqLzI2JPCgQBnw7HFQogg.ttf"
+  new URL("../public/fonts/NotoSansJP-Regular.ttf", import.meta.url)
 ).then((r) => r.arrayBuffer());
 
 const notoSansJpBold = fetch(
-  "https://fonts.gstatic.com/s/notosansjp/v52/-F6pfjtqLzI2JPCgQBnw7HFU5oG2xA.ttf"
+  new URL("../public/fonts/NotoSansJP-Bold.ttf", import.meta.url)
 ).then((r) => r.arrayBuffer());
 
 export default async function Image() {
