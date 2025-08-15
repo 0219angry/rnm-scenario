@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       images: [ogImage],
     },
   };
- }
+}
 
 // ページコンポーネントのPropsの型定義を修正
 export default async function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -76,11 +76,21 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
       tags: { select: { name: true, color: true } },
     },
   });
-
   if (!post) {
     notFound();
   }
-
+  const debugQs = new URLSearchParams({
+    id: post.id,
+    title: post.title,
+    site: 'シナリオ管理アプリ',
+    desc: post.summary ?? '',
+    author: post.author?.name ?? '',
+    tags: (post.tags ?? []).map(t => t.name).slice(0, 6).join('／'),
+    date: post.createdAt?.toISOString?.().slice(0,10) ?? '',
+    accent: '#3b82f6',
+    v: String(post.updatedAt?.getTime?.() ?? Date.now()),
+  });
+  const debugOgUrl = `/api/og/post?${debugQs.toString()}`;
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
       {/* タグ表示 */}
@@ -141,6 +151,14 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
           {post.content}
         </ReactMarkdown>
       </div>
+      {process.env.NODE_ENV !== 'production' && (
+        <div className="mt-8 border rounded-lg p-3 bg-gray-50 dark:bg-gray-900">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">OGPプレビュー（開発時のみ表示）</p>
+          {/* 通常のページ表示ではOGPは読み込まれないため、明示的に表示して確認 */}
+          <img src={debugOgUrl} alt="OGP preview" width={600} height={315} />
+          <p className="text-xs text-gray-500 mt-1 break-all">{debugOgUrl}</p>
+        </div>
+      )}
     </div>
   );
 }
