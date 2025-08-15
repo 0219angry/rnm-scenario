@@ -41,6 +41,7 @@ export default async function Image() {
             width: 176,
             height: 176,
             position: "relative",
+            display: "flex",
           }}
         >
           <div
@@ -118,9 +119,12 @@ export default async function Image() {
           <div
             style={{
               fontFamily: "NotoSansJP-Regular",
-              fontSize: 36,
-              lineHeight: 1.5,
+              fontSize: 28,
+              lineHeight: 1.6,
               color: "#E5E7EB",
+              marginTop: 10,
+              display: "flex",          // ★ 追加
+              alignItems: "baseline",
             }}
           >
             <span style={{ fontFamily: "NotoSansJP-Bold", color: "#C89F65" }}>探す</span>、
