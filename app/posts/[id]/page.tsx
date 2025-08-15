@@ -44,6 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     v: String(post.updatedAt?.getTime?.() ?? Date.now()),
   });
   const ogImage = `/api/og/post?${qs.toString()}`;
+
   return {
     title: post.title,
     description: post.summary,
@@ -62,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       images: [ogImage],
     },
   };
- }
+}
 
 // ページコンポーネントのPropsの型定義を修正
 export default async function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {

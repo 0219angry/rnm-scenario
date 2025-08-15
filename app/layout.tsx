@@ -13,7 +13,7 @@ const notoSansJp = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
- metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://example.com'),
+ metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://rnm-scenario.vercel.app'),
  title: {
    default: "調査手帖",
    template: "%s | 調査手帖",
