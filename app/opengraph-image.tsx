@@ -9,16 +9,16 @@ export const contentType = "image/png";
 const baseUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-const notoSansJpRegular = fetch(
-  `${baseUrl}/fonts/NotoSansJP-Regular.ttf`
+const notoSerifJpRegular = fetch(
+  `${baseUrl}/fonts/NotoSerifJP-Regular.ttf`
 ).then((r) => r.arrayBuffer());
 
-const notoSansJpBold = fetch(
-  `${baseUrl}/fonts/NotoSansJP-Bold.ttf`
+const notoSerifJpBold = fetch(
+  `${baseUrl}/fonts/NotoSerifJP-Bold.ttf`
 ).then((r) => r.arrayBuffer());
 
 export default async function Image() {
-  const [regular, bold] = await Promise.all([notoSansJpRegular, notoSansJpBold]);
+  const [regular, bold] = await Promise.all([notoSerifJpRegular, notoSerifJpBold]);
 
   return new ImageResponse(
     (

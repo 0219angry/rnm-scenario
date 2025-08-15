@@ -42,7 +42,7 @@ export async function Header() {
                 <text
                   x="0"
                   y="108"
-                  fontFamily="'Noto Sans JP','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif"
+                  fontFamily="'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif"
                   fontSize="72"
                   fill="currentColor"
                   fontWeight="700"
