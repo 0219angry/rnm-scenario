@@ -10,11 +10,11 @@ const baseUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 const notoSansJpRegular = fetch(
-  `${baseUrl}/fonts/NotoSansJP-Regular.woff2`
+  `${baseUrl}/fonts/NotoSansJP-Regular.ttf`
 ).then((r) => r.arrayBuffer());
 
 const notoSansJpBold = fetch(
-  `${baseUrl}/fonts/NotoSansJP-Bold.woff2`
+  `${baseUrl}/fonts/NotoSansJP-Bold.ttf`
 ).then((r) => r.arrayBuffer());
 
 export default async function Image() {
