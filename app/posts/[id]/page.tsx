@@ -28,8 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   });
   if (!post) return {};
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL;
-  const url = new URL(`/posts/${post.id}`, base);
+  const urlPath = `/posts/${post.id}`;
   const tags = (post.tags ?? []).map(t => t.name).slice(0, 6).join('／'); // 6つまで
   const date = post.createdAt?.toISOString?.().slice(0, 10) ?? '';       // YYYY-MM-DD
 
@@ -44,23 +43,23 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     accent: '#3b82f6',
     v: String(post.updatedAt?.getTime?.() ?? Date.now()),
   });
-  const ogImage = new URL(`/api/og/post?${qs.toString()}`, base);
+  const ogImage = `/api/og/post?${qs.toString()}`;
   return {
     title: post.title,
     description: post.summary,
     openGraph: {
       title: post.title,
       description: post.summary,
-      url: url.toString(),
+      url: urlPath,
       images: [
-        { url: ogImage.toString(), width: 1200, height: 630, type: 'image/png' },
+        { url: ogImage, width: 1200, height: 630, type: 'image/png' },
       ],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.summary,
-      images: [ogImage.toString()],
+      images: [ogImage],
     },
   };
  }
