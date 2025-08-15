@@ -23,17 +23,19 @@ export const metadata: Metadata = {
     icon: '/favicon.ico',
   },
  openGraph: {
-   type: 'website',
-   locale: 'ja_JP',
-   siteName: '調査手帖',
-   title: '調査手帖',
-   description: 'シナリオの保管・タグ付け、セッションのスケジュール共有、プレイ履歴の振り返りをスマートに。仲間と遊ぶ準備がもっと楽しくなる管理アプリ。',
- },
+    type: 'website',
+    locale: 'ja_JP',
+    siteName: '調査手帖',
+    title: '調査手帖',
+    description: 'シナリオの保管・タグ付け、セッションのスケジュール共有、プレイ履歴の振り返りをスマートに。仲間と遊ぶ準備がもっと楽しくなる管理アプリ。',
+    images: [{ url: `/opengraph-image?v=${Date.now()}`, width: 1200, height: 630 }],
+  },
  twitter: {
    card: 'summary_large_image',
    title: '調査手帖',
    description: 'シナリオの保管・タグ付け、セッションのスケジュール共有、プレイ履歴の振り返りをスマートに。仲間と遊ぶ準備がもっと楽しくなる管理アプリ。',
    creator: '@0219Angry',
+   images: [`/twitter-image?v=${Date.now()}`],
  },
 };
 
