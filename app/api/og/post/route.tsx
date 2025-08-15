@@ -10,7 +10,6 @@ export async function GET(req: NextRequest) {
 
   // 受け取り（未指定は空文字でフォールバック）
   const title  = searchParams.get("title")  ?? "";
-  const site   = searchParams.get("site")   ?? "";
   const desc   = searchParams.get("desc")   ?? "";
   const author = searchParams.get("author") ?? "";
   const tags   = searchParams.get("tags")   ?? "";

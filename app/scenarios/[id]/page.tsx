@@ -13,8 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const scenario = await fetchScenarioById(id);
   if (!scenario) return {};
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL;
-  const url = new URL(`/posts/${scenario.id}`, base);
+  const urlPath = `/scenarios/${scenario.id}`;
 
   // 説明文：内容があれば先頭を、なければ要点を短く整形
   const metaDesc =
@@ -27,25 +26,34 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     title: scenario.title,
     site: 'シナリオ管理アプリ',
     desc: metaDesc,
+    genre: scenario.genre ?? '',
+    players: (scenario.playerMin === scenario.playerMax
+      ? `${scenario.playerMin}`
+      : `${scenario.playerMin}〜${scenario.playerMax}`) + '人',
+    time: `${scenario.averageTime}分`,
+    gm: scenario.requiresGM ? 'GM必須' : 'GMレス',
+    rule: scenario.rulebook?.name ?? '',
+    price: (scenario.priceMin === scenario.priceMax
+      ? `${scenario.priceMin}`
+      : `${scenario.priceMin}〜${scenario.priceMax}`) + '円',
     accent: '#3b82f6',
-    v: String(scenario.updatedAt?.getTime?.() ?? Date.now()), // キャッシュ破り
+    v: String(scenario.updatedAt?.getTime?.() ?? Date.now()),
   });
-  const ogImage = new URL(`/api/og/post?${qs.toString()}`, base);
-
+  const ogImage = `/api/og/scenario?${qs.toString()}`;
   return {
     title: scenario.title,
     description: metaDesc,
     openGraph: {
       title: scenario.title,
       description: metaDesc,
-      url: url.toString(),
-      images: [{ url: ogImage.toString(), width: 1200, height: 630, type: 'image/png' }],
+      url: urlPath,
+      images: [{ url: ogImage, width: 1200, height: 630, type: 'image/png' }],
     },
     twitter: {
       card: 'summary_large_image',
       title: scenario.title,
       description: metaDesc,
-      images: [ogImage.toString()],
+      images: [ogImage],
     },
   };
 }
