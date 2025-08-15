@@ -6,7 +6,6 @@ import { ThemeProvider } from "@/components/features/theme/ThemeProvider";
 import { Toaster } from 'sonner';
 import { getCurrentUser } from "@/lib/auth";
 
-import { APP_VERSION } from "@/version";
 
 const notoSansJp = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
@@ -67,7 +66,7 @@ export default async function RootLayout({
             <footer className="bg-gray-200 dark:bg-gray-800 p-4 text-center">
               <p>© 2025 RNM</p>
               <span className="absolute right-4 bottom-2 text-xs text-gray-500 dark:text-gray-400">
-                v{APP_VERSION}
+                v{process.env.NEXT_PUBLIC_APP_VERSION || "開発版"}
               </span>
             </footer>
           </div>
