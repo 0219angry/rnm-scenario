@@ -1,18 +1,12 @@
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
-import { headers } from "next/headers";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
-  const h = await headers();
-  const proto = h.get("x-forwarded-proto") ?? "https";
-  const host = h.get("host") ?? "localhost:3000";
-  const origin = `${proto}://${host}`;
-
-  const { searchParams } = new URL(req.url);
+  const { searchParams, origin } = new URL(req.url);
 
   // 受け取り（未指定は空文字でフォールバック）
   const title  = searchParams.get("title")  ?? "";
@@ -25,8 +19,8 @@ export async function GET(req: NextRequest) {
 
   // フォントを public/fonts から実行時に取得
   const [serifRegular, serifBold] = await Promise.all([
-    fetch(`${origin}/fonts/NotoSerifJP-Regular.woff2`).then(r => r.arrayBuffer()),
-    fetch(`${origin}/fonts/NotoSerifJP-Bold.woff2`).then(r => r.arrayBuffer()),
+    fetch(`${origin}/fonts/NotoSerifJP-Regular.ttf`).then(r => r.arrayBuffer()),
+    fetch(`${origin}/fonts/NotoSerifJP-Bold.ttf`).then(r => r.arrayBuffer()),
   ]);
 
   try{
