@@ -56,59 +56,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <div className="flex flex-col min-h-screen">
-            <header className="flex items-center gap-4 p-4 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
-              <svg
-                width="180"
-                height="40"
-                viewBox="0 0 720 160"
-                xmlns="http://www.w3.org/2000/svg"
-                role="img"
-                aria-labelledby="t d"
-              >
-                <title id="t">調査手帖 ロゴ</title>
-                <desc id="d">ノート＋虫眼鏡のシンボルに、動詞強調サブタイトル（テーマ連動配色）</desc>
-
-                {/* アイコン（ベース＝currentColor／アクセント＝固定ゴールド） */}
-                <g transform="translate(0,16)">
-                  <rect x="12" y="12" width="88" height="104" rx="16" fill="currentColor" opacity="0.95" />
-                  <rect x="12" y="12" width="12" height="104" fill="currentColor" opacity="0.75" />
-                  <circle cx="92" cy="92" r="26" fill="none" stroke="#C89F65" strokeWidth="8" />
-                  <line x1="110" y1="110" x2="128" y2="128" stroke="#C89F65" strokeWidth="8" strokeLinecap="round" />
-                  <path d="M88 20 h18 v26 l-9 -7 -9 7 z" fill="#C89F65" />
-                </g>
-
-                {/* ロゴタイプ */}
-                <g transform="translate(168,0)">
-                  <text
-                    x="0"
-                    y="102"
-                    fontFamily="'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif"
-                    fontSize="64"
-                    fill="currentColor"
-                    fontWeight="600"
-                  >
-                    調査手帖
-                  </text>
-
-                  {/* サブタイトル：動詞をゴールド強調／本文はcurrentColor */}
-                  <text
-                    x="4"
-                    y="136"
-                    fontFamily="'Noto Sans JP','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif"
-                    fontSize="18"
-                    fill="currentColor"
-                    letterSpacing=".04em"
-                  >
-                    <tspan fontWeight="700" fill="#C89F65">探す</tspan>、
-                    <tspan fontWeight="700" fill="#C89F65">記す</tspan>、
-                    <tspan fontWeight="700" fill="#C89F65">遊ぶ</tspan>。
-                    すべてをひとつの手帖に。
-                  </text>
-                </g>
-              </svg>
-
-              <span className="sr-only">調査手帖</span>
-            </header>
+            <Header />
             <main className="flex-grow container mx-auto p-4">
               {children}
             </main>
