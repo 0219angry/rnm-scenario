@@ -1,3 +1,4 @@
+// app/api/og/scenario/route.ts
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 
@@ -8,21 +9,24 @@ export const revalidate = 0;
 export async function GET(req: NextRequest) {
   const { searchParams, origin } = new URL(req.url);
 
-  // 受け取り（未指定は空文字でフォールバック）
-  const title  = searchParams.get("title")  ?? "";
-  const desc   = searchParams.get("desc")   ?? "";
-  const author = searchParams.get("author") ?? "";
-  const tags   = searchParams.get("tags")   ?? "";
-  const date   = searchParams.get("date")   ?? "";
-  const accent = searchParams.get("accent") ?? "#3b82f6";
+  // 受け取り
+  const title   = searchParams.get("title")   ?? "";
+  const desc    = searchParams.get("desc")    ?? "";
+  const genre   = searchParams.get("genre")   ?? "";
+  const players = searchParams.get("players") ?? "";
+  const time    = searchParams.get("time")    ?? "";
+  const gm      = searchParams.get("gm")      ?? "";
+  const rule    = searchParams.get("rule")    ?? "";
+  const price   = searchParams.get("price")   ?? "";
+  const accent  = searchParams.get("accent")  ?? "#3b82f6";
 
-  // フォントを public/fonts から実行時に取得
+  // フォント
   const [serifRegular, serifBold] = await Promise.all([
     fetch(`${origin}/fonts/NotoSerifJP-Regular.ttf`).then(r => r.arrayBuffer()),
     fetch(`${origin}/fonts/NotoSerifJP-Bold.ttf`).then(r => r.arrayBuffer()),
   ]);
 
-  try{
+  try {
     return new ImageResponse(
       (
         <div style={{
@@ -43,10 +47,9 @@ export async function GET(req: NextRequest) {
             display: "flex",
             fontFamily: "NotoSerifJP-Bold",
             fontSize: 42,
-            opacity: 0.95,
             color: "#E5E7EB",
           }}>
-            {"調査手帖"}
+            調査手帖
           </div>
 
           {/* タイトル */}
@@ -61,7 +64,7 @@ export async function GET(req: NextRequest) {
           </div>
 
           {/* 要約 */}
-          {desc ? (
+          {desc && (
             <div style={{
               display: "flex",
               fontFamily: "NotoSerifJP-Regular",
@@ -72,9 +75,9 @@ export async function GET(req: NextRequest) {
             }}>
               {desc}
             </div>
-          ) : null}
+          )}
 
-          {/* メタ行（著者・日付・タグ） */}
+          {/* バッジエリア */}
           <div style={{
             display: "flex",
             gap: 16,
@@ -82,16 +85,15 @@ export async function GET(req: NextRequest) {
             alignItems: "center",
             marginTop: 8,
           }}>
-            {author ? <Badge label={`by ${author}`} color="sub" /> : null}
-            {date   ? <Badge label={date} color="sub" /> : null}
-            {tags
-              ? tags.split("／").slice(0, 6).map((t, i) => (
-                  <Badge key={i} label={t} accent={accent} />
-                ))
-              : null}
+            {genre   && <Badge label={genre} accent={accent} />}
+            {players && <Badge label={`人数: ${players}`} accent={accent} />}
+            {time    && <Badge label={`時間: ${time}`} accent={accent} />}
+            {gm      && <Badge label={gm} accent={accent} />}
+            {rule    && <Badge label={rule} color="sub" accent={accent} />}
+            {price   && <Badge label={`価格: ${price}`} color="sub" accent={accent} />}
           </div>
 
-          {/* フッター：ブランドライン */}
+          {/* ブランドライン */}
           <div style={{
             display: "flex",
             height: 6,
@@ -106,16 +108,15 @@ export async function GET(req: NextRequest) {
         width: 1200,
         height: 630,
         fonts: [
-          { name: "NotoSerifJP-Regular", data: serifRegular, weight: 400, style: "normal" },
-          { name: "NotoSerifJP-Bold", data: serifBold, weight: 700, style: "normal" },
+          { name: "NotoSerifJP-Regular", data: serifRegular, weight: 400 as const, style: "normal" },
+          { name: "NotoSerifJP-Bold", data: serifBold, weight: 700 as const, style: "normal" },
         ],
       }
     );
-    } catch (e) {
-    // フォールバック（絶対にPNGを返す）
+  } catch (e) {
     const msg = e instanceof Error ? e.message : "unknown";
     return new ImageResponse(
-      <div style={{ width: 1200, height: 630, display: "flex", padding: 60, background: "#111827", color: "#F9FAFB", fontSize: 32, lineHeight: 1.4 }}>
+      <div style={{ width: 1200, height: 630, display: "flex", padding: 60, background: "#111827", color: "#F9FAFB", fontSize: 32 }}>
         OGP fallback / {msg}
       </div>,
       { width: 1200, height: 630 }
@@ -123,7 +124,6 @@ export async function GET(req: NextRequest) {
   }
 }
 
-/** 小バッジ */
 function Badge({
   label,
   color = "primary",
@@ -153,10 +153,9 @@ function Badge({
   );
 }
 
-// #RRGGBB → rgba()
 function hexToRgba(hex: string, alpha = 1) {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!m) return `rgba(59,130,246,${alpha})`; // blue-500
+  if (!m) return `rgba(59,130,246,${alpha})`;
   const r = parseInt(m[1], 16);
   const g = parseInt(m[2], 16);
   const b = parseInt(m[3], 16);
