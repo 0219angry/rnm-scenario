@@ -20,18 +20,29 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const post = await prisma.post.findUnique({
     where: { id },
-    select: { title: true, summary: true, id: true, createdAt: true, updatedAt: true },
+    select: {
+      title: true, summary: true, id: true, createdAt: true, updatedAt: true,
+      author: { select: { name: true } },
+      tags:   { select: { name: true } },
+    },
   });
   if (!post) return {};
 
   const base = process.env.NEXT_PUBLIC_SITE_URL;
   const url = new URL(`/posts/${post.id}`, base);
+  const tags = (post.tags ?? []).map(t => t.name).slice(0, 6).join('／'); // 6つまで
+  const date = post.createdAt?.toISOString?.().slice(0, 10) ?? '';       // YYYY-MM-DD
+
   const qs = new URLSearchParams({
+    id: post.id,
     title: post.title,
     site: 'シナリオ管理アプリ',
     desc: post.summary ?? '',
-    accent: '#3b82f6', // 好きなブランド色にしてねっ
-    v: String(post.updatedAt?.getTime?.() ?? Date.now()), // キャッシュ破り
+    author: post.author?.name ?? '',
+    tags,
+    date,
+    accent: '#3b82f6',
+    v: String(post.updatedAt?.getTime?.() ?? Date.now()),
   });
   const ogImage = new URL(`/api/og/post?${qs.toString()}`, base);
   return {
