@@ -9,8 +9,10 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function Image() {
-  const h = headers();
-  const origin = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("host")}`;
+  const h = await headers();
+const proto = h.get("x-forwarded-proto") ?? "https";
+const host = h.get("host") ?? "localhost:3000";
+const origin = `${proto}://${host}`;
 
   // public/fonts から実行時に取得（ビルド時fetchを避ける）
   const [serifRegular, serifBold] = await Promise.all([
