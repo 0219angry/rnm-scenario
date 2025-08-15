@@ -45,19 +45,6 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   });
   const ogImage = `/api/og/post?${qs.toString()}`;
 
-  const debugQs = new URLSearchParams({
-    id: post.id,
-    title: post.title,
-    site: 'シナリオ管理アプリ',
-    desc: post.summary ?? '',
-    author: post.author?.name ?? '',
-    tags: (post.tags ?? []).map(t => t.name).slice(0, 6).join('／'),
-    date: post.createdAt?.toISOString?.().slice(0,10) ?? '',
-    accent: '#3b82f6',
-    v: String(post.updatedAt?.getTime?.() ?? Date.now()),
-  });
-  const debugOgUrl = `/api/og/post?${debugQs.toString()}`;
-
   return {
     title: post.title,
     description: post.summary,
