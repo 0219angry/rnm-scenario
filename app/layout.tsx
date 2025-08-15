@@ -63,7 +63,7 @@ export default async function RootLayout({
             <main className="flex-grow container mx-auto p-4">
               {children}
             </main>
-            <footer className="bg-gray-200 dark:bg-gray-800 p-4 text-center">
+            <footer className="relative bg-gray-200 dark:bg-gray-800 p-4 text-center">
               <p>© 2025 RNM</p>
               <span className="absolute right-4 bottom-2 text-xs text-gray-500 dark:text-gray-400">
                 v{process.env.NEXT_PUBLIC_APP_VERSION || "開発版"}
