@@ -40,9 +40,9 @@ const tsToMillis = (t?: TimerState['startedAt'] | null) => {
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const sessionId = params.id;
+  const sessionId = context.params.id;
 
   // 認証・権限チェック（GMのみ許可）
   const user = await getCurrentUser();
