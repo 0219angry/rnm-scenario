@@ -87,7 +87,7 @@ useEffect(() => {
     };
 
     fetchData();
-  }, [isOpen, channelId, currentUser]);
+  }, [isOpen, channelId, currentUser, sessionId]);
 
   // --- 2. リアルタイムリスナー設定 ---
   useEffect(() => {
