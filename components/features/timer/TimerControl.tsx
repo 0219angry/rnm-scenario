@@ -39,7 +39,7 @@ function fmt(ms: number) {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
-// 直前に Action 型を定義
+/** APIに渡すアクション型 */
 type TimerAction =
   | { type: 'start'; title?: string }
   | { type: 'pause' }
@@ -47,7 +47,7 @@ type TimerAction =
   | { type: 'add'; seconds: number }
   | { type: 'config'; title: string; phases: Phase[] };
 
-// 修正後
+/** API呼び出し（詳細エラーを拾う） */
 async function postAction(sessionId: string, body: TimerAction) {
   const res = await fetch(`/api/sessions/${sessionId}/timer`, {
     method: 'POST',
@@ -55,7 +55,16 @@ async function postAction(sessionId: string, body: TimerAction) {
     credentials: 'include',
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) {
+    let detail = '';
+    try {
+      const j = await res.json();
+      detail = j?.error || JSON.stringify(j);
+    } catch {
+      detail = await res.text();
+    }
+    throw new Error(`HTTP ${res.status}: ${detail}`);
+  }
 }
 
 export function TimerControl({ sessionId }: { sessionId: string }) {
@@ -75,7 +84,7 @@ export function TimerControl({ sessionId }: { sessionId: string }) {
       const st: TimerState | null = d ?? null;
       setRemote(st);
 
-      // 初回 or リモート更新をフォームへ反映（編集中の上書きは軽め）
+      // 初期同期（編集中は極力上書きしない）
       if (st) {
         setTitle((t) => (t === '' ? (st.title ?? 'セッション') : t));
         setPhases((ps) =>
@@ -128,37 +137,84 @@ export function TimerControl({ sessionId }: { sessionId: string }) {
     [phases]
   );
 
+  // --- 操作ヘルパ ---
+  const toSecondsSafe = (v: unknown) => {
+    const n = typeof v === 'number' ? v : Number(v);
+    return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+  };
+
   // --- 操作 ---
 
   const saveConfig = async () => {
     setSaving(true); setMsg(null);
     try {
-      // note はそのまま、seconds は0未満防止
-      const clean = phases.map(p => ({ name: p.name || 'Phase', seconds: Math.max(0, Math.floor(p.seconds)), note: p.note?.trim() || undefined }));
-      await postAction(sessionId, { type: 'config', title: title || 'セッション', phases: clean });
+      const clean = phases.map(p => ({
+        name: (p.name || 'Phase').trim(),
+        seconds: toSecondsSafe(p.seconds),
+        note: p.note?.trim() || undefined
+      }));
+      if (clean.length === 0) {
+        setMsg('フェーズがありません。最低1つ追加してください。');
+        return;
+      }
+      await postAction(sessionId, { type: 'config', title: (title || 'セッション').trim(), phases: clean });
       setMsg('保存しました！');
-    } catch {
-      setMsg('保存に失敗しちゃいました…もう一度試してほしいです…');
+    } catch (err) {
+      console.error(err);
+      setMsg(`保存に失敗しちゃいました… ${err instanceof Error ? err.message : ''}`);
     } finally {
       setSaving(false);
       setTimeout(() => setMsg(null), 2500);
     }
   };
 
-  const start = async () => { try { await postAction(sessionId, { type: 'start', title }); } catch {} };
-  const pause = async () => { try { await postAction(sessionId, { type: 'pause' }); } catch {} };
-  const reset = async () => { try { await postAction(sessionId, { type: 'reset' }); } catch {} };
+  const start = async () => {
+    try {
+      await postAction(sessionId, { type: 'start', title });
+    } catch (err) {
+      console.error(err);
+      setMsg('開始操作に失敗しました');
+    }
+  };
+  const pause = async () => {
+    try {
+      await postAction(sessionId, { type: 'pause' });
+    } catch (err) {
+      console.error(err);
+      setMsg('一時停止操作に失敗しました');
+    }
+  };
+  const reset = async () => {
+    try {
+      await postAction(sessionId, { type: 'reset' });
+    } catch (err) {
+      console.error(err);
+      setMsg('リセット操作に失敗しました');
+    }
+  };
 
-  // 現在フェーズに+5分（ローカルを更新→保存）
+  // 現在フェーズに+5分（ローカルもAPIも同時に反映）
   const add5ToCurrentPhase = async () => {
     if (!progress) return;
     const idx = progress.index;
-    setPhases((ps) => {
-      const next = [...ps];
-      if (next[idx]) next[idx] = { ...next[idx], seconds: (next[idx].seconds ?? 0) + 300 };
-      return next;
-    });
-    await saveConfig();
+    const nextPhases = phases.map((p, i) =>
+      i === idx ? { ...p, seconds: (p.seconds ?? 0) + 300 } : p
+    );
+    setPhases(nextPhases);
+
+    try {
+      const clean = nextPhases.map(p => ({
+        name: (p.name || 'Phase').trim(),
+        seconds: toSecondsSafe(p.seconds),
+        note: p.note?.trim() || undefined
+      }));
+      await postAction(sessionId, { type: 'config', title: (title || 'セッション').trim(), phases: clean });
+      setMsg('現在フェーズに+5分しました！');
+      setTimeout(() => setMsg(null), 2000);
+    } catch (err) {
+      console.error(err);
+      setMsg('＋5分の反映に失敗しました');
+    }
   };
 
   // フェーズ編集
