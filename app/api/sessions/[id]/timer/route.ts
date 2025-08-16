@@ -117,11 +117,14 @@ export async function POST(
     case 'config': {
       next.title = body.title?.trim() || 'セッション';
       next.phases = Array.isArray(body.phases)
-        ? body.phases.map((p) => ({
-            name: (p.name || 'Phase').trim(),
-            seconds: Math.max(0, Math.floor(Number(p.seconds) || 0)),
-            note: p.note?.trim() || undefined,
-          }))
+        ? body.phases.map((p) => {
+            const name = (p.name || 'Phase').trim();
+            const seconds = Math.max(0, Math.floor(Number(p.seconds) || 0));
+            const note = p.note?.trim();
+            return note
+              ? { name, seconds, note }         // noteがあるときだけ含める
+              : { name, seconds };              // ないときはキー自体を持たせない
+          })
         : [];
       next.durationSec = totalSeconds(next.phases, next.durationSec);
       break;
