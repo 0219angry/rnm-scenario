@@ -55,13 +55,15 @@ async function postAction(sessionId: string, body: TimerAction) {
     credentials: 'include',
     body: JSON.stringify(body),
   });
+
   if (!res.ok) {
-    let detail = '';
+    const raw = await res.text(); // ← 一度だけ読む
+    let detail = raw;
     try {
-      const j = await res.json();
-      detail = j?.error || JSON.stringify(j);
+      const j = JSON.parse(raw);
+      detail = (j && (j.error ?? j.message)) || raw;
     } catch {
-      detail = await res.text();
+      /* 生テキストのままでOK */
     }
     throw new Error(`HTTP ${res.status}: ${detail}`);
   }
