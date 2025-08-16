@@ -1,11 +1,11 @@
 // app/sessions/[id]/timer/page.tsx
 'use client';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useParams } from 'next/navigation';
 import { TimerView } from '@/components/features/timer/TimerView';
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+export default function Page() {
   const sp = useSearchParams();
-  const { id } = await params;
+  const { id } = useParams<{ id: string }>();
 
   return (
     <TimerView
