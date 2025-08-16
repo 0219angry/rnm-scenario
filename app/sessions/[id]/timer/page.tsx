@@ -3,11 +3,13 @@
 import { useSearchParams } from 'next/navigation';
 import { TimerView } from '@/components/features/timer/TimerView';
 
-export default function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const sp = useSearchParams();
+  const { id } = await params;
+
   return (
     <TimerView
-      sessionId={params.id}
+      sessionId={id}
       theme={(sp.get('theme') as 'dark' | 'light') ?? 'dark'}
       fontScale={Number(sp.get('fontScale') ?? '1')}
       hideTitle={sp.get('showTitle') === '0'}
