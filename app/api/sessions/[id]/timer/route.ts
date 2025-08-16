@@ -1,10 +1,11 @@
-// 追加 or 置換
+// app/api/sessions/[id]/timer/route.ts
 export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { adminDb } from '@/lib/firebaseAdmin';
+import { Timestamp } from 'firebase/firestore';
 
 type Phase = { name: string; seconds: number; note?: string };
 type TimerAction =
@@ -14,7 +15,33 @@ type TimerAction =
   | { type: 'add'; seconds: number }
   | { type: 'config'; title: string; phases: Phase[] };
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+type AgendaItem = { label: string; at: string };
+
+type TimerState = {
+  status: 'idle' | 'running' | 'paused';
+  durationSec: number; // phasesがあれば無視
+  startedAt?: Timestamp | { seconds: number; nanoseconds: number } | null;
+  elapsedMs: number;
+  title?: string;
+  agenda?: AgendaItem[];
+  phases?: Phase[];
+  showPhaseStrip?: boolean;
+};
+
+// Firestore Timestamp or PlainObject → ミリ秒変換
+const tsToMillis = (t?: TimerState['startedAt'] | null) => {
+  if (!t) return undefined;
+  if (t instanceof Timestamp) return t.toMillis();
+  if ('seconds' in t && typeof t.seconds === 'number') {
+    return t.seconds * 1000;
+  }
+  return undefined;
+};
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const sessionId = params.id;
 
   // 認証・権限チェック（GMのみ許可）
@@ -34,8 +61,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const snap = await ref.get();
 
   const now = Date.now();
-  const cur = snap.exists
-    ? snap.data()!
+  const cur: TimerState = snap.exists
+    ? (snap.data() as TimerState) // Firestore の型をキャスト
     : {
         status: 'idle',
         durationSec: 3600,
@@ -46,15 +73,17 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         phases: [{ name: 'Phase 1', seconds: 300 }],
       };
 
-  const calcElapsed = (d: any) =>
-    d.status === 'running' && d.startedAt?.seconds
-      ? (d.elapsedMs ?? 0) + (now - d.startedAt.seconds * 1000)
+  const calcElapsed = (d: TimerState) => {
+    const start = tsToMillis(d.startedAt);
+    return d.status === 'running' && start
+      ? (d.elapsedMs ?? 0) + (now - start)
       : d.elapsedMs ?? 0;
+  };
 
   const totalSeconds = (phases?: Phase[], durationSec?: number) =>
     phases?.length ? phases.reduce((s, p) => s + (p.seconds || 0), 0) : durationSec ?? 0;
 
-  let next = { ...cur };
+  const next: TimerState = { ...cur };
 
   switch (body.type) {
     case 'start': {
@@ -79,8 +108,10 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       break;
     }
     case 'add': {
-      // phases を使っている場合は現在フェーズへ加算する運用にしたければ拡張してね
-      next.durationSec = Math.max(0, (next.durationSec ?? 0) + (body.seconds || 0));
+      next.durationSec = Math.max(
+        0,
+        (next.durationSec ?? 0) + (body.seconds || 0)
+      );
       break;
     }
     case 'config': {
@@ -92,7 +123,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
             note: p.note?.trim() || undefined,
           }))
         : [];
-      // durationSec は UI 側では表示に使わないが、保守のため整合を維持
       next.durationSec = totalSeconds(next.phases, next.durationSec);
       break;
     }
