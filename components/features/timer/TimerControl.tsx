@@ -39,7 +39,16 @@ function fmt(ms: number) {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
-async function postAction(sessionId: string, body: any) {
+// 直前に Action 型を定義
+type TimerAction =
+  | { type: 'start'; title?: string }
+  | { type: 'pause' }
+  | { type: 'reset' }
+  | { type: 'add'; seconds: number }
+  | { type: 'config'; title: string; phases: Phase[] };
+
+// 修正後
+async function postAction(sessionId: string, body: TimerAction) {
   const res = await fetch(`/api/sessions/${sessionId}/timer`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -128,7 +137,7 @@ export function TimerControl({ sessionId }: { sessionId: string }) {
       const clean = phases.map(p => ({ name: p.name || 'Phase', seconds: Math.max(0, Math.floor(p.seconds)), note: p.note?.trim() || undefined }));
       await postAction(sessionId, { type: 'config', title: title || 'セッション', phases: clean });
       setMsg('保存しました！');
-    } catch (e) {
+    } catch {
       setMsg('保存に失敗しちゃいました…もう一度試してほしいです…');
     } finally {
       setSaving(false);
